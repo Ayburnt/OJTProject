@@ -201,6 +201,14 @@ AWS_SES_AUTO_THROTTLE_ENABLED = os.getenv('AWS_SES_AUTO_THROTTLE_ENABLED', defau
 # Set the default 'from' email address for all emails sent by Django
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', default="noreply@yourdomain.com")
 
+# In your settings.py
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake', # Can be any unique string
+    }
+}
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 

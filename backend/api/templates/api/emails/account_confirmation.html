@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Sari-Sari Events!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            width: 100% !important;
+        }
+        table {
+            border-collapse: collapse;
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+        td {
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .header {
+            background-color: #ffffff; /* Same as OTP email for consistency */
+            padding: 30px 20px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 10px 0 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #007bff; /* Blue text for consistency */
+        }
+        .header img {
+            display: block;
+            margin: 0 auto;
+            max-width: 150px;
+            height: auto;
+            padding-bottom: 10px;
+        }
+        .content {
+            padding: 30px;
+            text-align: center;
+            color: #333333;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            background-color: #1a73e8; /* Secondary color for button */
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            padding: 12px 25px;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 20px;
+        }
+        .footer {
+            background-color: #f0f0f0;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #888888;
+            border-top: 1px solid #eeeeee;
+        }
+        .footer a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        /* Responsive styles */
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                margin: 0 auto;
+                border-radius: 0;
+            }
+            .content {
+                padding: 20px;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4;">
+        <tr>
+            <td align="center" valign="top">
+                <table class="container" width="100%" border="0" cellspacing="0" cellpadding="0">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header">
+                            <img src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909" alt="Sari-Sari Events Logo" width="150" height="auto" style="display: block; margin: 0 auto; max-width: 150px; height: auto;">
+                            <h1>Sari-Sari Events</h1>
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td class="content">
+                            <p>Hi {{ first_name }},</p>
+                            <p>Your account with Sari-Sari Events has been successfully created! We're excited to have you on board.</p>
+                            <p>You can now log in and start exploring all the features.</p>
+                            <a href="https://www.sarisarievents.com/login" class="button">Go to Login</a>
+                            <p style="margin-top: 30px;">If you have any questions, feel free to contact our support team.</p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p>&copy; 2024 Sari-Sari Events. All rights reserved.</p>
+                            <p><a href="mailto:support@sarisarievents.com">Contact Support</a> | <a href="https://www.sarisarievents.com/privacy">Privacy Policy</a></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

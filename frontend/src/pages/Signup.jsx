@@ -73,14 +73,19 @@ function Signup({ onAuthSuccess }) {
     const [isAttendee, setIsAttendee] = useState(false);
     const [selectedRole, setSelectedRole] = useState("guest");
 
-    const [firstN, setFirstN] = useState("");
-    const [lastN, setLastN] = useState("");
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
     const [phoneNo, setPhoneNo] = useState("");
-    const [selectedDate, setSelectedDate] = useState("");
+    const [birthday, setBirthday] = useState("");
     const [gender, setGender] = useState("");
     const [agree, setAgree] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
+
+    // New state for email specific error
+    const [emailError, setEmailError] = useState(""); 
+    // New state for OTP verification loading
+    const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
     const handleFinalSubmit = async (e) => {
         e.preventDefault();
@@ -94,14 +99,14 @@ function Signup({ onAuthSuccess }) {
 
         try {
             const backendResponse = await api.post('/auth/register/', {
-                firstName: firstN,
-                lastName: lastN,
+                first_name: firstname,
+                last_name: lastname,
                 email: email,
                 password: password,
                 role: selectedRole, // Use selectedRole for manual signup
                 confirm_password: confirmPassword,
                 phone_number: phoneNo,
-                birthday: selectedDate,
+                birthday: birthday,
                 gender: gender, // Assuming your backend accepts gender
             });
 
@@ -240,19 +245,86 @@ function Signup({ onAuthSuccess }) {
 
     const handleEmailPass = async(e) => {
         e.preventDefault();
-        if(isMatch === false){
-            return;
-        }
+        // Clear previous errors
+        setStep2Err("");
+        setEmailError("");
+
         if (!email || !password || !confirmPassword) {
             setStep2Err("Please fill in all fields.");
             return;
-        } else {
-            setStep2Err("");
-            setStep(3);
-            
-            // axios for sending otp
         }
-    }
+        if (!isMatch) {
+            return; // Passwords don't match, error already displayed
+        }
+
+        setIsLoading(true);
+        setMessage("Checking email and sending verification code...");
+
+        try {
+            // Step 1: Check if email exists
+            const emailCheckResponse = await api.post('/auth/check-email/', { email });
+            if (emailCheckResponse.data.exists) {
+                setEmailError("This email is already registered. Please use a different email or sign in.");
+                setIsLoading(false);
+                return;
+            }
+
+            // Step 2: Send OTP if email is unique
+            const otpSendResponse = await api.post('/auth/send-otp/', { email });
+            if (otpSendResponse.status === 200) {
+                setMessage("Verification code sent to your email.");
+                setStep(3); // Proceed to OTP verification step
+            } else {
+                setMessage(otpSendResponse.data.detail || "Failed to send verification code. Please try again.");
+            }
+        } catch (error) {
+            console.error('Error during email check or OTP send:', error);
+            const data = error.response?.data;
+            if (data) {
+                if (data.email) setEmailError(data.email[0]);
+                else setMessage(data.detail || 'An error occurred. Please try again.');
+            } else {
+                setMessage('An unexpected error occurred. Please try again.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const [otpError, setOtpError] = useState(false);
+    const [otpErrMsg, setOtpErrMsg] = useState("");
+    const handleOtpVerification = async (e) => {
+        e.preventDefault();
+        const enteredOtp = otp.join('');
+        if (enteredOtp.length !== 6) {
+            setMessage("Please enter the complete 6-digit code.");
+            return;
+        }
+
+        setIsVerifyingOtp(true);
+        setMessage("Verifying code...");
+
+        try {
+            const response = await api.post('/auth/verify-otp/', { email, otp: enteredOtp });
+            if (response.status === 200) {
+                setMessage("Email verified successfully!");
+                setStep(4); // Proceed to fill up information
+                setOtpError(false);
+                setOtpErrMsg("");
+            } else {
+                setOtpError(true);
+                setOtpErrMsg(response.data.detail || "Invalid or expired verification code.");
+            }
+        } catch (error) {
+            console.error("Error verifying OTP:", error);
+            const data = error.response?.data;
+            setOtpError(true);
+            setOtpErrMsg(data?.detail || "Failed to verify code. Please try again.");
+        } finally {
+            setIsVerifyingOtp(false);            
+        }
+    };
+
 
     return (
         <div className="flex items-start justify-center h-screen bg-primary">
@@ -268,7 +340,7 @@ function Signup({ onAuthSuccess }) {
 
                         <div className="flex flex-col items-center justify-center gap-8 w-full transition-colors duration-500">
                             <div className={`w-[80%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                  ${isOrganizer && `bg-secondary`}`}
+                    ${isOrganizer && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(true);
                                     setIsAttendee(false);
@@ -279,7 +351,7 @@ function Signup({ onAuthSuccess }) {
                             </div>
 
                             <div className={`w-[80%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                  ${isAttendee && `bg-secondary`}`}
+                    ${isAttendee && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(false);
                                     setIsAttendee(true);
@@ -319,8 +391,9 @@ function Signup({ onAuthSuccess }) {
                             <label htmlFor="email" className="block mb-2 font-outfit text-sm pl-1 font-medium">E-mail</label>
                             <input
                                 type="email" id="email" name="email"
-                                className="w-full px-4 py-2 border border-grey rounded outline-none focus:ring-2 focus:ring-secondary"
+                                className={`w-full px-4 py-2 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
                                 value={email} onChange={(e) => setEmail(e.target.value)} required />
+                            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
                         </div>
 
                         <div className="mb-4 w-80">
@@ -342,7 +415,11 @@ function Signup({ onAuthSuccess }) {
 
                         <button
                             className="w-80 bg-secondary text-white py-2 font-outfit rounded-lg transition"
-                            onClick={handleEmailPass}>{isLoading ? 'Sign up' : 'Sign up'}</button>
+                            onClick={handleEmailPass}
+                            disabled={isLoading} // Disable button while loading
+                        >
+                            {isLoading ? 'Processing...' : 'Sign up'}
+                        </button>
 
                         <div className="flex items-center justify-center mt-7 w-full max-w-xs">
                             <div className="flex-grow border-t border-gray-300"></div>
@@ -357,6 +434,7 @@ function Signup({ onAuthSuccess }) {
 
                         <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
+                        {step2Err && <p className="text-center text-sm mt-4 text-red-500">{step2Err}</p>}
                     </>
                 )}
 
@@ -367,16 +445,18 @@ function Signup({ onAuthSuccess }) {
                         <div className="flex flex-col justify-between h-screen px-4 py-4 bg-primary">
 
                             <div className="text-center mt-5">
-                                <h2 className="text-3xl font-out fitfont-bold"> E-mail <br /> Verification </h2>
+                                <h2 className="text-3xl font-outfit font-bold"> E-mail <br /> Verification </h2>
                                 <div className="flex justify-center mt-6">
                                     <HiMail className="text-9xl text-secondary " />
                                 </div>
                                 <p className="text-base p-2 font-bold font-outfit text-left mt-10"> Please enter your verification code </p>
                                 <p className="text-base p-1 font-outfit text-left "> We have sent a verification to your registered email ID. </p>
 
+                                {otpError === true && <p className="font-outfit text-center text-lg mt-4 text-red-500 font-bold">{otpErrMsg}</p>}
+
                                 {/* Bottom Section: OTP Input Box */}
                                 <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm mx-auto text-center">
-                                    <div className="flex justify-center gap-2 mb-2" onPaste={handlePaste}>
+                                    <div className={"flex justify-center gap-2 mb-2"} onPaste={handlePaste}>
                                         {otp.map((digit, index) => (
                                             <input
                                                 key={index}
@@ -386,7 +466,7 @@ function Signup({ onAuthSuccess }) {
                                                 ref={(el) => (inputsRef.current[index] = el)}
                                                 onChange={(e) => handleChange(e, index)}
                                                 onKeyDown={(e) => handleKeyDown(e, index)}
-                                                className="w-10 h-12 text-center text-xl border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg bg-gray-100"
+                                                className={`w-10 h-12 text-center text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg bg-gray-100 ${otpError ? `border-3 border-red-300` : `border-1 border-gray-300`}`}
                                             />
                                         ))}
                                     </div>
@@ -395,10 +475,12 @@ function Signup({ onAuthSuccess }) {
                                 </div>
 
                                 <button
-                                    type="button" onClick={() => setStep(4)}
-                                    className="w-full bg-teal-600 text-white py-4 rounded-lg hover:bg-teal-700 font-outfit transition shadow-lg">
-                                    Done
-                                </button>
+                                    type="button" onClick={handleOtpVerification}
+                                    className="w-full bg-teal-600 text-white py-4 rounded-lg hover:bg-teal-700 font-outfit transition shadow-lg"
+                                    disabled={isVerifyingOtp}
+                                >
+                                    {isVerifyingOtp ? 'Verifying...' : 'Done'}
+                                </button>                                
                             </div>
                         </div>
                     </div>
@@ -417,38 +499,38 @@ function Signup({ onAuthSuccess }) {
                         <div className="mb-4 w-80">
                             <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
                             <input
-                                type="text" id="firstN"
+                                type="text" id="firstname" name="firstname"
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={firstN} onChange={(e) => setFirstN(e.target.value)} required />
+                                value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
                         </div>
 
                         <div className="mb-4 w-80">
                             <label htmlFor="lastN" className="block mb-2pl-1 text-sm font-medium font-outfit">Last Name</label>
                             <input
-                                type="text" id="lastN"
+                                type="text" id="lastname" name="lastname"
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={lastN} onChange={(e) => setLastN(e.target.value)} required />
+                                value={lastname} onChange={(e) => setLastname(e.target.value)} required />
                         </div>
 
                         <div className="mb-4 w-80">
                             <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
                             <input
-                                type="text" id="phoneNo"
+                                type="text" id="phoneNo" name="phoneNo"
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
                         </div>
 
                         <div className="mb-4 w-80">
                             <label htmlFor="date" className="block pl-1 mb-2 text-sm font-medium font-outfit">Date of Birth</label>
-                            <input type="date" id="date"
+                            <input type="date" id="birthday" name="birthday"
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} required />
+                                value={birthday} onChange={(e) => setBirthday(e.target.value)} required />
                         </div>
 
                         <div className="mb-4 w-80">
                             <label htmlFor="gender" className="block mb-2 pl-1 text-sm font-medium font-outfit">Gender</label>
                             <select
-                                id="gender"
+                                id="gender" name="gender"
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={gender} onChange={(e) => setGender(e.target.value)} required
                             >

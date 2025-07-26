@@ -9,6 +9,7 @@ from django.conf import settings # To access GOOGLE_CLIENT_ID from settings
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration with email, password, and role.
@@ -78,7 +79,7 @@ class UserLoginSerializer(serializers.Serializer):
         data['user'] = user # Store the authenticated user in validated_data
         return data
 
-# --- NEW: Base Serializer for Google Token Verification ---
+# --- Base Serializer for Google Token Verification ---
 class BaseGoogleAuthSerializer(serializers.Serializer):
     """
     Base serializer to handle Google ID token verification.
@@ -118,7 +119,7 @@ class BaseGoogleAuthSerializer(serializers.Serializer):
     def get_user_info(self):
         return self.google_user_info
 
-# --- NEW: Google Login Serializer (no 'role' field) ---
+# --- Google Login Serializer (no 'role' field) ---
 class GoogleLoginSerializer(BaseGoogleAuthSerializer):
     """
     Serializer for Google login.
@@ -126,7 +127,7 @@ class GoogleLoginSerializer(BaseGoogleAuthSerializer):
     """
     pass # Inherits 'token' and 'validate' from BaseGoogleAuthSerializer
 
-# --- NEW: Google Registration Serializer (with 'role' field) ---
+# --- Google Registration Serializer (with 'role' field) ---
 class GoogleRegisterSerializer(BaseGoogleAuthSerializer):
     """
     Serializer for Google registration.
@@ -143,3 +144,23 @@ class GoogleRegisterSerializer(BaseGoogleAuthSerializer):
         data = super().validate(data)
         # Add any additional validation specific to Google registration here
         return data
+
+# --- NEW: Serializers for Email Check and OTP ---
+class EmailCheckSerializer(serializers.Serializer):
+    """
+    Serializer for checking if an email exists.
+    """
+    email = serializers.EmailField()
+
+class OTPSendSerializer(serializers.Serializer):
+    """
+    Serializer for sending OTP to an email.
+    """
+    email = serializers.EmailField()
+
+class OTPVerifySerializer(serializers.Serializer):
+    """
+    Serializer for verifying OTP.
+    """
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=6, min_length=6) # Ensure 6 digits

@@ -5,10 +5,9 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import (
-    UserRegistrationView,
-    UserLoginView,
-    GoogleAuthRegisterView,
-    GoogleAuthLoginView,
+    UserRegistrationView, UserLoginView,
+    GoogleAuthRegisterView, GoogleAuthLoginView,
+    CheckEmailExistsView, SendOTPView, VerifyOTPView
 )
 
 urlpatterns = [
@@ -22,4 +21,9 @@ urlpatterns = [
     # Google OAuth authentication
     path('auth/google/register/', GoogleAuthRegisterView.as_view(), name='google_register'),
     path('auth/google/login/', GoogleAuthLoginView.as_view(), name='google_login'),
+
+
+    path('auth/check-email/', CheckEmailExistsView.as_view(), name='check_email_exists'),
+    path('auth/send-otp/', SendOTPView.as_view(), name='send_otp'),
+    path('auth/verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
 ]
