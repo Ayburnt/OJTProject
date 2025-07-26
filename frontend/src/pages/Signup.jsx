@@ -176,7 +176,7 @@ function Signup({ onAuthSuccess }) {
             if (googleButtonContainer) {
                 window.google.accounts.id.renderButton(
                     googleButtonContainer,
-                    { theme: 'outline', size: 'large', text: 'signup_with', width: '360' } // Customize button
+                    { theme: 'outline', size: 'large', text: 'signup_with', width: '360' }
                 );
                 googleGsiInitialized.current = true; // Mark GSI as initialized
             } else {
@@ -220,6 +220,7 @@ function Signup({ onAuthSuccess }) {
 
     const [isMatch, setIsMatch] = useState(true);
     const [passwordErr, setPasswordErr] = useState("");
+    const [step2Err, setStep2Err] = useState("");
 
     useEffect(() => {
         if (password === '' && confirmPassword === '') {
@@ -236,6 +237,22 @@ function Signup({ onAuthSuccess }) {
             setIsMatch(true);
         }
     }, [password, confirmPassword]);
+
+    const handleEmailPass = async(e) => {
+        e.preventDefault();
+        if(isMatch === false){
+            return;
+        }
+        if (!email || !password || !confirmPassword) {
+            setStep2Err("Please fill in all fields.");
+            return;
+        } else {
+            setStep2Err("");
+            setStep(3);
+            
+            // axios for sending otp
+        }
+    }
 
     return (
         <div className="flex items-start justify-center h-screen bg-primary">
@@ -325,7 +342,7 @@ function Signup({ onAuthSuccess }) {
 
                         <button
                             className="w-80 bg-secondary text-white py-2 font-outfit rounded-lg transition"
-                            onClick={() => setStep(3)}>{isLoading ? 'Sign up' : 'Sign up'}</button>
+                            onClick={handleEmailPass}>{isLoading ? 'Sign up' : 'Sign up'}</button>
 
                         <div className="flex items-center justify-center mt-7 w-full max-w-xs">
                             <div className="flex-grow border-t border-gray-300"></div>

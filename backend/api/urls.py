@@ -13,13 +13,13 @@ from .views import (
 
 urlpatterns = [
     # Standard email/password authentication
-    path('register/', UserRegistrationView.as_view(), name='register'),
-    path('login/', UserLoginView.as_view(), name='login'),
+    path('auth/register/', UserRegistrationView.as_view(), name='register'),
+    path('auth/login/', UserLoginView.as_view(), name='login'),
 
     # JWT token refresh endpoint (useful for keeping users logged in)
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # Google OAuth authentication
-    path('google/register/', GoogleAuthRegisterView.as_view(), name='google_register'),
-    path('google/login/', GoogleAuthLoginView.as_view(), name='google_login'),
+    path('auth/google/register/', GoogleAuthRegisterView.as_view(), name='google_register'),
+    path('auth/google/login/', GoogleAuthLoginView.as_view(), name='google_login'),
 ]

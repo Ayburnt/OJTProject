@@ -129,7 +129,7 @@ function Login({ onAuthSuccess }) {
             value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
 
-        {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
+        {message && <p className="text-center text-sm text-gray-600">{message}</p>}
         <button type="submit" className="w-72 bg-secondary text-white py-2 rounded hover:bg-blue-600 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
         <p className="text-center py-4"> or </p>
         <div id="google-sign-in-button" className="flex justify-center"></div>

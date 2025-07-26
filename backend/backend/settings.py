@@ -187,6 +187,20 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.CustomUser'
 
+# --- AWS SES Email Settings ---
+EMAIL_BACKEND = 'django_ses.SESBackend'
+
+# Load SES credentials and region from environment variables using env()
+AWS_SES_ACCESS_KEY_ID = os.getenv('AWS_SES_ACCESS_KEY_ID')
+AWS_SES_SECRET_ACCESS_KEY = os.getenv('AWS_SES_SECRET_ACCESS_KEY')
+AWS_SES_REGION_NAME = os.getenv('AWS_SES_REGION_NAME', default='us-east-1')
+
+# Optional: Enable auto-throttling based on SES sending limits (recommended for production)
+AWS_SES_AUTO_THROTTLE_ENABLED = os.getenv('AWS_SES_AUTO_THROTTLE_ENABLED', default=True)
+
+# Set the default 'from' email address for all emails sent by Django
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', default="noreply@yourdomain.com")
+
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 
