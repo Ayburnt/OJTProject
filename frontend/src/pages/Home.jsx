@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import api, { ACCESS_TOKEN } from '../api.js';
 
 function Home() {
+  useEffect(() => {
+          document.title = "Sari-Sari Events";
+      }, [])
+
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [userEmail, setUserEmail] = useState('');

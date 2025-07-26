@@ -4,6 +4,10 @@ import api, { ACCESS_TOKEN } from '../api.js';
 import useLogout from '../components/Logout.jsx';
 
 function ClientDashboard() {
+    useEffect(() => {
+        document.title = "Sari-Sari Events";
+    }, [])
+
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userRole, setUserRole] = useState('');
     const [userEmail, setUserEmail] = useState('');
@@ -18,7 +22,7 @@ function ClientDashboard() {
         const email = localStorage.getItem('userEmail');
 
         if (accessToken && refreshToken && role && email) {
-            if(role === 'guest') {
+            if (role === 'guest') {
                 navigate('/');
                 return;
             }
@@ -29,7 +33,7 @@ function ClientDashboard() {
             navigate('/login');
         }
     }, [navigate]);
-   
+
     if (!isLoggedIn) {
         return <p>Loading or redirecting...</p>;
     }

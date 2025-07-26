@@ -4,6 +4,9 @@ import api, { ACCESS_TOKEN } from "../api.js";
 
 
 function Login({ onAuthSuccess }) {
+  useEffect(() => {
+    document.title = "Login | Sari-Sari Events";
+  }, [])
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -11,23 +14,23 @@ function Login({ onAuthSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const defaultHandleAuthSuccess = (userData, tokens) => {
-            localStorage.setItem(ACCESS_TOKEN, tokens.access);
-            localStorage.setItem('refreshToken', tokens.refresh);
-            localStorage.setItem('userRole', userData.role);
-            localStorage.setItem('userEmail', userData.email);
-            
-            // Conditional redirection based on user role
-            if (userData.role === 'client') {
-                navigate("/client-dashboard");
-            } else if (userData.role === 'guest') {
-                navigate("/"); // Assuming Home.jsx is at the root path '/'
-            } else {
-                navigate("/dashboard"); // Fallback for other roles or if role is not 'client' or 'guest'
-            }
-      };
-  
-      // Use the prop if available, otherwise use the default
-      const actualOnAuthSuccess = onAuthSuccess || defaultHandleAuthSuccess;
+    localStorage.setItem(ACCESS_TOKEN, tokens.access);
+    localStorage.setItem('refreshToken', tokens.refresh);
+    localStorage.setItem('userRole', userData.role);
+    localStorage.setItem('userEmail', userData.email);
+
+    // Conditional redirection based on user role
+    if (userData.role === 'client') {
+      navigate("/client-dashboard");
+    } else if (userData.role === 'guest') {
+      navigate("/"); // Assuming Home.jsx is at the root path '/'
+    } else {
+      navigate("/dashboard"); // Fallback for other roles or if role is not 'client' or 'guest'
+    }
+  };
+
+  // Use the prop if available, otherwise use the default
+  const actualOnAuthSuccess = onAuthSuccess || defaultHandleAuthSuccess;
 
   useEffect(() => {
     // Load Google API script

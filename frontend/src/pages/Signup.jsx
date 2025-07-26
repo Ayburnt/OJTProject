@@ -8,6 +8,10 @@ import { FaGoogle } from "react-icons/fa";
 import api, { ACCESS_TOKEN } from '../api.js';
 
 function Signup({ onAuthSuccess }) {
+    useEffect(() => {
+        document.title = "Sign Up | Sari-Sari Events";
+    }, [])
+
     const defaultHandleAuthSuccess = (userData, tokens) => {
         localStorage.setItem(ACCESS_TOKEN, tokens.access);
         localStorage.setItem('refreshToken', tokens.refresh);
