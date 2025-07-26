@@ -190,4 +190,4 @@ AUTH_USER_MODEL = 'api.CustomUser'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 
-GOOGLE_CLIENT_ID = os.getenv('1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com', '1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com')
+GOOGLE_CLIENT_ID = '1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com'

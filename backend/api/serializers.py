@@ -22,7 +22,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'password', 'confirm_password', 'role', 'phone_number', 'birthday')
+        fields = ('first_name', 'last_name', 'email', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender') # Added gender
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -49,7 +49,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', ''),
             role=validated_data.get('role', 'guest'), # Ensure role is set, default to 'guest'
             phone_number=validated_data.get('phone_number', None), # Save new field
-            birthday=validated_data.get('birthday', None) # Save new field
+            birthday=validated_data.get('birthday', None), # Save new field
+            gender=validated_data.get('gender', None) # Save new field
         )
         return user
 
@@ -77,43 +78,68 @@ class UserLoginSerializer(serializers.Serializer):
         data['user'] = user # Store the authenticated user in validated_data
         return data
 
-class GoogleAuthSerializer(serializers.Serializer):
+# --- NEW: Base Serializer for Google Token Verification ---
+class BaseGoogleAuthSerializer(serializers.Serializer):
     """
-    Serializer to handle Google ID token verification and extract user information.
-    Only expects 'token' and 'role' from the frontend.
+    Base serializer to handle Google ID token verification.
+    Contains common logic for verifying the token.
     """
-    token = serializers.CharField(required=True) # The Google ID token from the frontend
-    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='guest', required=False) # Optional role for registration
+    token = serializers.CharField(required=True)
 
     def validate(self, data):
-        """
-        Verify the Google ID token with Google's API and perform other validations.
-        """
-        print(f"GoogleAuthSerializer received data: {data}") # Debug print: See all data received
         token = data.get('token')
-        role_from_data = data.get('role')
-
-        print(f"GoogleAuthSerializer extracted role: {role_from_data}")
-        # Removed phone_number and birthday debug prints as they are no longer expected from frontend
-
         if not token:
             raise serializers.ValidationError({"token": "Google ID token is required."})
 
         try:
+            # IMPORTANT: Ensure settings.GOOGLE_CLIENT_ID is correctly set in your Django settings.py
+            # It must match the client_id used in your frontend.
             idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), settings.GOOGLE_CLIENT_ID)
 
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                print(f"DEBUG: Google token verification failed - Wrong issuer: {idinfo.get('iss')}")
                 raise ValueError('Wrong issuer.')
 
+            # Check if the audience (aud) matches your client ID
+            if idinfo['aud'] != settings.GOOGLE_CLIENT_ID:
+                print(f"DEBUG: Google token verification failed - Audience mismatch. Expected: {settings.GOOGLE_CLIENT_ID}, Got: {idinfo.get('aud')}")
+                raise ValueError('Audience mismatch.')
+
             self.google_user_info = idinfo
-            return data # Return the entire validated data dictionary
-        except ValueError:
-            raise serializers.ValidationError("Invalid Google ID token.")
+            print(f"DEBUG: Google token successfully verified. Email: {idinfo.get('email')}")
+            return data
+        except ValueError as ve:
+            print(f"DEBUG: Google token verification ValueError: {ve}")
+            raise serializers.ValidationError(f"Invalid Google ID token: {ve}")
         except Exception as e:
+            print(f"DEBUG: Google token verification general Exception: {e}")
             raise serializers.ValidationError(f"Google token verification failed: {e}")
 
     def get_user_info(self):
-        """
-        Returns the verified Google user information.
-        """
         return self.google_user_info
+
+# --- NEW: Google Login Serializer (no 'role' field) ---
+class GoogleLoginSerializer(BaseGoogleAuthSerializer):
+    """
+    Serializer for Google login.
+    Only expects the 'token'. The user's role is determined from the database.
+    """
+    pass # Inherits 'token' and 'validate' from BaseGoogleAuthSerializer
+
+# --- NEW: Google Registration Serializer (with 'role' field) ---
+class GoogleRegisterSerializer(BaseGoogleAuthSerializer):
+    """
+    Serializer for Google registration.
+    Expects 'token' and 'role' from the frontend.
+    """
+    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='guest', required=False)
+    # Add other fields here if your Google registration process collects them
+    # e.g., phone_number = serializers.CharField(required=False, allow_blank=True)
+    # e.g., birthday = serializers.DateField(required=False, allow_null=True)
+    # e.g., gender = serializers.CharField(required=False, allow_blank=True)
+
+    def validate(self, data):
+        # Call the parent validate to verify the token
+        data = super().validate(data)
+        # Add any additional validation specific to Google registration here
+        return data
