@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { IoArrowBackCircle } from "react-icons/io5";
-import { LuCalendarDays } from "react-icons/lu";
+import { HiOutlineCalendarDays } from "react-icons/hi2";
 import { HiOutlineIdentification } from "react-icons/hi";
 import { HiMail } from 'react-icons/hi';
 import { FaGoogle } from "react-icons/fa";
@@ -17,7 +17,7 @@ function Signup({ onAuthSuccess }) {
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
         localStorage.setItem('userEmail', userData.email);
-        
+
         // Conditional redirection based on user role
         if (userData.role === 'client') {
             navigate("/client-dashboard");
@@ -87,7 +87,7 @@ function Signup({ onAuthSuccess }) {
     const [message, setMessage] = useState("");
 
     // New state for email specific error
-    const [emailError, setEmailError] = useState(""); 
+    const [emailError, setEmailError] = useState("");
     // New state for OTP verification loading
     const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
@@ -247,7 +247,7 @@ function Signup({ onAuthSuccess }) {
         }
     }, [password, confirmPassword]);
 
-    const handleEmailPass = async(e) => {
+    const handleEmailPass = async (e) => {
         e.preventDefault();
         // Clear previous errors
         setStep2Err("");
@@ -325,7 +325,7 @@ function Signup({ onAuthSuccess }) {
             setOtpError(true);
             setOtpErrMsg(data?.detail || "Failed to verify code. Please try again.");
         } finally {
-            setIsVerifyingOtp(false);            
+            setIsVerifyingOtp(false);
         }
     };
 
@@ -342,19 +342,19 @@ function Signup({ onAuthSuccess }) {
 
                         <p className="font-outfit text-xl mb-10">Choose your role to get started</p>
 
-                        <div className="flex flex-col items-center justify-center gap-8 w-full transition-colors duration-500">
-                            <div className={`w-[80%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
+                        <div className="flex flex-col xl:flex-row items-center justify-center gap-8 xl:gap-[5rem] w-full transition-colors duration-500">
+                            <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
                     ${isOrganizer && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(true);
                                     setIsAttendee(false);
                                     setSelectedRole("client"); // Set role to 'client' for organizer
                                 }}>
-                                <LuCalendarDays className={`text-secondary text-[8rem] ${isOrganizer && `text-white`}`} />
+                                <HiOutlineCalendarDays className={`text-secondary text-[9rem] ${isOrganizer && `text-white`}`} />
                                 <p className={`uppercase font-outfit text-secondary font-bold ${isOrganizer && `text-white`}`}>organizer</p>
                             </div>
 
-                            <div className={`w-[80%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
+                            <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
                     ${isAttendee && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(false);
@@ -364,18 +364,17 @@ function Signup({ onAuthSuccess }) {
                                 <HiOutlineIdentification className={`text-secondary text-[9rem] ${isAttendee && `text-white`}`} />
                                 <p className={`uppercase font-outfit text-secondary font-bold ${isAttendee && `text-white`}`}>attendee</p>
                             </div>
-
-                            <button className="bg-secondary w-[70%] py-2 rounded-md text-white uppercase shadow-md cursor-pointer" disabled={!isOrganizer && !isAttendee}
-                                onClick={() => {
-                                    // Only proceed if a role is selected
-                                    if (selectedRole) {
-                                        setStep(2);
-                                    } else {
-                                        setMessage("Please select a role to continue.");
-                                    }
-                                }}>done</button>
                         </div>
 
+                        <button className="bg-secondary w-[70%] xl:w-[20%] py-2 mt-10 rounded-md text-white uppercase shadow-md cursor-pointer" disabled={!isOrganizer && !isAttendee}
+                            onClick={() => {
+                                // Only proceed if a role is selected
+                                if (selectedRole) {
+                                    setStep(2);
+                                } else {
+                                    setMessage("Please select a role to continue.");
+                                }
+                            }}>done</button>
                         <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
                     </>
@@ -484,7 +483,7 @@ function Signup({ onAuthSuccess }) {
                                     disabled={isVerifyingOtp}
                                 >
                                     {isVerifyingOtp ? 'Verifying...' : 'Done'}
-                                </button>                                
+                                </button>
                             </div>
                         </div>
                     </div>
