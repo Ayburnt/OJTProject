@@ -396,7 +396,7 @@ function Signup({ onAuthSuccess }) {
                                 type="email" id="email" name="email"
                                 className={`w-full px-4 py-2 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
                                 value={email} onChange={(e) => setEmail(e.target.value)} required />
-                            {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+                            {emailError && <p className="font-outfit text-red-500 text-sm mt-1">{emailError}</p>}
                         </div>
 
                         <div className="mb-4 w-80">
@@ -407,15 +407,14 @@ function Signup({ onAuthSuccess }) {
                                 value={password} onChange={(e) => setPassword(e.target.value)} required />
                         </div>
 
-                        <div className="mb-6 w-80">
-                            {passwordErr && <p className="text-red-500 text-sm mb-2">{passwordErr}</p>}
+                        <div className="mb-6 w-80">                            
                             <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium">Confirm Password</label>
                             <input
                                 type="password" id="confirmPassword" name="confirmPassword"
                                 className={`w-full px-4 py-2 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
                                 value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                        </div>
-
+                                {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
+                        </div>                        
                         <button
                             className="w-80 bg-secondary text-white py-2 font-outfit rounded-lg transition"
                             onClick={handleEmailPass}
@@ -436,7 +435,6 @@ function Signup({ onAuthSuccess }) {
                         </div>
 
                         <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
-                        {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
                         {step2Err && <p className="text-center text-sm mt-4 text-red-500">{step2Err}</p>}
                     </>
                 )}
