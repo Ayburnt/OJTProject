@@ -15,6 +15,10 @@ from botocore.exceptions import ClientError
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 
+# For authentication and permissions (uncomment and configure if needed)
+# from rest_framework.permissions import IsAuthenticated
+# from rest_framework_simplejwt.authentication import JWTAuthentication
+
 # Import all necessary serializers
 from .serializers import (
     UserRegisterSerializer,
@@ -23,7 +27,8 @@ from .serializers import (
     GoogleRegisterSerializer,
     EmailCheckSerializer,
     OTPSendSerializer,
-    OTPVerifySerializer
+    OTPVerifySerializer,
+    ProfileUpdateSerializer, # Import the new serializer
 )
 from .models import CustomUser
 
@@ -37,6 +42,8 @@ def get_tokens_for_user(user):
         'phone_number': user.phone_number,
         'birthday': user.birthday.isoformat() if user.birthday else None,
         'gender': user.gender,
+        'company_name': user.company_name, # Include company info in tokens
+        'company_website': user.company_website, # Include company info in tokens
     }
 
 # Configure AWS SES client using settings from settings.py
@@ -57,6 +64,9 @@ class UserRegistrationView(APIView):
     """
     API endpoint for user registration with email and password.
     """
+    authentication_classes = [] # No authentication needed for registration
+    permission_classes = [] # No permissions needed for registration
+
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -64,14 +74,16 @@ class UserRegistrationView(APIView):
                 user = serializer.save() # This calls the create method in the serializer
                 tokens = get_tokens_for_user(user)
 
-                # --- NEW: Send Account Confirmation Email ---
+                # Determine if profile completion is needed based on role
+                needs_profile_completion = user.role == 'client'
+
+                # --- Send Account Confirmation Email ---
                 sender_email = settings.DEFAULT_FROM_EMAIL
                 subject = "Welcome to Sari-Sari Events! Your Account is Ready"
                 
                 context = {
                     'first_name': user.first_name,
                     'email': user.email,
-                    # You can add other context variables if needed for the template
                 }
                 html_confirmation_body = render_to_string('api/emails/account_confirmation.html', context)
                 text_confirmation_body = strip_tags(html_confirmation_body)
@@ -94,10 +106,8 @@ class UserRegistrationView(APIView):
                         print(f"Account confirmation email sent to {user.email}")
                     except ClientError as e:
                         print(f"SES Error sending confirmation email: {e.response['Error']['Message']}")
-                        # Log error but don't prevent user registration success
                     except Exception as e:
                         print(f"General Error sending confirmation email: {e}")
-                        # Log error but don't prevent user registration success
                 else:
                     print("SES client not initialized. Cannot send confirmation email.")
                 # --- END NEW ---
@@ -113,6 +123,9 @@ class UserRegistrationView(APIView):
                         'phone_number': user.phone_number,
                         'birthday': user.birthday.isoformat() if user.birthday else None,
                         'gender': user.gender,
+                        'company_name': user.company_name,
+                        'company_website': user.company_website,
+                        'needs_profile_completion': needs_profile_completion, # Flag for frontend
                     },
                     'tokens': tokens,
                 }, status=status.HTTP_201_CREATED)
@@ -127,6 +140,8 @@ class UserRegistrationView(APIView):
                     {'detail': 'An unexpected error occurred during registration.'},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+        # Add this line to print serializer errors when validation fails
+        print("UserRegistrationView serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
@@ -134,11 +149,25 @@ class UserLoginView(APIView):
     API endpoint for user login with email and password.
     Returns JWT tokens upon successful authentication.
     """
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.validated_data['user']
             tokens = get_tokens_for_user(user)
+
+            # Determine if profile completion is needed based on role and missing fields
+            # For login, if they are a client and any required fields are missing, flag it.
+            needs_profile_completion = user.role == 'client' and (
+                not user.phone_number or
+                not user.birthday or
+                not user.gender or
+                not user.company_name or # Assuming company_name is required for clients
+                not user.company_website # Assuming company_website is required for clients
+            )
+
             return Response({
                 'message': 'Login successful.',
                 'user': {
@@ -150,6 +179,9 @@ class UserLoginView(APIView):
                     'phone_number': user.phone_number,
                     'birthday': user.birthday.isoformat() if user.birthday else None,
                     'gender': user.gender,
+                    'company_name': user.company_name,
+                    'company_website': user.company_website,
+                    'needs_profile_completion': needs_profile_completion, # Flag for frontend
                 },
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
@@ -165,7 +197,7 @@ class GoogleAuthRegisterView(APIView):
     permission_classes = []
 
     def post(self, request):
-        serializer = GoogleRegisterSerializer(data=request.data)
+        serializer = GoogleRegisterSerializer(data=request.data) # Use GoogleRegisterSerializer
         if serializer.is_valid():
             google_user_info = serializer.get_user_info()
             email = google_user_info.get('email')
@@ -173,6 +205,7 @@ class GoogleAuthRegisterView(APIView):
             last_name = google_user_info.get('family_name', '')
             profile_picture = google_user_info.get('picture', None)
             
+            # Get role from serializer's validated_data
             role = serializer.validated_data.get('role', 'guest')
 
             print(f"VIEWS: Attempting Google registration for email: {email}")
@@ -185,7 +218,9 @@ class GoogleAuthRegisterView(APIView):
                 user.first_name = first_name
                 user.last_name = last_name
                 user.profile_picture = profile_picture
-                user.role = role
+                user.role = role # This is where the role from frontend is applied
+                # Do NOT overwrite phone_number, birthday, gender, company_name, company_website here
+                # They will be filled in the separate profile completion step.
                 user.save()
                 print(f"VIEWS: Role after saving existing user: {user.role}")
                 message = "User already exists and details updated. Logging in."
@@ -199,13 +234,16 @@ class GoogleAuthRegisterView(APIView):
                         first_name=first_name,
                         last_name=last_name,
                         profile_picture=profile_picture,
-                        role=role,
+                        role=role, # This applies the role for new users
+                        # Set these to None as they are not provided by Google at this stage
                         phone_number=None,
                         birthday=None,
                         gender=None,
+                        company_name=None, # Explicitly set to None for new Google users
+                        company_website=None, # Explicitly set to None for new Google users
                         is_active=True
                     )
-                    user.set_unusable_password()
+                    user.set_unusable_password() # Google users don't have a password
                     user.save()
                     print(f"VIEWS: Role after saving new user: {user.role}")
                     message = "User registered via Google successfully."
@@ -225,6 +263,8 @@ class GoogleAuthRegisterView(APIView):
                     )
 
             tokens = get_tokens_for_user(user)
+            needs_profile_completion = user.role == 'client' # Flag for frontend
+
             return Response({
                 'message': message,
                 'user': {
@@ -236,6 +276,9 @@ class GoogleAuthRegisterView(APIView):
                     'phone_number': user.phone_number,
                     'birthday': user.birthday.isoformat() if user.birthday else None,
                     'gender': user.gender,
+                    'company_name': user.company_name,
+                    'company_website': user.company_website,
+                    'needs_profile_completion': needs_profile_completion, # Flag for frontend
                 },
                 'tokens': tokens,
             }, status=status_code)
@@ -243,9 +286,11 @@ class GoogleAuthRegisterView(APIView):
 
 class GoogleAuthLoginView(APIView):
     """
-    Handles Google login by verifying the ID token and logging in the user.
-    If the user doesn't exist, it indicates they need to register.
+    API endpoint for Google OAuth login.
+    Receives Google ID token, verifies it, and logs in the existing user.
+    If the user does not exist, it returns an error prompting them to sign up.
     """
+    authentication_classes = []
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
@@ -262,33 +307,98 @@ class GoogleAuthLoginView(APIView):
 
         try:
             user = CustomUser.objects.get(email=email)
+            print(f"VIEWS: User with email {email} found for Google login. Updating details.")
 
-            refresh = RefreshToken.for_user(user)
+            user.first_name = google_user_info.get('given_name', user.first_name)
+            user.last_name = google_user_info.get('family_name', user.last_name)
+            user.profile_picture = google_user_info.get('picture', user.profile_picture)
+            
+            # Do NOT overwrite phone_number, birthday, gender, company_name, company_website during login from Google
+            # They should retain existing values or remain None.
+            user.save()
+            
+            tokens = get_tokens_for_user(user)
+            
+            # Determine if profile completion is needed based on role and missing fields
+            needs_profile_completion = user.role == 'client' and (
+                not user.phone_number or
+                not user.birthday or
+                not user.gender or
+                not user.company_name or # Assuming company_name is required for clients
+                not user.company_website # Assuming company_website is required for clients
+            )
+
             return Response({
-                "message": "Login successful!",
-                "user": {
-                    "email": user.email,
-                    "role": user.role,
-                    "first_name": user.first_name,
-                    "last_name": user.last_name,
-                    "profile_picture": user.profile_picture,
-                    "phone_number": user.phone_number,
-                    "birthday": user.birthday.isoformat() if user.birthday else None,
-                    "gender": user.gender,
+                'message': 'Logged in via Google successfully.',
+                'user': {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'profile_picture': user.profile_picture,
+                    'role': user.role,
+                    'phone_number': user.phone_number,
+                    'birthday': user.birthday.isoformat() if user.birthday else None,
+                    'gender': user.gender,
+                    'company_name': user.company_name,
+                    'company_website': user.company_website,
+                    'needs_profile_completion': needs_profile_completion, # Flag for frontend
                 },
-                "tokens": {
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh),
-                },
+                'tokens': tokens,
             }, status=status.HTTP_200_OK)
-
         except ObjectDoesNotExist:
-            return Response({"detail": "User not found. Please register first using Google Sign-Up."},
+            print(f"VIEWS: User with email {email} does not exist for Google login. Prompting sign up.")
+            return Response({"detail": "User with this Google account does not exist. Please sign up first."},
                             status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print(f"Error during Google login process: {e}")
+            print(f"VIEWS: Error during Google login process: {e}")
             return Response({"detail": "An unexpected error occurred during login."},
                             status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# --- NEW: Profile Completion View ---
+class ProfileCompletionView(APIView):
+    """
+    API endpoint for users to complete their profile information.
+    Requires authentication.
+    """
+    # Uncomment and configure these if you have JWT authentication set up
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        # In a real app, you'd ensure the user is authenticated.
+        # For this example, we'll assume request.user is available via middleware.
+        # If not using JWTAuthentication, you'd need a different way to get the user.
+        user = request.user 
+        if not user.is_authenticated: # Fallback if authentication_classes/permission_classes are not used
+             return Response({'detail': 'Authentication credentials were not provided.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+        # Use the new ProfileUpdateSerializer
+        serializer = ProfileUpdateSerializer(instance=user, data=request.data, partial=True) 
+        if serializer.is_valid():
+            # The serializer's save method will handle updating the instance
+            serializer.save()
+
+            # Re-fetch user to ensure all fields are up-to-date in the response
+            user.refresh_from_db()
+
+            return Response({
+                'message': 'Profile updated successfully.',
+                'user': {
+                    'email': user.email,
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'profile_picture': user.profile_picture,
+                    'role': user.role,
+                    'phone_number': user.phone_number,
+                    'birthday': user.birthday.isoformat() if user.birthday else None,
+                    'gender': user.gender,
+                    'company_name': user.company_name,
+                    'company_website': user.company_website,
+                    'needs_profile_completion': False, # Profile is now complete
+                }
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # --- API Views for Email Check and OTP ---
 class CheckEmailExistsView(APIView):
@@ -328,7 +438,6 @@ class SendOTPView(APIView):
             cache.set(f'otp_{email}', otp, timeout=300) # 300 seconds = 5 minutes
 
             # Render HTML email from template
-            # The template path now includes 'api/' because of the nested folder structure
             context = {'otp': otp}
             html_body = render_to_string('api/emails/otp_verification.html', context)
             

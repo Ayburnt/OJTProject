@@ -1,30 +1,53 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { IoArrowBackCircle } from "react-icons/io5";
-import { HiOutlineCalendarDays } from "react-icons/hi2";
+import { HiOutlineCalendarDays } from "react-icons/hi2"; // Changed from LuCalendarDays to match current code
 import { HiOutlineIdentification } from "react-icons/hi";
 import { HiMail } from 'react-icons/hi';
-import { FaGoogle } from "react-icons/fa";
 import api, { ACCESS_TOKEN } from '../api.js';
 
 function Signup({ onAuthSuccess }) {
     useEffect(() => {
         document.title = "Sign Up | Sari-Sari Events";
-    }, [])
+    }, []);
 
+    // Default handleAuthSuccess if not provided as a prop
     const defaultHandleAuthSuccess = (userData, tokens) => {
+        console.log("Auth Success in Signup.jsx (default):", userData);
         localStorage.setItem(ACCESS_TOKEN, tokens.access);
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
         localStorage.setItem('userEmail', userData.email);
+        
+        // Store other user data received from backend
+        localStorage.setItem('userFirstName', userData.first_name || '');
+        localStorage.setItem('userLastName', userData.last_name || '');
+        localStorage.setItem('userPhoneNumber', userData.phone_number || '');
+        localStorage.setItem('userBirthday', userData.birthday || '');
+        localStorage.setItem('userGender', userData.gender || '');
+        localStorage.setItem('userCompanyName', userData.company_name || '');
+        localStorage.setItem('userCompanyWebsite', userData.company_website || '');
 
-        // Conditional redirection based on user role
-        if (userData.role === 'client') {
-            navigate("/client-dashboard");
-        } else if (userData.role === 'guest') {
-            navigate("/");
+        if (userData.needs_profile_completion) {
+            console.log("Redirecting to profile completion step (step 4).");
+            // Pre-fill step 4 fields with any data already available (e.g., from Google)
+            setFirstname(userData.first_name || '');
+            setLastname(userData.last_name || '');
+            setPhoneNo(userData.phone_number || '');
+            setBirthday(userData.birthday || '');
+            setGender(userData.gender || '');
+            setCompanyName(userData.company_name || '');
+            setCompanyWebsite(userData.company_website || '');
+            setStep(4); // Navigate to the fill-up form
         } else {
-            navigate("/dashboard");
+            console.log("Redirecting to dashboard based on role.");
+            if (userData.role === 'client') {
+                navigate("/client-dashboard");
+            } else if (userData.role === 'guest') {
+                navigate("/");
+            } else {
+                navigate("/dashboard"); // Fallback for other roles like 'admin'
+            }
         }
     };
 
@@ -69,20 +92,23 @@ function Signup({ onAuthSuccess }) {
         e.preventDefault();
     };
 
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isOrganizer, setIsOrganizer] = useState(false);
     const [isAttendee, setIsAttendee] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("guest");
+    const [selectedRole, setSelectedRole] = useState("guest"); // Default to 'guest'
 
+    // States for Step 4 (Fill up Information)
     const [firstname, setFirstname] = useState("");
     const [lastname, setLastname] = useState("");
     const [phoneNo, setPhoneNo] = useState("");
-    const [birthday, setBirthday] = useState("");
+    const [birthday, setBirthday] = useState(""); // birthday
     const [gender, setGender] = useState("");
+    const [companyName, setCompanyName] = useState(""); // New field for client
+    const [companyWebsite, setCompanyWebsite] = useState(""); // New field for client
     const [agree, setAgree] = useState(false);
+
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
 
@@ -91,7 +117,117 @@ function Signup({ onAuthSuccess }) {
     // New state for OTP verification loading
     const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
-    const handleFinalSubmit = async (e) => {
+    // Manual Signup Flow: Step 2 to Step 3 (Email/Pass to OTP)
+    const handleEmailPass = async (e) => {
+        e.preventDefault();
+        // Clear previous errors
+        setStep2Err("");
+        setEmailError("");
+        setMessage(""); // Clear general message
+
+        if (!email || !password || !confirmPassword) {
+            setStep2Err("Please fill in all fields.");
+            return;
+        }
+        if (!isMatch) {
+            return; // Passwords don't match, error already displayed
+        }
+
+        setIsLoading(true);
+        setMessage("Checking email and sending verification code...");
+
+        try {
+            // Step 1: Check if email exists
+            const emailCheckResponse = await api.post('/auth/email-check/', { email }); // Corrected endpoint
+            if (emailCheckResponse.data.exists) {
+                setEmailError("This email is already registered. Please use a different email or sign in.");
+                setIsLoading(false);
+                return;
+            }
+
+            // Step 2: Send OTP if email is unique
+            const otpSendResponse = await api.post('/auth/otp-send/', { email }); // Corrected endpoint
+            if (otpSendResponse.status === 200) {
+                setMessage("Verification code sent to your email.");
+                setStep(3); // Proceed to OTP verification step
+            } else {
+                setMessage(otpSendResponse.data.detail || "Failed to send verification code. Please try again.");
+            }
+        } catch (error) {
+            console.error('Error during email check or OTP send:', error);
+            const data = error.response?.data;
+            if (data) {
+                if (data.email) setEmailError(data.email[0]);
+                else setMessage(data.detail || 'An error occurred. Please try again.');
+            } else {
+                setMessage('An unexpected error occurred. Please try again.');
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Manual Signup Flow: Step 3 (OTP Verification)
+    const [otpError, setOtpError] = useState(false);
+    const [otpErrMsg, setOtpErrMsg] = useState("");
+    const handleOtpVerification = async (e) => {
+        e.preventDefault();
+        const enteredOtp = otp.join('');
+        if (enteredOtp.length !== 6) {
+            setMessage("Please enter the complete 6-digit code.");
+            return;
+        }
+
+        setIsVerifyingOtp(true);
+        setMessage("Verifying code...");
+
+        try {
+            const response = await api.post('/auth/otp-verify/', { email, otp: enteredOtp });
+            if (response.status === 200) {
+                setMessage("Email verified successfully! Registering your account...");
+                setOtpError(false);
+                setOtpErrMsg("");
+
+                // After OTP verification, now perform the actual user registration
+                const registrationResponse = await api.post('/auth/register/', {
+                    first_name: firstname, // These might be empty, will be filled in step 4
+                    last_name: lastname,   // These might be empty, will be filled in step 4
+                    email: email,
+                    password: password,
+                    role: selectedRole,
+                    confirm_password: confirmPassword,
+                    phone_number: null, // Initial registration doesn't include these
+                    birthday: null,
+                    gender: null,
+                    company_name: null,
+                    company_website: null,
+                });
+
+                const data = registrationResponse.data;
+                if (registrationResponse.status === 201) {
+                    setMessage('Registration successful!');
+                    actualOnAuthSuccess(data.user, data.tokens); // This will handle redirection (to step 4 or dashboard)
+                } else {
+                    setMessage(data.detail || 'Registration failed after OTP. Please try again.');
+                }
+
+            } else {
+                setOtpError(true);
+                setOtpErrMsg(response.data.detail || "Invalid or expired verification code.");
+            }
+        } catch (error) {
+            console.error("Error verifying OTP or during registration:", error);
+            const data = error.response?.data;
+            setOtpError(true);
+            setOtpErrMsg(data?.detail || "Failed to verify code or register. Please try again.");
+        } finally {
+            setIsVerifyingOtp(false);
+            setIsLoading(false); // Ensure main loading state is also reset
+        }
+    };
+
+    // Function to handle profile completion submission (from step 4)
+    const handleProfileCompletionSubmit = async (e) => {
         e.preventDefault();
         if (!agree) {
             setMessage("Please agree to the terms and conditions.");
@@ -99,44 +235,49 @@ function Signup({ onAuthSuccess }) {
         }
 
         setIsLoading(true);
-        setMessage('Signing up...');
+        setMessage('Saving profile information...');
 
         try {
-            const backendResponse = await api.post('/auth/register/', {
+            // Send updated profile data to the new profile completion endpoint
+            const backendResponse = await api.post('/auth/complete-profile/', {
                 first_name: firstname,
                 last_name: lastname,
-                email: email,
-                password: password,
-                role: selectedRole, // Use selectedRole for manual signup
-                confirm_password: confirmPassword,
                 phone_number: phoneNo,
                 birthday: birthday,
-                gender: gender, // Assuming your backend accepts gender
+                gender: gender,
+                company_name: companyName,
+                company_website: companyWebsite,
             });
 
             const data = backendResponse.data;
 
-            if (backendResponse.status === 201) { // Check for 201 Created status for successful registration
-                setMessage('Sign-up successful! Redirecting to dashboard...');
-                actualOnAuthSuccess(data.user, data.tokens); // Use actualOnAuthSuccess
+            if (backendResponse.status === 200) {
+                setMessage('Profile updated successfully! Redirecting to dashboard...');
+                // Update local storage with new profile data
+                localStorage.setItem('userFirstName', data.user.first_name || '');
+                localStorage.setItem('userLastName', data.user.last_name || '');
+                localStorage.setItem('userPhoneNumber', data.user.phone_number || '');
+                localStorage.setItem('userBirthday', data.user.birthday || '');
+                localStorage.setItem('userGender', data.user.gender || '');
+                localStorage.setItem('userCompanyName', data.user.company_name || '');
+                localStorage.setItem('userCompanyWebsite', data.user.company_website || '');
+                localStorage.setItem('userRole', data.user.role); // Ensure role is consistent
+
+                // Final redirect after profile completion
+                if (data.user.role === 'client') {
+                    navigate("/client-dashboard");
+                } else if (data.user.role === 'guest') {
+                    navigate("/");
+                } else {
+                    navigate("/dashboard");
+                }
             } else {
-                // This block might not be reached if Axios throws an error for non-2xx status
-                setMessage(data.detail || 'Sign-up failed. Please try again.');
+                setMessage(data.detail || 'Failed to save profile information. Please try again.');
             }
         } catch (error) {
-            console.error('Error during manual sign-up:', error);
+            console.error('Error during profile completion:', error);
             const data = error.response?.data;
-            if (data) {
-                if (data.email) setMessage(`Email: ${data.email[0]}`);
-                else if (data.password) setMessage(`Password: ${data.password[0]}`);
-                else if (data.confirm_password) setMessage(`Confirm Password: ${data.confirm_password[0]}`);
-                else if (data.phone_number) setMessage(`Phone Number: ${data.phone_number[0]}`);
-                else if (data.birthday) setMessage(`Birthday: ${data.birthday[0]}`);
-                else if (data.non_field_errors) setMessage(data.non_field_errors[0]);
-                else setMessage(data.detail || 'Sign-up failed. Please try again.');
-            } else {
-                setMessage('An error occurred during sign-up.');
-            }
+            setMessage(data?.detail || 'An error occurred while saving profile information.');
         } finally {
             setIsLoading(false);
         }
@@ -176,7 +317,7 @@ function Signup({ onAuthSuccess }) {
         if (googleScriptLoaded && window.google && step === 2 && !googleGsiInitialized.current) {
             // Initialize Google Sign-In only once
             window.google.accounts.id.initialize({
-                client_id: '1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com', // <<-- REPLACE THIS WITH YOUR ACTUAL GOOGLE CLIENT ID
+                client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Ensure this is correctly configured in your .env
                 callback: (response) => handleGoogleSignUp(response, selectedRoleRef.current),
             });
 
@@ -211,7 +352,8 @@ function Signup({ onAuthSuccess }) {
             const data = backendResponse.data;
 
             setMessage('Google Sign-up successful!');
-            actualOnAuthSuccess(data.user, data.tokens); // Use actualOnAuthSuccess
+            actualOnAuthSuccess(data.user, data.tokens); // This will handle redirection (to step 4 or dashboard)
+
         } catch (error) {
             console.error('Error during Google sign-up:', error);
             const data = error.response?.data;
@@ -247,88 +389,6 @@ function Signup({ onAuthSuccess }) {
         }
     }, [password, confirmPassword]);
 
-    const handleEmailPass = async (e) => {
-        e.preventDefault();
-        // Clear previous errors
-        setStep2Err("");
-        setEmailError("");
-
-        if (!email || !password || !confirmPassword) {
-            setStep2Err("Please fill in all fields.");
-            return;
-        }
-        if (!isMatch) {
-            return; // Passwords don't match, error already displayed
-        }
-
-        setIsLoading(true);
-        setMessage("Checking email and sending verification code...");
-
-        try {
-            // Step 1: Check if email exists
-            const emailCheckResponse = await api.post('/auth/check-email/', { email });
-            if (emailCheckResponse.data.exists) {
-                setEmailError("This email is already registered. Please use a different email or sign in.");
-                setIsLoading(false);
-                return;
-            }
-
-            // Step 2: Send OTP if email is unique
-            const otpSendResponse = await api.post('/auth/send-otp/', { email });
-            if (otpSendResponse.status === 200) {
-                setMessage("Verification code sent to your email.");
-                setStep(3); // Proceed to OTP verification step
-            } else {
-                setMessage(otpSendResponse.data.detail || "Failed to send verification code. Please try again.");
-            }
-        } catch (error) {
-            console.error('Error during email check or OTP send:', error);
-            const data = error.response?.data;
-            if (data) {
-                if (data.email) setEmailError(data.email[0]);
-                else setMessage(data.detail || 'An error occurred. Please try again.');
-            } else {
-                setMessage('An unexpected error occurred. Please try again.');
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const [otpError, setOtpError] = useState(false);
-    const [otpErrMsg, setOtpErrMsg] = useState("");
-    const handleOtpVerification = async (e) => {
-        e.preventDefault();
-        const enteredOtp = otp.join('');
-        if (enteredOtp.length !== 6) {
-            setMessage("Please enter the complete 6-digit code.");
-            return;
-        }
-
-        setIsVerifyingOtp(true);
-        setMessage("Verifying code...");
-
-        try {
-            const response = await api.post('/auth/verify-otp/', { email, otp: enteredOtp });
-            if (response.status === 200) {
-                setMessage("Email verified successfully!");
-                setStep(4); // Proceed to fill up information
-                setOtpError(false);
-                setOtpErrMsg("");
-            } else {
-                setOtpError(true);
-                setOtpErrMsg(response.data.detail || "Invalid or expired verification code.");
-            }
-        } catch (error) {
-            console.error("Error verifying OTP:", error);
-            const data = error.response?.data;
-            setOtpError(true);
-            setOtpErrMsg(data?.detail || "Failed to verify code. Please try again.");
-        } finally {
-            setIsVerifyingOtp(false);
-        }
-    };
-
 
     return (
         <div className="flex items-start justify-center h-screen bg-primary">
@@ -337,14 +397,14 @@ function Signup({ onAuthSuccess }) {
                 {step === 1 && (
                     <>
                         <div className="w-full text-left mb-10">
-                            <IoArrowBackCircle className="text-secondary text-[2.5rem]" onClick={() => navigate(-1)} /> {/* Use navigate(-1) for back */}
+                            <IoArrowBackCircle className="text-secondary text-[2.5rem]" onClick={() => navigate(-1)} />
                         </div>
 
                         <p className="font-outfit text-xl mb-10">Choose your role to get started</p>
 
                         <div className="flex flex-col xl:flex-row items-center justify-center gap-8 xl:gap-[5rem] w-full transition-colors duration-500">
                             <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                    ${isOrganizer && `bg-secondary`}`}
+                   ${isOrganizer && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(true);
                                     setIsAttendee(false);
@@ -355,7 +415,7 @@ function Signup({ onAuthSuccess }) {
                             </div>
 
                             <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                    ${isAttendee && `bg-secondary`}`}
+                   ${isAttendee && `bg-secondary`}`}
                                 onClick={() => {
                                     setIsOrganizer(false);
                                     setIsAttendee(true);
@@ -364,17 +424,17 @@ function Signup({ onAuthSuccess }) {
                                 <HiOutlineIdentification className={`text-secondary text-[9rem] ${isAttendee && `text-white`}`} />
                                 <p className={`uppercase font-outfit text-secondary font-bold ${isAttendee && `text-white`}`}>attendee</p>
                             </div>
-                        </div>
 
-                        <button className="bg-secondary w-[70%] xl:w-[20%] py-2 mt-10 rounded-md text-white uppercase shadow-md cursor-pointer" disabled={!isOrganizer && !isAttendee}
-                            onClick={() => {
-                                // Only proceed if a role is selected
-                                if (selectedRole) {
-                                    setStep(2);
-                                } else {
-                                    setMessage("Please select a role to continue.");
-                                }
-                            }}>done</button>
+                            <button className="bg-secondary w-[70%] xl:w-[20%] py-2 mt-10 rounded-md text-white uppercase shadow-md cursor-pointer" disabled={!isOrganizer && !isAttendee}
+                                onClick={() => {
+                                    // Only proceed if a role is selected
+                                    if (selectedRole) {
+                                        setStep(2);
+                                    } else {
+                                        setMessage("Please select a role to continue.");
+                                    }
+                                }}>done</button>
+                        </div>
                         <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
                     </>
@@ -407,17 +467,17 @@ function Signup({ onAuthSuccess }) {
                                 value={password} onChange={(e) => setPassword(e.target.value)} required />
                         </div>
 
-                        <div className="mb-6 w-80">                            
+                        <div className="mb-6 w-80">
                             <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium">Confirm Password</label>
                             <input
                                 type="password" id="confirmPassword" name="confirmPassword"
                                 className={`w-full px-4 py-2 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
                                 value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                                {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
-                        </div>                        
+                            {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
+                        </div>
                         <button
                             className="w-80 bg-secondary text-white py-2 font-outfit rounded-lg transition"
-                            onClick={handleEmailPass}
+                            onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
                             disabled={isLoading} // Disable button while loading
                         >
                             {isLoading ? 'Processing...' : 'Sign up'}
@@ -476,7 +536,7 @@ function Signup({ onAuthSuccess }) {
                                 </div>
 
                                 <button
-                                    type="button" onClick={handleOtpVerification}
+                                    type="button" onClick={handleOtpVerification} // Call handleOtpVerification
                                     className="w-full bg-teal-600 text-white py-4 rounded-lg hover:bg-teal-700 font-outfit transition shadow-lg"
                                     disabled={isVerifyingOtp}
                                 >
@@ -488,14 +548,22 @@ function Signup({ onAuthSuccess }) {
                 )}
 
                 {step === 4 && (
-
                     // Fillup Information
                     <>
                         <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2.5rem] mb-10" onClick={() => setStep(3)} />
+                            <IoArrowBackCircle className="text-secondary text-[2.5rem] mb-10" onClick={() => {
+                                // Decide where to go back based on how they got to step 4
+                                // If already authenticated (e.g., Google signup), go back to login page
+                                // If manual signup, go back to OTP step
+                                if (localStorage.getItem('refreshToken')) { // Simple check if user is already "logged in"
+                                    navigate("/login"); // Or a specific "profile incomplete" page
+                                } else {
+                                    setStep(3); // Go back to OTP if manual signup path
+                                }
+                            }} />
                         </div>
 
-                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Fill up</h2>
+                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Fill up Your Profile</h2>
 
                         <div className="mb-4 w-80">
                             <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
@@ -516,7 +584,7 @@ function Signup({ onAuthSuccess }) {
                         <div className="mb-4 w-80">
                             <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
                             <input
-                                type="text" id="phoneNo" name="phoneNo"
+                                type="tel" id="phoneNo" name="phoneNo" // Changed type to tel
                                 className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
                         </div>
@@ -542,6 +610,26 @@ function Signup({ onAuthSuccess }) {
                             </select>
                         </div>
 
+                        {/* Conditionally render company fields for 'client' role */}
+                        {selectedRoleRef.current === 'client' && (
+                            <>
+                                <div className="mb-4 w-80">
+                                    <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name</label>
+                                    <input
+                                        type="text" id="companyName" name="companyName"
+                                        className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                        value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+                                </div>
+                                <div className="mb-4 w-80">
+                                    <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website</label>
+                                    <input
+                                        type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
+                                        className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                        value={companyWebsite} onChange={(e) => setCompanyWebsite(e.target.value)} />
+                                </div>
+                            </>
+                        )}
+
                         <div className="flex items-center w-80">
                             <input
                                 type="checkbox" id="agree" className="mr-2"
@@ -551,9 +639,12 @@ function Signup({ onAuthSuccess }) {
                                 <span className="text-blue-500">Terms and Conditions</span> </p>
                         </div>
                         <button
-                            type="submit" onClick={handleFinalSubmit} // Call handleFinalSubmit on click
-                            className="w-80 bg-secondary text-white py-2 rounded-lg transition">
-                            Continue </button>
+                            type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
+                            className="w-80 bg-secondary text-white py-2 rounded-lg transition"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Saving...' : 'Continue'}
+                        </button>
                         <hr className=" mt-7 border-black w-85 h-2" />
                         <p className="text-grey font-outfit mt-5">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}

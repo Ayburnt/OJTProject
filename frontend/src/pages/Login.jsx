@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api, { ACCESS_TOKEN } from "../api.js";
+import { IoIosArrowBack } from "react-icons/io";
 
 
 function Login({ onAuthSuccess }) {
@@ -42,7 +43,7 @@ function Login({ onAuthSuccess }) {
       // Initialize Google Sign-In
       if (window.google) {
         window.google.accounts.id.initialize({
-          client_id: '1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com', // <<-- REPLACE THIS WITH YOUR ACTUAL GOOGLE CLIENT ID
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // <<-- REPLACE THIS WITH YOUR ACTUAL GOOGLE CLIENT ID
           callback: handleGoogleSignIn,
         });
         window.google.accounts.id.renderButton(
@@ -114,10 +115,20 @@ function Login({ onAuthSuccess }) {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen rounded-lg">
-      <form onSubmit={handleSubmit}
+    <div className="flex items-start items-center justify-center h-screen rounded-lg">
 
-        className="bg-white p-8 rounded w-full py-20 flex flex-col justify-center items-center" >
+      <form onSubmit={handleSubmit}     
+
+        className="bg-white p-8 rounded w-[full] py-5  flex flex-col justify-center items-center" >
+          <div className="flex items-center cursor-pointer mb-5" onClick={() => window.history.back()}>
+          <IoIosArrowBack className="text-secondary text-xl mr-2" />
+          <span className="text-secondary text-sm font-medium font-outfit">Back to role selection</span>
+        </div> 
+
+        <div className="w-[45%]">
+          <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
+        </div>
+
         <h2 className="text-2xl font-bold mb-6 text-center">Welcome!</h2>
 
         <div className="mb-4">
@@ -139,6 +150,7 @@ function Login({ onAuthSuccess }) {
         <p className="text-grey font-outfit mt-10">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
       </form>
     </div>
+
   );
 }
 

@@ -15,27 +15,33 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     Serializer for user registration with email, password, and role.
     Includes password confirmation, phone number, and birthday.
     """
-    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
-    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    company_name = serializers.CharField(max_length=255, required=False, allow_blank=True, allow_null=True)
+    company_website = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True)
+    # Added min_length to password fields
+    password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
+    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
     role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='guest') # Updated default role
-    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True) # New field
+    phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True) # New field
     birthday = serializers.DateField(required=False, allow_null=True) # New field
+    gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender') # Added gender
+        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender') # Added gender
         extra_kwargs = {
-            'first_name': {'required': True},
-            'last_name': {'required': True},
+            'first_name': {'required': False, 'allow_blank': True}, # Made optional for initial registration
+            'last_name': {'required': False, 'allow_blank': True},  # Made optional for initial registration
             'email': {'required': True},
         }
 
     def validate(self, data):
         """
         Check that the two password fields match.
+        This validation runs only if 'password' is present in data.
         """
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+        if 'password' in data and 'confirm_password' in data:
+            if data['password'] != data['confirm_password']:
+                raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
         return data
 
     def create(self, validated_data):
@@ -48,6 +54,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', ''),
+            company_name=validated_data.get('company_name', ''),
+            company_website=validated_data.get('company_website', ''),
             role=validated_data.get('role', 'guest'), # Ensure role is set, default to 'guest'
             phone_number=validated_data.get('phone_number', None), # Save new field
             birthday=validated_data.get('birthday', None), # Save new field
@@ -144,6 +152,31 @@ class GoogleRegisterSerializer(BaseGoogleAuthSerializer):
         data = super().validate(data)
         # Add any additional validation specific to Google registration here
         return data
+
+# --- NEW: Serializer for Profile Update ---
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    """
+    Serializer for updating user profile information.
+    Does NOT include password fields.
+    """
+    class Meta:
+        model = CustomUser
+        fields = (
+            'first_name', 'last_name', 'phone_number', 'birthday', 'gender',
+            'company_name', 'company_website'
+        )
+        # Make all fields optional for partial updates
+        extra_kwargs = {
+            'first_name': {'required': False},
+            'last_name': {'required': False},
+            'phone_number': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'birthday': {'required': False, 'allow_null': True},
+            'gender': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'company_name': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'company_website': {'required': False, 'allow_blank': True, 'allow_null': True},
+        }
+        read_only_fields = ('email', 'role') # Email and role should not be updated via this serializer
+
 
 # --- NEW: Serializers for Email Check and OTP ---
 class EmailCheckSerializer(serializers.Serializer):
