@@ -14,7 +14,6 @@ function Signup({ onAuthSuccess }) {
 
     // Default handleAuthSuccess if not provided as a prop
     const defaultHandleAuthSuccess = (userData, tokens) => {
-        console.log("Auth Success in Signup.jsx (default):", userData);
         localStorage.setItem(ACCESS_TOKEN, tokens.access);
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
@@ -22,15 +21,9 @@ function Signup({ onAuthSuccess }) {
         
         // Store other user data received from backend
         localStorage.setItem('userFirstName', userData.first_name || '');
-        localStorage.setItem('userLastName', userData.last_name || '');
-        localStorage.setItem('userPhoneNumber', userData.phone_number || '');
-        localStorage.setItem('userBirthday', userData.birthday || '');
-        localStorage.setItem('userGender', userData.gender || '');
-        localStorage.setItem('userCompanyName', userData.company_name || '');
-        localStorage.setItem('userCompanyWebsite', userData.company_website || '');
+        localStorage.setItem('userProfile', userData.profile_picture || '');
 
-        if (userData.needs_profile_completion) {
-            console.log("Redirecting to profile completion step (step 4).");
+        if (userData.needs_profile_completion || selectedRole === 'guest') {
             // Pre-fill step 4 fields with any data already available (e.g., from Google)
             setFirstname(userData.first_name || '');
             setLastname(userData.last_name || '');
@@ -40,8 +33,7 @@ function Signup({ onAuthSuccess }) {
             setCompanyName(userData.company_name || '');
             setCompanyWebsite(userData.company_website || '');
             setStep(4); // Navigate to the fill-up form
-        } else {
-            console.log("Redirecting to dashboard based on role.");
+        } else {        
             if (userData.role === 'client') {
                 navigate("/client-dashboard");
             } else if (userData.role === 'guest') {
@@ -256,13 +248,9 @@ function Signup({ onAuthSuccess }) {
                 setMessage('Profile updated successfully! Redirecting to dashboard...');
                 // Update local storage with new profile data
                 localStorage.setItem('userFirstName', data.user.first_name || '');
-                localStorage.setItem('userLastName', data.user.last_name || '');
-                localStorage.setItem('userPhoneNumber', data.user.phone_number || '');
-                localStorage.setItem('userBirthday', data.user.birthday || '');
-                localStorage.setItem('userGender', data.user.gender || '');
-                localStorage.setItem('userCompanyName', data.user.company_name || '');
-                localStorage.setItem('userCompanyWebsite', data.user.company_website || '');
+                localStorage.setItem('userProfile', data.user.profile_picture || '');
                 localStorage.setItem('userRole', data.user.role); // Ensure role is consistent
+                localStorage.setItem('isLoggedIn', true);
 
                 // Final redirect after profile completion
                 if (data.user.role === 'client') {
@@ -338,8 +326,6 @@ function Signup({ onAuthSuccess }) {
 
     // Modified handleGoogleSignUp to accept 'currentRole' from the ref
     const handleGoogleSignUp = async (response, currentRole) => {
-        console.log('Google Sign-Up Response:', response);
-        console.log('Role from ref (should be correct):', currentRole); // This should now show the correct role
 
         setIsLoading(true);
         setMessage('Signing up with Google...');
@@ -391,69 +377,69 @@ function Signup({ onAuthSuccess }) {
     }, [password, confirmPassword]);
 
 
-return (
-    <div className="flex items-start justify-center h-screen bg-primary"> {/* Light background like in the image */}
-        <form
-            className="w-[90%] max-w-lg py-12 flex flex-col justify-center items-center font-outfit"
-        >
-            {step === 1 && (
-                <>
+    return (
+        <div className="flex items-start justify-center h-screen bg-primary"> {/* Light background like in the image */}
+            <form
+                className="w-[90%] max-w-lg py-12 flex flex-col justify-center items-center font-outfit"
+            >
+                {step === 1 && (
+                    <>
 
-                    <div className="w-full max-w-md flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1"  onClick={() => navigate(-1)}>
-                              <IoIosArrowBack className="text-secondary text-xl" />
-                              <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
-                            </div> 
-
-                             <div className="w-[45%] max-w-md flex items-center mb-6 ">
-                             <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
-                             </div>
-
-                    <p className="font-outfit text-2xl text-center font-semibold text-black mb-12">Choose your role to get started</p> {/* Improved typography */}
-
-                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 w-full transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
-                        <div
-                            className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
-                                ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-[#009a94]'}`}
-                            onClick={() => {
-                                setIsOrganizer(true);
-                                setIsAttendee(false);
-                                setSelectedRole("client");
-                            }}>
-
-                            <HiOutlineCalendarDays className="text-[8rem]" /> {/* Adjusted icon size */}
-                            <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
+                        <div className="w-full max-w-md flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1 cursor-pointer" onClick={() => navigate('/')}>
+                            <IoIosArrowBack className="text-secondary text-xl" />
+                            <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
                         </div>
 
-                        <div
-                            className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
+                        <div className="w-[45%] max-w-md flex items-center mb-6 ">
+                            <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
+                        </div>
+
+                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-12">Choose your role to get started</p> {/* Improved typography */}
+
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 w-full transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
+                            <div
+                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 p-8
+                                ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
+                                onClick={() => {
+                                    setIsOrganizer(true);
+                                    setIsAttendee(false);
+                                    setSelectedRole("client");
+                                }}>
+
+                                <HiOutlineCalendarDays className="text-[8rem]" /> {/* Adjusted icon size */}
+                                <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
+                            </div>
+
+                            <div
+                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
                                 ${isAttendee ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
-                            onClick={() => {
-                                setIsOrganizer(false);
-                                setIsAttendee(true);
-                                setSelectedRole("guest");
-                            }}
-                        >
-                            <HiOutlineIdentification className="text-[8rem]" /> {/* Adjusted icon size */}
-                            <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
+                                onClick={() => {
+                                    setIsOrganizer(false);
+                                    setIsAttendee(true);
+                                    setSelectedRole("guest");
+                                }}
+                            >
+                                <HiOutlineIdentification className="text-[8rem]" /> {/* Adjusted icon size */}
+                                <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
+                            </div>
                         </div>
-                    </div>
 
-                    <button
-                        className="bg-secondary text-white uppercase font-bold py-3 mt-10 w-[80%] max-w-xs rounded-md shadow-md cursor-pointer transition-all duration-300"
-                        disabled={!isOrganizer && !isAttendee}
-                        onClick={() => {
-                            if (selectedRole) {
-                                setStep(2);
-                            } else {
-                                setMessage("Please select a role to continue.");
-                            }
-                        }}> Done </button>
+                        <button
+                            className="bg-secondary text-white uppercase font-bold py-3 mt-10 w-[80%] max-w-xs rounded-md shadow-md cursor-pointer transition-all duration-300"
+                            disabled={!isOrganizer && !isAttendee}
+                            onClick={() => {
+                                if (selectedRole) {
+                                    setStep(2);
+                                } else {
+                                    setMessage("Please select a role to continue.");
+                                }
+                            }}> Done </button>
 
-                    <p className="text-gray-600 font-outfit mt-8"> {/* Adjusted margin and color */}
-                        Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
-                    </p>
-                    {message && <p className="text-center text-sm mt-4 text-red-500">{message}</p>}
-                </>
+                        <p className="text-gray-600 font-outfit mt-8"> {/* Adjusted margin and color */}
+                            Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
+                        </p>
+                        {message && <p className="text-center text-sm mt-4 text-red-500">{message}</p>}
+                    </>
                 )}
 
 
@@ -581,7 +567,7 @@ return (
 
                         <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Create Your Attendee Account</h2>
 
-                        <div className="mb-4 w-65">
+                        <div className="mb-4 w-80">
                             <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
                             <input
                                 type="text" id="firstname" name="firstname"
@@ -589,7 +575,7 @@ return (
                                 value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-65">
+                        <div className="mb-4 w-80">
                             <label htmlFor="lastN" className="block mb-2pl-1 text-sm font-medium font-outfit">Last Name</label>
                             <input
                                 type="text" id="lastname" name="lastname"
@@ -597,7 +583,7 @@ return (
                                 value={lastname} onChange={(e) => setLastname(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-65">
+                        <div className="mb-4 w-80">
                             <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
                             <input
                                 type="tel" id="phoneNo" name="phoneNo" // Changed type to tel
@@ -605,14 +591,14 @@ return (
                                 value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-65">
+                        <div className="mb-4 w-80">
                             <label htmlFor="date" className="block pl-1 mb-2 text-sm font-medium font-outfit">Date of Birth</label>
                             <input type="date" id="birthday" name="birthday"
                                 className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={birthday} onChange={(e) => setBirthday(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-65">
+                        <div className="mb-4 w-80">
                             <label htmlFor="gender" className="block mb-2 pl-1 text-sm font-medium font-outfit">Gender</label>
                             <select
                                 id="gender" name="gender"
