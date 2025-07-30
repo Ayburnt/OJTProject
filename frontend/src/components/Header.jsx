@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { CiSearch } from "react-icons/ci";
-import SariSariLogo from '../assets/Logo.png'; // Make sure this path is correct for your project
+import SariSariLogo from '/sariLogo.png';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import useAuth from '../hooks/useAuth'; // Import the useAuth hook
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
+  
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -37,12 +40,22 @@ function Header() {
           <Link to="#" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
             Find my Tickets
           </Link>
-          <Link to="/login" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
-            Login
-          </Link>
-          <Link to="/signup" className="bg-teal-600 text-white px-5 py-2.5 rounded-full hover:bg-teal-700 transition-colors shadow-md text-base font-semibold">
-            Sign up
-          </Link>
+          {isLoggedIn ? (
+            <>
+              <button onClick={logout}>Log out</button>
+              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
+              <p>{userFirstName}</p>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
+                Login
+              </Link>
+              <Link to="/signup" className="bg-teal-600 text-white px-5 py-2.5 rounded-full hover:bg-teal-700 transition-colors shadow-md text-base font-semibold">
+                Sign up
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Mobile menu icon */}
@@ -60,12 +73,23 @@ function Header() {
             <Link to="#" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Find my Tickets
             </Link>
-            <Link to="/login" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+
+            {isLoggedIn ? (
+              <>
+              <button onClick={logout}>Log out</button>
+              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
+              <p>{userFirstName}</p>
+              </>
+            ) : (
+              <>
+              <Link to="/login" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Login
             </Link>
             <Link to="/signup" className="block bg-teal-600 text-white px-5 py-2.5 rounded-full hover:bg-teal-700 transition-colors shadow-md text-base font-semibold">
               Sign up
             </Link>
+              </>
+            )}      
           </nav>
         </div>
       )}

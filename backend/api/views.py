@@ -398,6 +398,7 @@ class ProfileCompletionView(APIView):
                     'needs_profile_completion': False, # Profile is now complete
                 }
             }, status=status.HTTP_200_OK)
+        print("ProfileCompletionView serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # --- API Views for Email Check and OTP ---

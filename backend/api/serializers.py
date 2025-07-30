@@ -24,10 +24,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True) # New field
     birthday = serializers.DateField(required=False, allow_null=True) # New field
     gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
+    profile_picture = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True) # New field for profile picture
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender') # Added gender
+        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture') # Added gender
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True}, # Made optional for initial registration
             'last_name': {'required': False, 'allow_blank': True},  # Made optional for initial registration
@@ -59,7 +60,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             role=validated_data.get('role', 'guest'), # Ensure role is set, default to 'guest'
             phone_number=validated_data.get('phone_number', None), # Save new field
             birthday=validated_data.get('birthday', None), # Save new field
-            gender=validated_data.get('gender', None) # Save new field
+            gender=validated_data.get('gender', None), # Save new field
+            profile_picture=validated_data.get('profile_picture', 'https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575') # Save new field
         )
         return user
 
@@ -103,7 +105,7 @@ class BaseGoogleAuthSerializer(serializers.Serializer):
         try:
             # IMPORTANT: Ensure settings.GOOGLE_CLIENT_ID is correctly set in your Django settings.py
             # It must match the client_id used in your frontend.
-            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), settings.GOOGLE_CLIENT_ID)
+            idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), settings.GOOGLE_CLIENT_ID, clock_skew_in_seconds=10)
 
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                 print(f"DEBUG: Google token verification failed - Wrong issuer: {idinfo.get('iss')}")
