@@ -115,21 +115,25 @@ function Login({ onAuthSuccess }) {
   };
 
   return (
-    <div className="flex items-start items-center justify-center h-screen rounded-lg">
+    <div className="flex items-center justify-center h-screen rounded-lg">
 
       <form onSubmit={handleSubmit}     
 
         className="bg-white p-8 rounded w-[full] py-5  flex flex-col justify-center items-center" >
-          <div className="flex items-center cursor-pointer mb-5" onClick={() => window.history.back()}>
-          <IoIosArrowBack className="text-secondary text-xl mr-2" />
-          <span className="text-secondary text-sm font-medium font-outfit">Back to role selection</span>
+        {/* Back button */}
+        {/* This will navigate back to the previous page */}
+          <div className="w-full max-w-md flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1" onClick={() => window.history.back()}>
+          <IoIosArrowBack className="text-secondary text-xl ml  -2" />
+          <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
         </div> 
 
-        <div className="w-[45%]">
+        <div className="w-[45%] max-w-md flex items-center mb-6 ">
           <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
         </div>
 
-        <h2 className="text-2xl font-bold mb-6 text-center">Welcome!</h2>
+        <h2 className="text-5xl font-bold font-outfit mb-2 mt-5 text-center">Welcome!</h2>
+        <hr className="w-70 mb-2 border-t border-gray-600" />
+        <p className="text-center text-sm font-outfit mb-8">Sign in your account</p>  
 
         <div className="mb-4">
           <label htmlFor="email" className="block mb-2 text-sm font-medium">   Your E-mail </label>

@@ -4,6 +4,7 @@ import { IoArrowBackCircle } from "react-icons/io5";
 import { HiOutlineCalendarDays } from "react-icons/hi2"; // Changed from LuCalendarDays to match current code
 import { HiOutlineIdentification } from "react-icons/hi";
 import { HiMail } from 'react-icons/hi';
+import { IoIosArrowBack } from "react-icons/io";
 import api, { ACCESS_TOKEN } from '../api.js';
 
 function Signup({ onAuthSuccess }) {
@@ -390,100 +391,115 @@ function Signup({ onAuthSuccess }) {
     }, [password, confirmPassword]);
 
 
-    return (
-        <div className="flex items-start justify-center h-screen bg-primary">
-            <form
-                className="rounded w-[90%] py-10 flex flex-col justify-center items-center">
-                {step === 1 && (
-                    <>
-                        <div className="w-full text-left mb-10">
-                            <IoArrowBackCircle className="text-secondary text-[2.5rem]" onClick={() => navigate(-1)} />
+return (
+    <div className="flex items-start justify-center h-screen bg-primary"> {/* Light background like in the image */}
+        <form
+            className="w-[90%] max-w-lg py-12 flex flex-col justify-center items-center font-outfit"
+        >
+            {step === 1 && (
+                <>
+
+                    <div className="w-full max-w-md flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1"  onClick={() => navigate(-1)}>
+                              <IoIosArrowBack className="text-secondary text-xl" />
+                              <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
+                            </div> 
+
+                             <div className="w-[45%] max-w-md flex items-center mb-6 ">
+                             <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
+                             </div>
+
+                    <p className="font-outfit text-2xl text-center font-semibold text-black mb-12">Choose your role to get started</p> {/* Improved typography */}
+
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-6 w-full transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
+                        <div
+                            className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
+                                ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-[#009a94]'}`}
+                            onClick={() => {
+                                setIsOrganizer(true);
+                                setIsAttendee(false);
+                                setSelectedRole("client");
+                            }}>
+
+                            <HiOutlineCalendarDays className="text-[8rem]" /> {/* Adjusted icon size */}
+                            <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
                         </div>
 
-                        <p className="font-outfit text-xl mb-10">Choose your role to get started</p>
-
-                        <div className="flex flex-col xl:flex-row items-center justify-center gap-8 xl:gap-[5rem] w-full transition-colors duration-500">
-                            <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                   ${isOrganizer && `bg-secondary`}`}
-                                onClick={() => {
-                                    setIsOrganizer(true);
-                                    setIsAttendee(false);
-                                    setSelectedRole("client"); // Set role to 'client' for organizer
-                                }}>
-                                <HiOutlineCalendarDays className={`text-secondary text-[9rem] ${isOrganizer && `text-white`}`} />
-                                <p className={`uppercase font-outfit text-secondary font-bold ${isOrganizer && `text-white`}`}>organizer</p>
-                            </div>
-
-                            <div className={`w-[80%] xl:w-[20%] flex items-center justify-center flex-col border-3 border-secondary rounded-2xl cursor-pointer transition-colors duration-400
-                   ${isAttendee && `bg-secondary`}`}
-                                onClick={() => {
-                                    setIsOrganizer(false);
-                                    setIsAttendee(true);
-                                    setSelectedRole("guest"); // Set role to 'guest' for attendee
-                                }}>
-                                <HiOutlineIdentification className={`text-secondary text-[9rem] ${isAttendee && `text-white`}`} />
-                                <p className={`uppercase font-outfit text-secondary font-bold ${isAttendee && `text-white`}`}>attendee</p>
-                            </div>
-
-                            <button className="bg-secondary w-[70%] xl:w-[20%] py-2 mt-10 rounded-md text-white uppercase shadow-md cursor-pointer" disabled={!isOrganizer && !isAttendee}
-                                onClick={() => {
-                                    // Only proceed if a role is selected
-                                    if (selectedRole) {
-                                        setStep(2);
-                                    } else {
-                                        setMessage("Please select a role to continue.");
-                                    }
-                                }}>done</button>
+                        <div
+                            className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
+                                ${isAttendee ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
+                            onClick={() => {
+                                setIsOrganizer(false);
+                                setIsAttendee(true);
+                                setSelectedRole("guest");
+                            }}
+                        >
+                            <HiOutlineIdentification className="text-[8rem]" /> {/* Adjusted icon size */}
+                            <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
                         </div>
-                        <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
-                        {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
-                    </>
+                    </div>
+
+                    <button
+                        className="bg-secondary text-white uppercase font-bold py-3 mt-10 w-[80%] max-w-xs rounded-md shadow-md cursor-pointer transition-all duration-300"
+                        disabled={!isOrganizer && !isAttendee}
+                        onClick={() => {
+                            if (selectedRole) {
+                                setStep(2);
+                            } else {
+                                setMessage("Please select a role to continue.");
+                            }
+                        }}> Done </button>
+
+                    <p className="text-gray-600 font-outfit mt-8"> {/* Adjusted margin and color */}
+                        Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
+                    </p>
+                    {message && <p className="text-center text-sm mt-4 text-red-500">{message}</p>}
+                </>
                 )}
 
 
                 {step === 2 && (
                     <>
                         <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2.5rem] mb-10" onClick={() => setStep(1)} />
+                            <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => setStep(1)} />
                         </div>
 
                         <h2 className="text-2xl font-bold font-outfit mb-4 text-center">Sign Up</h2>
 
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="email" className="block mb-2 font-outfit text-sm pl-1 font-medium">E-mail</label>
                             <input
                                 type="email" id="email" name="email"
-                                className={`w-full px-4 py-2 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
+                                className={`w-full px-4 py-1 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
                                 value={email} onChange={(e) => setEmail(e.target.value)} required />
                             {emailError && <p className="font-outfit text-red-500 text-sm mt-1">{emailError}</p>}
                         </div>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="password" className="block mb-2 pl-1 text-sm font-outfit font-medium">Password</label>
                             <input
                                 type="password" id="password" name="password"
-                                className={`w-full px-4 py-2 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
+                                className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
                                 value={password} onChange={(e) => setPassword(e.target.value)} required />
                         </div>
 
-                        <div className="mb-6 w-80">
+                        <div className="mb-6 w-65">
                             <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium">Confirm Password</label>
                             <input
                                 type="password" id="confirmPassword" name="confirmPassword"
-                                className={`w-full px-4 py-2 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
+                                className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
                                 value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                             {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
                         </div>
                         <button
-                            className="w-80 bg-secondary text-white py-2 font-outfit rounded-lg transition"
+                            className="w-65 bg-secondary text-white py-1 font-outfit rounded-lg transition"
                             onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
                             disabled={isLoading} // Disable button while loading
                         >
                             {isLoading ? 'Processing...' : 'Sign up'}
                         </button>
 
-                        <div className="flex items-center justify-center mt-7 w-full max-w-xs">
+                        <div className="flex items-center justify-center mt-7 w-[80%] max-w-xs">
                             <div className="flex-grow border-t border-gray-300"></div>
                             <span className="mx-4 text-gray-500">or</span>
                             <div className="flex-grow border-t border-gray-300"></div>
@@ -501,17 +517,17 @@ function Signup({ onAuthSuccess }) {
 
 
                 {step === 3 && (
-                    <div className="w-full text-left">
-                        <IoArrowBackCircle className="text-secondary text-[2.5rem] mb-10" onClick={() => setStep(2)} />
+                    <div className="w-full text-left font-outfit">
+                        <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => setStep(2)} />
                         <div className="flex flex-col justify-between h-screen px-4 py-4 bg-primary">
 
-                            <div className="text-center mt-5">
+                            <div className="text-center mt-2">
                                 <h2 className="text-3xl font-outfit font-bold"> E-mail <br /> Verification </h2>
                                 <div className="flex justify-center mt-6">
                                     <HiMail className="text-9xl text-secondary " />
                                 </div>
                                 <p className="text-base p-2 font-bold font-outfit text-left mt-10"> Please enter your verification code </p>
-                                <p className="text-base p-1 font-outfit text-left "> We have sent a verification to your registered email ID. </p>
+                                <p className="text-xs p-1 font-outfit text-left "> We have sent a verification to your registered email ID. </p>
 
                                 {otpError === true && <p className="font-outfit text-center text-lg mt-4 text-red-500 font-bold">{otpErrMsg}</p>}
 
@@ -532,12 +548,12 @@ function Signup({ onAuthSuccess }) {
                                         ))}
                                     </div>
 
-                                    <div className="border-t-2 border-black my-3 w-full"></div>
+                                    <div className="border-t-1 border-black my-3 w-full"></div>
                                 </div>
 
                                 <button
                                     type="button" onClick={handleOtpVerification} // Call handleOtpVerification
-                                    className="w-full bg-teal-600 text-white py-4 rounded-lg hover:bg-teal-700 font-outfit transition shadow-lg"
+                                    className="w-[80%] bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 mt-3 font-outfit transition shadow-lg"
                                     disabled={isVerifyingOtp}
                                 >
                                     {isVerifyingOtp ? 'Verifying...' : 'Done'}
@@ -551,7 +567,7 @@ function Signup({ onAuthSuccess }) {
                     // Fillup Information
                     <>
                         <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2.5rem] mb-10" onClick={() => {
+                            <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => {
                                 // Decide where to go back based on how they got to step 4
                                 // If already authenticated (e.g., Google signup), go back to login page
                                 // If manual signup, go back to OTP step
@@ -563,44 +579,44 @@ function Signup({ onAuthSuccess }) {
                             }} />
                         </div>
 
-                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Fill up Your Profile</h2>
+                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Create Your Attendee Account</h2>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
                             <input
                                 type="text" id="firstname" name="firstname"
-                                className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="lastN" className="block mb-2pl-1 text-sm font-medium font-outfit">Last Name</label>
                             <input
                                 type="text" id="lastname" name="lastname"
-                                className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={lastname} onChange={(e) => setLastname(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
                             <input
                                 type="tel" id="phoneNo" name="phoneNo" // Changed type to tel
-                                className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="date" className="block pl-1 mb-2 text-sm font-medium font-outfit">Date of Birth</label>
                             <input type="date" id="birthday" name="birthday"
-                                className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={birthday} onChange={(e) => setBirthday(e.target.value)} required />
                         </div>
 
-                        <div className="mb-4 w-80">
+                        <div className="mb-4 w-65">
                             <label htmlFor="gender" className="block mb-2 pl-1 text-sm font-medium font-outfit">Gender</label>
                             <select
                                 id="gender" name="gender"
-                                className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={gender} onChange={(e) => setGender(e.target.value)} required
                             >
                                 <option value="" disabled>Select Gender</option>
@@ -630,7 +646,7 @@ function Signup({ onAuthSuccess }) {
                             </>
                         )}
 
-                        <div className="flex items-center w-80">
+                        <div className="flex items-center w-65">
                             <input
                                 type="checkbox" id="agree" className="mr-2"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
@@ -640,12 +656,11 @@ function Signup({ onAuthSuccess }) {
                         </div>
                         <button
                             type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
-                            className="w-80 bg-secondary text-white py-2 rounded-lg transition"
+                            className="w-65 bg-secondary text-white py-2 rounded-lg transition"
                             disabled={isLoading}
                         >
                             {isLoading ? 'Saving...' : 'Continue'}
                         </button>
-                        <hr className=" mt-7 border-black w-85 h-2" />
                         <p className="text-grey font-outfit mt-5">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
                     </>
