@@ -37,7 +37,6 @@ export const useAuth = () => {
       setIsLoggedIn(false);
       setUserRole('');
       setUserEmail('');
-      navigate('/');
     }
   }, []); // navigate is a stable function from react-router-dom, but good practice to include
 

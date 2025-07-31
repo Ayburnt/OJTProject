@@ -9,14 +9,14 @@ import CallToActionSection from './components/CallToActionSection';
 import Footer from './components/Footer';
 import EventDetailPage from './pages/EventDetailPage';
 import ViewAllEventsPage from './pages/ViewAllEventsPage';
-import ClientDashboard from './pages/ClientDashboard';
+import OrganizerDashboard from './pages/OrganizerDashboard';
 
 function App() {
   const location = useLocation(); // Get the current location object
 
   // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/client-dashboard';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/client-dashboard';
+  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard';
+  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">
@@ -36,10 +36,10 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/client-dashboard" element={<ClientDashboard />} />
+          <Route path="/signup" element={<SignUp />} />          
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
+          <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
         </Routes>
       </main>
 

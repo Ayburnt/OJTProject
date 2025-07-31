@@ -27,7 +27,7 @@ function Header() {
 
         {/* Search Bar (centralized and sleek) */}
         <div className="relative flex items-center bg-gray-100 rounded-full px-4 py-2 w-full max-w-md mx-4 md:mx-8">
-          <CiSearch className="text-gray-500 text-xl mr-2" />
+          <CiSearch className="text-gray-500 text-secondary text-xl mr-2" />
           <input
             type="text"
             placeholder="Search for events..."
