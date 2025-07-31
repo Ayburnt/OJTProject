@@ -8,7 +8,7 @@ const api = axios.create({
     // Use environment variable for the base URL, falling back to a default
     // For Vite, it's import.meta.env.VITE_API_URL
     // For Create-React-App, it would be process.env.REACT_APP_API_URL
-    baseURL: import.meta.env.VITE_API_URL || 'http://0.0.0.0:8000/api', // Default to your Django backend API base URL
+    baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api', // Default to your Django backend API base URL
 });
 
 // Add a request interceptor to include the JWT token in headers
