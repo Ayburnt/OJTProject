@@ -39,7 +39,7 @@ export const useAuth = () => {
       setUserEmail('');
       navigate('/');
     }
-  }, [navigate]); // navigate is a stable function from react-router-dom, but good practice to include
+  }, []); // navigate is a stable function from react-router-dom, but good practice to include
 
   // Optional: Add login and logout functions to the hook for easier management
   const login = (accessToken, refreshToken, role, email) => {
