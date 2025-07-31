@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CiSearch } from "react-icons/ci";
-import SariSariLogo from '/sariLogo.png';
+const SariSariLogo = "/sariLogo.png";
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import useAuth from '../hooks/useAuth'; // Import the useAuth hook
 
