@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Install react-icons if you haven't: npm install react-icons
 
 function HeroSection() {
+  useEffect(() => {
+    document.title = "Sari-Sari Events";
+  },[])
   const images = [
     {
       src: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ladies-night-party-landscape-poster-flyer-design-template-cc9e9c66c4e308161db9c7dcaa27bffe_screen.jpg?ts=1601365829",
