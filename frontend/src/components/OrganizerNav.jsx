@@ -10,23 +10,24 @@ function OrganizerNav() {
   return (
     <>
       {/* Mobile Top Navbar */}
-  <div className="md:hidden fixed top-0 left-0 w-full h-16 bg-white z-50 px-4 flex items-center justify-between shadow">
-  {/* Burger Menu */}
-  <button
-    onClick={() => setIsOpen(true)}
-    className="text-2xl text-gray-700 cursor-pointer"
-  >
-    <FiMenu />
-  </button>
+      <div className="md:hidden fixed top-0 left-0 w-full h-16 bg-white z-50 px-4 flex items-center justify-between shadow">
+        {/* Burger Menu */}
+        <button
+          onClick={() => setIsOpen(true)}
+          className="text-2xl text-gray-700 cursor-pointer"
+        >
+          <FiMenu />
+        </button>
 
-  {/* Profile Icon */}
- <CgProfile className="text-4xl sm:text-5xl text-gray-600" />
-</div>
+        {/* Profile Icon */}
+        <CgProfile className="text-4xl sm:text-5xl text-gray-600" />
+      </div>
 
       {/* Mobile Popup Navigation */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 z-50 flex justify-center items-center md:hidden">
-          <div className="bg-white w-11/12 max-w-sm rounded-xl shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
+        <div
+          className={`fixed top-0 left-0 w-[80%] h-screen bg-black bg-opacity-40 z-60 flex justify-center items-center md:hidden`}>
+          <div className="bg-white w-full rounded-xl shadow-lg p-6 relative h-screen overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setIsOpen(false)}
@@ -36,22 +37,24 @@ function OrganizerNav() {
             </button>
 
             {/* Logo */}
-            <div className="mb-6 text-center mt-4">
+            <div className="mb-15 text-center mt-4">
               <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10 mx-auto" />
             </div>
 
             {/* Navigation */}
-            <ul className="space-y-4 text-center text-gray-800">
+            <div className="flex flex-col items-center justify-center">
+            <ul className="space-y-5 pl-10 w-full text-center text-gray-800 flex flex-col items-start">
               <li className="cursor-pointer hover:text-teal-600 transition-colors">Dashboard</li>
               <li className="cursor-pointer hover:text-teal-600 transition-colors">My Events</li>
               <li className="cursor-pointer hover:text-teal-600 transition-colors">Attendees</li>
               <li className="cursor-pointer hover:text-teal-600 transition-colors">Manage Account</li>
             </ul>
+            </div>            
 
             <hr className="my-5 border-gray-300" />
 
             {/* Footer */}
-            <div className="flex flex-col gap-3 items-center text-secondary">
+            <div className="flex flex-col mt-10 gap-3 pl-8 w-full items-start text-secondary">
               <div
                 className="flex items-center gap-2 cursor-pointer"
                 onClick={() => console.log("Back to client-dashboard")}
@@ -64,7 +67,7 @@ function OrganizerNav() {
                 onClick={() => console.log("Logout clicked")}
               >
                 <IoExitOutline className="text-xl transform -scale-x-100" />
-                <span className="text-sm font-medium">Log Out</span>
+                <span className="text-sm font-medium">Log out</span>
               </button>
             </div>
           </div>
@@ -87,7 +90,7 @@ function OrganizerNav() {
           <li className="cursor-pointer hover:text-teal-600 transition-colors">Manage Account</li>
         </ul>
 
-        
+
 
         {/* Footer */}
         <hr className="border-gray-300" />
