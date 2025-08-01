@@ -10,6 +10,7 @@ import Footer from './components/Footer';
 import EventDetailPage from './pages/EventDetailPage';
 import ViewAllEventsPage from './pages/ViewAllEventsPage';
 import OrganizerDashboard from './pages/OrganizerDashboard';
+import ForgotPass from './pages/ForgotPass.jsx';
 
 function App() {
   const location = useLocation(); // Get the current location object
@@ -40,6 +41,8 @@ function App() {
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
+          <Route path="/forgot-password" element={<ForgotPass />} />
+          {/* Add more routes as needed */}
         </Routes>
       </main>
 
