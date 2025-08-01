@@ -74,6 +74,9 @@ function Header() {
             <Link to="#" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Find my Tickets
             </Link>
+            <Link to="#" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+              Create Event
+            </Link>
 
             {isLoggedIn ? (
               <>
@@ -86,9 +89,7 @@ function Header() {
               <Link to="/login" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Login
             </Link>
-            <Link to="/signup" className="block bg-teal-600 text-white px-5 py-2.5 rounded-full hover:bg-teal-700 transition-colors shadow-md text-base font-semibold">
-              Sign up
-            </Link>
+
               </>
             )}      
           </nav>
