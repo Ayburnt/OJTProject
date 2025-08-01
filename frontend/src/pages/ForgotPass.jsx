@@ -32,6 +32,7 @@ const ForgotPass = () => {
 
   const handleCodeSubmit = () => {
     const enteredCode = code.join('');
+    // TODO: In a real app, you would send the code to your backend for verification
     if (enteredCode !== '123456') {
       setCodeError('WRONG VERIFICATION CODE!');
     } else {
@@ -44,9 +45,15 @@ const ForgotPass = () => {
     if (newPassword !== confirmPassword) {
       setPasswordMismatchError(true);
     } else {
+      // TODO: In a real app, you would send the new password to your backend
       setPasswordMismatchError(false);
       setShowSuccessModal(true);
     }
+  };
+
+  // This function handles the navigation back to the login page
+  const handleGoBackToLogin = () => {
+    navigate('/login');
   };
 
   const mainColor = 'bg-[#009494]';
@@ -56,20 +63,21 @@ const ForgotPass = () => {
     <div className="w-full min-h-screen flex items-center justify-center p-4 bg-gray-100">
       {step === 'email' && (
         <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
-          <div className="flex items-center mb-8 cursor-pointer" onClick={() => setStep('Login')}>
+          {/* UPDATED: The onClick now uses the navigate function to go to '/login' */}
+          <div className="flex items-center mb-8 cursor-pointer" onClick={handleGoBackToLogin}>
             <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" />
           </div>
           <div className="flex flex-col items-center text-center mb-8">
-              <h1 className="text-2xl font-bold font-outfit text-gray-800">Enter your E-mail</h1>
+            <h1 className="text-2xl font-bold font-outfit text-gray-800">Enter your E-mail</h1>
             <HiMail className="w-20 h-20 mb-4 text-[#007D7D]" />
             <div className="text-left w-full ">
-            <p className="mt-2 text-sm font-outfit font-bold text-gray-500">
-              Please enter your registered email.
-            </p>
-            <p className="text-xs font-outfit text-gray-500 mb-4">
-              We have sent a verification code to your email ID.
+              <p className="mt-2 text-sm font-outfit font-bold text-gray-500">
+                Please enter your registered email.
               </p>
-              </div>
+              <p className="text-xs font-outfit text-gray-500 mb-4">
+                We have sent a verification code to your email ID.
+              </p>
+            </div>
           </div>
           <input
             type="email"
@@ -92,10 +100,10 @@ const ForgotPass = () => {
 
       {step === 'code' && (
         <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
+          {/* This back arrow correctly goes back one step in the internal form flow */}
           <div className="flex items-center mb-8 cursor-pointer" onClick={() => setStep('email')}>
             <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" />
           </div>
-
           <div className="flex flex-col items-center text-center mb-6">
             <h1 className="text-2xl font-bold font-outfit text-gray-800 mb-8">Password Reset Code</h1>
             {codeError ? (
@@ -104,19 +112,17 @@ const ForgotPass = () => {
               <BsShieldLockFill className="w-20 h-20 mb-4" style={{ color: iconColor }} />
             )}
             <div className="text-left w-full ">
-            <p className="mt-2 text-sm font-outfit font-bold text-gray-500">
-              Please enter your reset code.
-            </p>
-            <p className="text-xs font-outfit text-gray-500 mb-4">
-              We have sent a verification code to your email ID.
+              <p className="mt-2 text-sm font-outfit font-bold text-gray-500">
+                Please enter your reset code.
               </p>
-              </div>
+              <p className="text-xs font-outfit text-gray-500 mb-4">
+                We have sent a verification code to your email ID.
+              </p>
+            </div>
           </div>
-
           {codeError && (
             <p className="text-center font-bold text-red-500 mb-4">{codeError}</p>
           )}
-
           <div className="flex justify-between space-x-2 mb-6">
             {code.map((digit, index) => (
               <input
@@ -147,7 +153,6 @@ const ForgotPass = () => {
               />
             ))}
           </div>
-
           <button
             onClick={handleCodeSubmit}
             className={`w-full py-4 text-white font-semibold font-outfit rounded-2xl transition-transform transform ${mainColor} hover:scale-105`}
@@ -159,18 +164,17 @@ const ForgotPass = () => {
 
       {step === 'newPassword' && (
         <div className="w-full max-w-sm p-8 bg-white rounded-2xl shadow-xl border border-gray-200">
+          {/* This back arrow also correctly goes back one step in the internal flow */}
           <div className="flex items-center mb-8 cursor-pointer" onClick={() => setStep('code')}>
             <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" />
           </div>
-
           <div className="flex flex-col items-center mb-6 text-center">
             <h1 className="text-2xl font-bold font-outfit text-gray-800 mb-8">Enter New Password</h1>
             <BsShieldLockFill className="w-20 h-20 mb-4" style={{ color: iconColor }} />
             <div className="text-left w-full font-outfit font-bold ">
-            <p className="mt-2 text-sm font-outfit text-gray-500">Please enter your new password below.</p>
+              <p className="mt-2 text-sm font-outfit text-gray-500">Please enter your new password below.</p>
+            </div>
           </div>
-          </div>
-
           <input
             type="password"
             placeholder="New Password"
@@ -188,7 +192,6 @@ const ForgotPass = () => {
           {passwordMismatchError && (
             <p className="text-sm text-red-500 mb-4">Passwords do not match.</p>
           )}
-
           <button
             onClick={handlePasswordSubmit}
             className={`w-full py-4 text-white font-semibold font-outfit rounded-2xl transition-transform transform ${mainColor} hover:scale-105`}

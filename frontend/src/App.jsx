@@ -16,8 +16,8 @@ function App() {
   const location = useLocation(); // Get the current location object
 
   // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard';
+  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password';
+  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">

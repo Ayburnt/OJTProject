@@ -156,7 +156,8 @@ function Login({ onAuthSuccess }) {
         <button type="submit" className="w-72 bg-secondary text-white py-2 rounded hover:bg-blue-600 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
         <p className="text-center py-4"> or </p>
         <div id="google-sign-in-button" className="flex justify-center"></div>
-        <p className="text-grey font-outfit mt-10">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
+       <p class="text-grey font-outfit mt-5">Forgot Password? <a class="text-secondary" href="/forgot-password">Reset it here</a></p>
+        <p className="text-grey font-outfit mt-5">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
       </form>
     </div>
 
