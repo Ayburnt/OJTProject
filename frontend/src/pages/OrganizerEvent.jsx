@@ -1,21 +1,24 @@
 import React from 'react';
 import OrganizerNav from '../components/OrganizerNav';
+import EventCard from '../components/OrganizerEventCard';
 
 const OrganizerEvent = () => {
   const events = [
     {
-      name: 'Event Name',
-      date: 'Date',
-      location: 'Location',
-      attendees: 'Attendees',
+      name: 'Tech Conference 2023',
+      img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Multicolor-Abstract-Sunset-Party-Poster-724x1024.jpg',
+      date: '2026-12-40 at 5:69 PM',
+      location: 'SMX Pasay Manila',
+      attendees: '100000 Attendees',
       price: 'Price',
       status: 'Status',
     },
     {
-      name: 'Event Name',
-      date: 'Date',
-      location: 'Location',
-      attendees: 'Attendees',
+      name: 'Meow',
+      img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Purple-Black-Tropical-Party-Club-Poster-724x1024.jpg',
+      date: '2026-12-40 at 5:69 PM',
+      location: 'SMX Pasay Manila',
+      attendees: '100000 Attendees',
       price: 'Price',
       status: 'Status',
     },
@@ -26,7 +29,7 @@ const OrganizerEvent = () => {
       <OrganizerNav />
 
       {/* Content Container */}
-      <div className="pt-20 md:ml-64 p-4 md:p-8 lg:p-12">
+      <div className="pt-20 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
         {/* Header */}
         <div className="flex justify-center mb-8">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-light font-outfit text-gray-800">
@@ -61,9 +64,9 @@ const OrganizerEvent = () => {
 
           {/* Action buttons */}
           <div className="flex flex-col md:flex-row gap-55 w-full md:w-auto">
-           <button className="px-6 py-2 bg-secondary text-white rounded-full hover:bg-secondary/80 font-outfit shadow">
-                All Events
-                </button>
+            <button className="px-6 py-2 bg-secondary text-white rounded-full hover:bg-secondary/80 font-outfit shadow">
+              All Events
+            </button>
 
             <button className="px-6 py-2 bg-secondary text-white rounded-lg hover:bg-secondary/80 font-outfit shadow">
               Create Event
@@ -71,39 +74,18 @@ const OrganizerEvent = () => {
           </div>
         </div>
 
-        {/* Event Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
-          <div className="min-w-[700px]">
-            {/* Header */}
-            <div className="grid grid-cols-8 gap-4 p-4 text-sm font-semibold font-outfit text-gray-700 bg-gray-50 border-b">
-              <div className="col-span-2">Event Name</div>
-              <div>Date</div>
-              <div>Location</div>
-              <div>Attendees</div>
-              <div>Price</div>
-              <div>Status</div>
-              <div>Actions</div>
-            </div>
-
-            {/* Rows */}
-            {events.map((event, i) => (
-              <div
-                key={i}
-                className={`grid grid-cols-8 gap-4 p-4 text-sm text-gray-600 border-b ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-              >
-                <div className="col-span-2 font-medium">{event.name}</div>
-                <div>{event.date}</div>
-                <div>{event.location}</div>
-                <div>{event.attendees}</div>
-                <div>{event.price}</div>
-                <div>{event.status}</div>
-                <div className="flex space-x-3">
-                  <a href="#" className="text-teal-500 font-medium hover:underline">Edit</a>
-                  <a href="#" className="text-red-500 font-medium hover:underline">Delete</a>
-                </div>
-              </div>
-            ))}
-          </div>
+        <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 xl:gap-5 mt-8 w-[95%] lg:w-full'>
+          {events.map((event, i) => (
+            <EventCard
+              key={i}
+              eventPoster={event.img}
+              eventStatus={event.status}
+              eventName={event.name}
+              eventDate={event.date}
+              eventLocation={event.location}
+              eventAttendees={event.attendees}
+            />
+          ))}
         </div>
       </div>
     </div>

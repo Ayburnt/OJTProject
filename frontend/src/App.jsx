@@ -11,13 +11,14 @@ import EventDetailPage from './pages/EventDetailPage';
 import ViewAllEventsPage from './pages/ViewAllEventsPage';
 import OrganizerDashboard from './pages/OrganizerDashboard';
 import ForgotPass from './pages/ForgotPass.jsx';
+import OrganizerEvent from './pages/OrganizerEvent.jsx';
 
 function App() {
   const location = useLocation(); // Get the current location object
 
   // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password';
+  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event';
+  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">
@@ -42,6 +43,7 @@ function App() {
           <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
           <Route path="/forgot-password" element={<ForgotPass />} />
+          <Route path="/my-event" element={<OrganizerEvent />} />
           {/* Add more routes as needed */}
         </Routes>
       </main>
