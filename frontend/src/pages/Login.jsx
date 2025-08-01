@@ -22,7 +22,7 @@ function Login({ onAuthSuccess }) {
 
     // Conditional redirection based on user role
     if (userData.role === 'client') {
-      navigate("/client-dashboard");
+      navigate("/organizer-dashboard");
     } else if (userData.role === 'guest') {
       navigate("/"); // Assuming Home.jsx is at the root path '/'
     } else {
@@ -64,7 +64,7 @@ function Login({ onAuthSuccess }) {
 
   const handleGoogleSignIn = async (response) => {
     setIsLoading(true);
-    setMessage('Signing in with Google...');
+    setMessage('');
     try {
       // Use the imported 'api' instance for the request
       const backendResponse = await api.post('/auth/google/login/', { token: response.credential });
@@ -72,7 +72,7 @@ function Login({ onAuthSuccess }) {
       // Axios automatically parses JSON, so data is directly available
       const data = backendResponse.data;
 
-      setMessage('Google Sign-in successful!');
+      setMessage('');
       actualOnAuthSuccess(data.user, data.tokens);
       localStorage.setItem('userFirstName', data.user.first_name || '');
       localStorage.setItem('isLoggedIn', true);
@@ -90,7 +90,6 @@ function Login({ onAuthSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    setMessage('Signing in...');
 
     try {
       // Use the imported 'api' instance for the request
@@ -153,7 +152,7 @@ function Login({ onAuthSuccess }) {
             value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
 
-        {message && <p className="text-center text-sm text-gray-600">{message}</p>}
+        {message && <p className="font-outfit text-center text-sm text-red-500">{message}</p>}
         <button type="submit" className="w-72 bg-secondary text-white py-2 rounded hover:bg-blue-600 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
         <p className="text-center py-4"> or </p>
         <div id="google-sign-in-button" className="flex justify-center"></div>

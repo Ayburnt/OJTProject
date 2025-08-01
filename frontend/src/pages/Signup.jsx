@@ -104,6 +104,7 @@ function Signup({ onAuthSuccess }) {
 
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
+    const [roleMsg, setRoleMsg] = useState("");
 
     // New state for email specific error
     const [emailError, setEmailError] = useState("");
@@ -141,7 +142,7 @@ function Signup({ onAuthSuccess }) {
             // Step 2: Send OTP if email is unique
             const otpSendResponse = await api.post('/auth/otp-send/', { email }); // Corrected endpoint
             if (otpSendResponse.status === 200) {
-                setMessage("Verification code sent to your email.");
+                setMessage("");
                 setStep(3); // Proceed to OTP verification step
             } else {
                 setMessage(otpSendResponse.data.detail || "Failed to send verification code. Please try again.");
@@ -172,12 +173,12 @@ function Signup({ onAuthSuccess }) {
         }
 
         setIsVerifyingOtp(true);
-        setMessage("Verifying code...");
+        setMessage("");
 
         try {
             const response = await api.post('/auth/otp-verify/', { email, otp: enteredOtp });
             if (response.status === 200) {
-                setMessage("Email verified successfully! Registering your account...");
+                setMessage("");
                 setOtpError(false);
                 setOtpErrMsg("");
 
@@ -198,7 +199,7 @@ function Signup({ onAuthSuccess }) {
 
                 const data = registrationResponse.data;
                 if (registrationResponse.status === 201) {
-                    setMessage('Registration successful!');
+                    setMessage('');
                     actualOnAuthSuccess(data.user, data.tokens); // This will handle redirection (to step 4 or dashboard)
                 } else {
                     setMessage(data.detail || 'Registration failed after OTP. Please try again.');
@@ -228,7 +229,7 @@ function Signup({ onAuthSuccess }) {
         }
 
         setIsLoading(true);
-        setMessage('Saving profile information...');
+        setMessage('');
 
         try {
             // Send updated profile data to the new profile completion endpoint
@@ -245,7 +246,7 @@ function Signup({ onAuthSuccess }) {
             const data = backendResponse.data;
 
             if (backendResponse.status === 200) {
-                setMessage('Profile updated successfully! Redirecting to dashboard...');
+                setMessage('');
                 // Update local storage with new profile data
                 localStorage.setItem('userFirstName', data.user.first_name || '');
                 localStorage.setItem('userProfile', data.user.profile_picture || '');
@@ -254,7 +255,7 @@ function Signup({ onAuthSuccess }) {
 
                 // Final redirect after profile completion
                 if (data.user.role === 'client') {
-                    navigate("/client-dashboard");
+                    navigate("/organizer-dashboard");
                 } else if (data.user.role === 'guest') {
                     navigate("/");
                 } else {
@@ -328,7 +329,7 @@ function Signup({ onAuthSuccess }) {
     const handleGoogleSignUp = async (response, currentRole) => {
 
         setIsLoading(true);
-        setMessage('Signing up with Google...');
+        setMessage('');
         try {
             // Send the role from the ref. Phone/birthday are not sent from frontend for Google sign-up.
             const backendResponse = await api.post('/auth/google/register/', {
@@ -338,7 +339,7 @@ function Signup({ onAuthSuccess }) {
 
             const data = backendResponse.data;
 
-            setMessage('Google Sign-up successful!');
+            setMessage('');
             actualOnAuthSuccess(data.user, data.tokens); // This will handle redirection (to step 4 or dashboard)
 
         } catch (error) {
@@ -431,14 +432,13 @@ function Signup({ onAuthSuccess }) {
                                 if (selectedRole) {
                                     setStep(2);
                                 } else {
-                                    setMessage("Please select a role to continue.");
+                                    setRoleMsg("Please select a role to continue.");
                                 }
                             }}> Done </button>
-
+                            {roleMsg && <p className="text-center text-sm mt-4 text-red-500">{roleMsg}</p>}
                         <p className="text-gray-600 font-outfit mt-8"> {/* Adjusted margin and color */}
                             Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
                         </p>
-                        {message && <p className="text-center text-sm mt-4 text-red-500">{message}</p>}
                     </>
                 )}
 
@@ -586,7 +586,7 @@ function Signup({ onAuthSuccess }) {
                         <div className="mb-4 w-80">
                             <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
                             <input
-                                type="tel" id="phoneNo" name="phoneNo" // Changed type to tel
+                                type="tel" id="phoneNo" name="phoneNo" placeholder="e.g. 09xxxxxxxxx" maxLength={11} oninput="this.value = this.value.replace(/[^0-9]/g, '')"
                                 className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
                                 value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
                         </div>
@@ -647,8 +647,8 @@ function Signup({ onAuthSuccess }) {
                         >
                             {isLoading ? 'Saving...' : 'Continue'}
                         </button>
-                        <p className="text-grey font-outfit mt-5">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
-                        {message && <p className="text-center text-sm mt-4 text-gray-600">{message}</p>}
+                        {message && <p className="font-outfit text-center text-sm mt-4 text-red-500">{message}</p>}
+                        <p className="text-grey font-outfit mt-5">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>                        
                     </>
                 )}
             </form>
