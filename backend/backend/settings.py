@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
+import dj_database_url
 import os
 
 load_dotenv()
@@ -26,11 +27,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('AUTH_SECRET')
+DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-django-secret")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = ['event.sari-sari.com', 'www.event.sari-sari.com', '47.129.29.245', 'localhost']
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -119,16 +119,23 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.postgresql',
-		'NAME': os.getenv('DB_NAME'),  # Name of the database you created
-		'USER': os.getenv('DB_USER'),   # Your PostgreSQL username
-		'PASSWORD': os.getenv('DB_PASSWORD'),  # Your PostgreSQL password
-		'HOST': os.getenv('DB_HOST'),  # Use 'localhost' if running locally
-		'PORT': os.getenv('DB_PORT'),       # Default PostgreSQL port
-	}
-}
+DEBUG = os.getenv("DEBUG", "False") == "True"
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('DB_NAME', 'local_db'),
+            'USER': os.getenv('DB_USER', 'postgres'),
+            'PASSWORD': os.getenv('DB_PASSWORD', 'password'),
+            'HOST': os.getenv('DB_HOST', 'localhost'),
+            'PORT': os.getenv('DB_PORT', '5432'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
+    }
 
 TEMPLATES = [
     {
@@ -213,7 +220,7 @@ CACHES = {
     }
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWS_CREDENTIALS = True
 
 GOOGLE_CLIENT_ID = '1012610059915-plt61d82bht9hnk9j9p8ntnaf8ta4nu7.apps.googleusercontent.com'
