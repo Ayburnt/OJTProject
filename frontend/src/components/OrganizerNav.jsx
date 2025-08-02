@@ -74,7 +74,7 @@ function OrganizerNav() {
                 <Link to='/my-event' className={`${title === 'Event Overview' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                   <p className={`${title === 'Event Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Event</p>
                 </Link>
-                <Link to='/my-event' className={`${title === 'Attendees Overview' && `bg-[#FF965D]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                <Link to='/attendees' className={`${title === 'Attendees Overview' && `bg-[#FF965D]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                   <p className={`${title === 'Attendees Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Attendees</p>
                 </Link>
                 <Link to='/my-event' className={`${title === 'Manage Account' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
