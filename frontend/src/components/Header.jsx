@@ -37,7 +37,7 @@ function Header() {
 
         {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center space-x-6">
-          <Link to="#" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
+          <Link to="/find-my-ticket" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
             Find my Tickets
           </Link>
           <Link to="#" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
