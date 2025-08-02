@@ -29,7 +29,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('AUTH_SECRET')
 DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "fallback-django-secret")
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.elasticbeanstalk.com', 'localhost', '127.0.0.1']
 
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
