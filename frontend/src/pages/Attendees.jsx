@@ -57,10 +57,10 @@ const Attendees = () => {
   return (
     <>
       <OrganizerNav />
-      <div className="min-h-screen bg-primary px-6 py-12 mt-16 md:mt-0 md:pl-64 mx-4">
+           <div className="min-h-screen bg-gray-100 px-6 py-12 mt-16 md:mt-0 md:pl-64 mx-4">
       
                   <div className="flex justify-end mb-2">
-    <CgProfile className="hidden md:flex text-[3rem] text-gray-300 mr-10" />
+ <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
   </div>
 
         <div className="w-[95%] max-w-6xl mx-auto p-10 border border-gray-300 rounded-xl shadow bg-white mt-15">

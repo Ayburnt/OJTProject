@@ -15,13 +15,14 @@ import OrganizerEvent from './pages/OrganizerEvent.jsx';
 import FindMyTicket from './pages/FindmyTicket.jsx';
 import Attendees from './pages/Attendees.jsx';
 import CreateEvent from './pages/CreateEvent.jsx';
+import AttendeesDashboard from './pages/AttendeesDashboard.jsx'; // Import the AttendeesDashboard component
 
 function App() {
   const location = useLocation(); // Get the current location object
 
   // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/create-event';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/create-event' ;
+  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/create-event' && location.pathname !=='/attendees-dashboard';
+  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/create-event'  && location.pathname !=='/attendees-dashboard';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">
@@ -50,6 +51,7 @@ function App() {
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
           <Route path="/attendees" element={<Attendees />} />
            <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> {/* Add the AttendeesDashboard route */}
           {/* Add more routes as needed */}
         </Routes>
       </main>
