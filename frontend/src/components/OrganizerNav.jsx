@@ -4,11 +4,13 @@ import { IoIosArrowBack } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
 import { Link, useLocation } from "react-router-dom";
+import useAuth from '../hooks/useAuth';
 
 function OrganizerNav() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
+  const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
 
   let title;
 
@@ -43,8 +45,14 @@ function OrganizerNav() {
           <p className="font-outfit text-lg">{title}</p>
         </div>
 
-        {/* Profile Icon */}
-        <CgProfile className="text-4xl sm:text-5xl text-gray-600" />
+        {isLoggedIn ? (
+          <>
+            {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
+          </>
+        ) : (
+          <CgProfile className="text-4xl sm:text-5xl text-gray-600" />
+        )}
+
       </div>
 
       {/* Mobile Popup Navigation */}
@@ -95,8 +103,8 @@ function OrganizerNav() {
                 <span className="text-sm font-medium font-outfit">Back</span>
               </div>
               <button
-                className="flex items-center gap-2 hover:underline font-outfit transition-colors"
-                onClick={() => console.log("Logout clicked")}
+                className="flex items-center gap-2 hover:underline font-outfit transition-colors cursor-pointer"
+                onClick={logout}
               >
                 <IoExitOutline className="text-xl transform -scale-x-100" />
                 <span className="text-sm font-medium">Log out</span>
@@ -115,68 +123,60 @@ function OrganizerNav() {
 
         {/* Navigation */}
         <div className="flex flex-col items-center justify-center w-full bg-gray-200">
-      <ul className="w-full text-center bg-white text-gray-800 flex flex-col items-start">
-        <Link
-          to="/organizer-dashboard"
-          className={`${
-            title === 'Dashboard Overview' ? 'bg-[#009494]' : ''
-          } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
-        >
-          <p
-            className={`${
-              title === 'Dashboard Overview' ? 'bg-[#EEEEEE]' : ''
-            } py-3 ml-5 pl-3 font-outfit`}
-          >
-            Dashboard
-          </p>
-        </Link>
+          <ul className="w-full text-center bg-white text-gray-800 flex flex-col items-start">
+            <Link
+              to="/organizer-dashboard"
+              className={`${title === 'Dashboard Overview' ? 'bg-[#009494]' : ''
+                } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
+            >
+              <p
+                className={`${title === 'Dashboard Overview' ? 'bg-[#EEEEEE]' : ''
+                  } py-3 ml-5 pl-3 font-outfit`}
+              >
+                Dashboard
+              </p>
+            </Link>
 
-        <Link
-          to="/my-event"
-          className={`${
-            title === 'Event Overview' ? 'bg-[#5BD4D4]' : ''
-          } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
-        >
-          <p
-            className={`${
-              title === 'Event Overview' ? 'bg-[#EEEEEE]' : ''
-            } py-3 ml-5 pl-3 font-outfit`}
-          >
-            My Events
-          </p>
-        </Link>
+            <Link
+              to="/my-event"
+              className={`${title === 'Event Overview' ? 'bg-[#5BD4D4]' : ''
+                } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
+            >
+              <p
+                className={`${title === 'Event Overview' ? 'bg-[#EEEEEE]' : ''
+                  } py-3 ml-5 pl-3 font-outfit`}
+              >
+                My Events
+              </p>
+            </Link>
 
-        <Link
-          to="/attendees"
-          className={`${
-            title === 'Attendees Overview' ? 'bg-[#FF965D]' : ''
-          } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
-        >
-          <p
-            className={`${
-              title === 'Attendees Overview' ? 'bg-[#EEEEEE]' : ''
-            } py-3 ml-5 pl-3 font-outfit`}
-          >
-            Attendees
-          </p>
-        </Link>
+            <Link
+              to="/attendees"
+              className={`${title === 'Attendees Overview' ? 'bg-[#FF965D]' : ''
+                } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
+            >
+              <p
+                className={`${title === 'Attendees Overview' ? 'bg-[#EEEEEE]' : ''
+                  } py-3 ml-5 pl-3 font-outfit`}
+              >
+                Attendees
+              </p>
+            </Link>
 
-        <Link
-          to="/manage-account"
-          className={`${
-            title === 'Manage Account' ? 'bg-[#EF4B4C]' : ''
-          } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
-        >
-          <p
-            className={`${
-              title === 'Manage Account' ? 'bg-[#EEEEEE]' : ''
-            } py-3 ml-5 pl-3 font-outfit`}
-          >
-            Manage Account
-          </p>
-        </Link>
-      </ul>
-    </div>
+            <Link
+              to="/manage-account"
+              className={`${title === 'Manage Account' ? 'bg-[#EF4B4C]' : ''
+                } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
+            >
+              <p
+                className={`${title === 'Manage Account' ? 'bg-[#EEEEEE]' : ''
+                  } py-3 ml-5 pl-3 font-outfit`}
+              >
+                Manage Account
+              </p>
+            </Link>
+          </ul>
+        </div>
 
 
 
@@ -188,8 +188,8 @@ function OrganizerNav() {
             <span className="text-sm font-medium font-outfit">Back</span>
           </div>
           <button
-            className="flex items-center mb-10 hover:underline font-outfit transition-colors"
-            onClick={() => console.log("")} >
+            className="flex items-center mb-10 gap-2 hover:underline font-outfit transition-colors cursor-pointer"
+            onClick={logout} >
             <IoExitOutline className="text-xl transform -scale-x-100" />
             <span className="text-sm font-medium">Log Out</span>
           </button>

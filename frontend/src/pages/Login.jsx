@@ -14,6 +14,20 @@ function Login({ onAuthSuccess }) {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  if(isLoggedIn){
+    const userRole = localStorage.getItem('userRole');
+    if (userRole === 'client') {
+      navigate("/organizer-dashboard");
+    } else if (userRole === 'guest') {
+      navigate("/")
+    } else {
+      navigate("/");
+    }
+  }
+  },[])  
+
   const defaultHandleAuthSuccess = (userData, tokens) => {
     localStorage.setItem(ACCESS_TOKEN, tokens.access);
     localStorage.setItem('refreshToken', tokens.refresh);

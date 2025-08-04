@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { CiSearch } from "react-icons/ci";
 const SariSariLogo = "/sariLogo.png";
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import useAuth from '../hooks/useAuth'; // Import the useAuth hook
+import useAuth from '../hooks/useAuth';
 
 function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -45,9 +45,9 @@ function Header() {
           </Link>
           {isLoggedIn ? (
             <>
-              <button onClick={logout}>Log out</button>
+              <button className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium cursor-pointer" onClick={logout}>Log out</button>
               {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
-              <p>{userFirstName}</p>
+              <p className="text-gray-700 transition-colors text-base font-medium">{userFirstName}</p>
             </>
           ) : (
             <>
@@ -71,18 +71,18 @@ function Header() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white py-2 shadow-md">
           <nav className="flex flex-col items-center space-y-3">
-            <Link to="#" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+            <Link to="#" className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Find my Tickets
             </Link>
-            <Link to="#" className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+            <Link to="#" className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
               Create Event
             </Link>
 
             {isLoggedIn ? (
               <>
-              <button onClick={logout}>Log out</button>
+              <button className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1" onClick={logout}>Log out</button>
               {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
-              <p>{userFirstName}</p>
+              <p className='font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1'>{userFirstName}</p>
               </>
             ) : (
               <>
