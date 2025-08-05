@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
+import { IoIosArrowBack } from "react-icons/io";
 
-// To use the 'Outfit' font, please add the following link to your HTML file's <head> section:
-// <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-// Then, ensure your Tailwind CSS configuration includes 'Outfit' in the font-family.
 
 // Main App component
 const CreateEvent = () => {
@@ -403,9 +401,12 @@ const EventForm = () => {
   return (
     <div className="w-full">
       <div className="mb-8">
-        <button type="button" className="text-teal-600 hover:text-teal-800 transition-colors duration-200 font-semibold text-lg">
-          Back
-        </button>
+
+        <div className="flex items-center gap-1 mb-6 cursor-pointer" onClick={() => window.history.back()}>
+                    <IoIosArrowBack className="text-secondary text-2xl" />
+                    <span className="text-secondary text-xl font-medium font-outfit">Back</span>
+                  </div>
+
         <h1 className="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Create a New Event</h1>
         <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
       </div>

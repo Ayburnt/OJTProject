@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
+import { Link } from "react-router-dom";
+
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
@@ -80,7 +82,10 @@ const OrganizerEvent = () => {
             </button>
           </div>
 
-          <button className='bg-secondary text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>Create New Event</button>
+              <Link to="/create-event">
+            <button className='bg-secondary text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
+            Create New Event</button>
+              </Link>
         </div>
 
 

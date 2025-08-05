@@ -6,17 +6,18 @@ import { CgProfile } from "react-icons/cg";
 import { Link, useLocation } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 
-function AttendeesNav() {
+function AdminNav() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const currentPath = location.pathname;
   const { isLoggedIn, userFirstName, userProfile, logout } = useAuth();
 
   let title;
+
   switch (currentPath) {
-    case "/attendees-dashboard":
-      document.title = 'Attendees | Sari-Sari Events';
-      title = 'My Tickets';
+    case "/admin-dashboard":
+      document.title = 'Admin | Sari-Sari Events';
+      title = 'Admin Dashboard';
       break;
     default:
       document.title = 'Sari-Sari Events';
@@ -58,17 +59,17 @@ function AttendeesNav() {
 
             <div className="flex flex-col items-center justify-center">
                      <ul className="w-full text-center bg-white text-gray-800 flex flex-col items-start">
-                       <Link to='/attendees-dashboard' className={`${title === 'Dashboard Overview' && `bg-[#009494]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                       <Link to='/admin-dashboard' className={`${title === 'Dashboard Overview' && `bg-[#009494]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                          <p className={`${title === 'Dashboard Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Dashboard</p>
                        </Link>
-                       <Link to='/#' className={`${title === 'My Schedules Overview' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === 'My Schedules Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Shedules</p>
+                       <Link to='/#' className={`${title === ' Pag-iisipan pa daw' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Shedules</p>
                        </Link>
-                       <Link to='/#' className={`${title === 'My ticket Overview' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === 'My ticket Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Tickets</p>
+                       <Link to='/#' className={`${title === ' Pag-iisipan pa daw' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Tickets</p>
                        </Link>
-                       <Link to='/#' className={`${title === 'Attendees Manage Account' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === 'Attendees Manage Account' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Manage Account</p>
+                       <Link to='/#' className={`${title === 'Pag iisipan pa daw' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Manage Account</p>
                        </Link>
                      </ul>
                    </div>
@@ -100,8 +101,8 @@ function AttendeesNav() {
               <div className="flex flex-col items-center justify-center w-full bg-gray-200 text-base">
                 <ul className="w-full text-center bg-white text-gray-800 font-outfit flex flex-col items-start">
                   <Link
-                    to="/attendees-dashboard"
-                    className={`${title === 'Dashboard Overview' ? 'bg-[#009494]' : ''
+                    to="/admin-dashboard"
+                    className={`${title === 'Overview' ? 'bg-[#009494]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
@@ -114,40 +115,40 @@ function AttendeesNav() {
       
                   <Link
                     to="/#"
-                    className={`${title === 'My Schedules Overview' ? 'bg-[#5BD4D4]' : ''
+                    className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#5BD4D4]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === 'My Schedules Overview' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                      My Schedule
+                       Pag-iisipan pa daw
                     </p>
                   </Link>
       
                   <Link
                     to="/#"
-                    className={`${title === 'My Ticket Overview' ? 'bg-[#FF965D]' : ''
+                    className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#FF965D]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === 'My Ticket Overview' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                      My ticket
+                       Pag-iisipan pa daw
                     </p>
                   </Link>
       
                   <Link
                     to="/#"
-                    className={`${title === 'Manage Account' ? 'bg-[#EF4B4C]' : ''
+                    className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#EF4B4C]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === 'Manage Account' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                      Manage Account
+                      Pag-iisipan pa daw
                     </p>
                   </Link>
                 </ul>
@@ -170,4 +171,4 @@ function AttendeesNav() {
   );
 }
 
-export default AttendeesNav;
+export default AdminNav;

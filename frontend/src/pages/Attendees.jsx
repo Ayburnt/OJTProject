@@ -57,12 +57,10 @@ const Attendees = () => {
   return (
     <>
       <OrganizerNav />
-           <div className="min-h-screen bg-gray-100 px-6 py-12 mt-16 md:mt-0 md:pl-64 mx-4">
-      
+           <div className="min-h-screen bg-gray-100 px-6 py-12 mt-16 md:mt-0 md:pl-64 mx-4 font-outfit">
                   <div className="flex justify-end mb-2">
- <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
-  </div>
-
+              <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
+                </div>
         <div className="w-[95%] max-w-6xl mx-auto p-10 border border-gray-300 rounded-xl shadow bg-white mt-15">
           <h1 className="text-2xl font-semibold text-gray-800 mb-10">
             Manage Event Attendees

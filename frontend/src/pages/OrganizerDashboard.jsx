@@ -2,6 +2,7 @@ import React from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import { CgProfile } from 'react-icons/cg';
 import { TbMessageChatbotFilled } from "react-icons/tb";
+import { Link } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 
 function OrganizerDashboard() {
@@ -51,11 +52,12 @@ function OrganizerDashboard() {
         <section className="bg-white rounded-xl shadow-md p-6 mb-6 font-outfit">
           <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
             <h3 className="text-lg font-semibold">Recent Events</h3>
-            <button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center">
-              Create
-            </button>
+            <Link to="/create-event">
+              <button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center">
+                Create
+              </button>
+            </Link>
           </div>
-
           {/* Event Placeholder */}
           <div className="flex flex-col gap-4 font-outfit">
             <div className="border p-10 rounded-lg flex justify-between items-center text-gray-400">
