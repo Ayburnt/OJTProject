@@ -1,106 +1,212 @@
-import React from "react";
-import { FaHome, FaSignOutAlt, FaUser, FaCalendarAlt, FaCog } from "react-icons/fa";
-import AdminNav from "../components/AdminNav";
-import { CgProfile } from 'react-icons/cg';
+  import { useState } from 'react';
+  import { FaCalendarAlt} from "react-icons/fa";
+  import AdminNav from "../components/AdminNav";
+  import { CgProfile } from 'react-icons/cg';
+  import { FaCheck } from "react-icons/fa6";
+  import { RxCross2 } from "react-icons/rx";
+  import { FaUserGroup } from "react-icons/fa6";
+  import { FaPesoSign } from "react-icons/fa6";
+  import { FaClock } from "react-icons/fa6";
+  import { IoEyeSharp } from "react-icons/io5";
+  import { IoLocationOutline } from "react-icons/io5";
 
-function AdminDashboard() {
-  return (
-    <div className="min-h-screen bg-alice-blue flex flex-col md:flex-row font-outfit">
-      {/* Sidebar */}
-      <AdminNav />
-      {/* Main Content */}
-   <main className="p-1 md:w-full md:w-4/5 md:mx-5 mt-10 md:mt-0 ml-8 mr-8 md:ml-0 md:mr-0">
+  
 
-        <div className="flex justify-end mb-1 mt-10">
-         <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
-          </div>
+  function AdminDashboard() {
+      const [selectedCategory, setSelectedCategory] = useState('All Events');
 
-        <div className="mb-8 text-center md:text-center lg:pl-35">
-          <h2 className="text-xl font-medium text-gray-700">
-            Good Morning, <span className="text-teal-600 font-bold">Lester James</span>
-          </h2>
-          <p className="text-sm text-gray-500 mt-1">
-            Here's what's happening with your events today.
-          </p>
-        </div>
+    return (
+      <div className="min-h-screen bg-alice-blue flex flex-col md:flex-row font-outfit">
+        {/* Sidebar */}
+        <AdminNav />
+        {/* Main Content */}
+    <main className="p-1 md:w-full md:w-4/5 md:mx-5 mt-10 md:mt-0 ml-8 mr-8 md:ml-6 md:mr-6">
 
-        <div className="flex flex-col-reverse md:flex-row md:space-x-6 md:ml-70">
-          {/* Left side - Recent Events */}
-          <div className="flex-1">
-            {/* Tabs */}
-            <div className="flex flex-wrap space-x-4 mb-6 text-sm justify-center md:justify-start">
-              <div className="text-teal-600 font-semibold cursor-pointer">
-                All Events
-                <span className="bg-teal-100 text-teal-600 px-2 py-0.5 rounded-full ml-1">6</span>
-              </div>
-              <div className="text-gray-500 cursor-pointer">
-                Ongoing
-                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full ml-1">3</span>
-              </div>
-              <div className="text-gray-500 cursor-pointer">
-                Upcoming
-                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full ml-1">3</span>
-              </div>
-              <div className="text-gray-500 cursor-pointer">
-                Canceled
-                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full ml-1">3</span>
-              </div>
+          <div className="flex justify-end mb-1 mt-10">
+          <CgProfile className="hidden md:flex text-[2.5rem] text-gray-400 mr-10" />
             </div>
 
-<div className="bg-white p-4 mb-6 w-full md:max-w-2xl pb-30">
-  <h3 className="text-md font-semibold mb-4">Recent Events</h3>
-  <div className="p-1 rounded bg-gray-100">
-    <div className="flex justify-between items-start">
-      <div>
-        <h4 className="font-semibold text-gray-800">Tuli ni Josh: Kids Party</h4>
-        <p className="text-sm text-gray-600">2000 Attendees</p>
-        <p className="text-sm text-gray-600">Sep 12, 2025</p>
-        <p className="text-sm text-gray-600">SMX Convention Center</p>
-      </div>
-      <span className="text-xs text-green-600 bg-green-100 px-2 py-1 rounded-full">Ongoing</span>
+          <div className="mb-8 text-center md:text-center lg:pl-35 mb-12">
+            <h2 className="text-3xl font-medium text-gray-700">
+              Good Morning, <span className="text-teal-600 font-bold">Lester James</span>
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Here's what's happening with your events today.
+            </p>
+          </div>
+
+          <div className="flex flex-col-reverse md:flex-row md:gap-x-10 md:ml-70">
+            {/* Left side - Recent Events */}
+            <div className="flex-1">
+    {/* Tabs */}
+  <div className="w-full md:max-w-3xl mx-auto mb-4">
+    <div className="flex flex-row gap-1.5 items-center overflow-x-auto hide-scrollbar text-[16px]">
+      {/* All Events */}
+      <button
+        onClick={() => setSelectedCategory('All Events')}
+        className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
+      >
+        All Events
+        <span className="bg-third text-secondary group-hover:bg-secondary group-hover:text-white group-active:bg-secondary group-active:text-white group-focus:bg-secondary group-focus:text-white font-semibold px-2 py-0.5 rounded-full text-[13px] transition-colors">
+          6
+        </span>
+      </button>
+
+      {/* Ongoing */}
+      <button
+        onClick={() => setSelectedCategory('Ongoing')}
+        className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
+      >
+        Ongoing
+        <span className="bg-third text-secondary group-hover:bg-secondary group-hover:text-white group-active:bg-secondary group-active:text-white group-focus:bg-secondary group-focus:text-white font-semibold px-2 py-0.5 rounded-full text-[13px] transition-colors">
+          3
+        </span>
+      </button>
+
+      {/* Upcoming */}
+      <button
+        onClick={() => setSelectedCategory('Upcoming')}
+        className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
+      >
+        Upcoming
+        <span className="bg-third text-secondary group-hover:bg-secondary group-hover:text-white group-active:bg-secondary group-active:text-white group-focus:bg-secondary group-focus:text-white font-semibold px-2 py-0.5 rounded-full text-[13px] transition-colors">
+          3
+        </span>
+      </button>
+
+      {/* Canceled */}
+      <button
+        onClick={() => setSelectedCategory('Canceled')}
+        className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
+      >
+        Canceled
+        <span className="bg-third text-secondary group-hover:bg-secondary group-hover:text-white group-active:bg-secondary group-active:text-white group-focus:bg-secondary group-focus:text-white font-semibold px-2 py-0.5 rounded-full text-[13px] transition-colors">
+          3
+        </span>
+      </button>
     </div>
-    <p className="text-xs text-right text-gray-400 mt-2">Tech Corp.</p>
   </div>
-</div>
-</div>
-          
-          {/* Right side - Stats Cards */}
-             <div className="w-full md:w-[350px] mr-5 space-y-2 mb-6 md:mb-0">
-            <div className="bg-white shadow p-4 rounded">
-              <div className="flex items-center justify-between">
-                <FaCalendarAlt className="text-teal-600 mr-4" />
-                <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Total Overall Events</p>
-                <p className="text-xl font-bold text-gray-700 pl-2">2,000</p>
+
+
+
+  <div className="bg-white p-6 mb-6 w-full md:max-w-3xl rounded-xl shadow-md">
+    {/* Title */}
+    <h3 className="text-xl font-bold mb-4">Events</h3>
+
+    {/* Event Card */}
+    <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4 shadow-sm">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4 mt-3">
+        {/* Title & Status */}
+        <div className="flex flex-col md:flex-row md:items-center md:gap-4">
+          <h4 className="text-lg font-semibold text-gray-800">Tuli ni Josh: Kids Party</h4>
+        <span className="hidden md:inline-block text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full w-max">
+    Pending
+  </span>
+        </div>
+
+        {/* this is website view Buttons hidden in the mobile view*/}
+        <div className="hidden md:flex flex-col sm:flex-row gap-2 md:w-auto">
+          <button className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto">
+            <FaCheck /> Approve
+          </button>
+          <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto">
+            <RxCross2 /> Reject
+          </button>
+        </div>
+      </div>
+
+
+  <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 text-[10px] sm:text-sm text-gray-500 mb-3">
+    <div className="flex items-center gap-2">
+      <FaCalendarAlt className="text-secondary text-[12px] sm:text-base" />
+      <span>Sep 12, 2025, 10:00 PM</span>
+    </div>
+    <div className="flex items-center justify-between w-full sm:w-auto">
+      <div className="flex items-center gap-2">
+        <IoLocationOutline className="text-secondary text-[12px] sm:text-base" />
+        <span>SMX Convention Center</span>
+      </div>
+      </div>
+
+  
+    <div className="flex items-center justify-between w-full sm:w-auto">
+      <div className="flex items-center gap-2">
+        <FaUserGroup className="text-secondary text-[12px] sm:text-base" />
+        <span>2000 Attendees</span>
+        </div>
+                {/* in mobile view approve Button */}
+      <button className="bg-teal-600 hover:bg-teal-700 text-white px-2 py-0.5 text-[10px] rounded-md flex items-center gap-1 md:hidden">
+        <FaCheck className="text-[11px]" /> Approve
+      </button>
+      <button className="bg-red-500 hover:bg-red-600 text-white px-3.5 py-0.5 text-[10px] rounded-md flex items-center gap-1 md:hidden">
+        <RxCross2 className="text-[11px]" /> Reject
+      </button>
+    </div>
+          </div>
+        
+
+
+      {/* Organizer Info */}
+  <div className="flex flex-col sm:flex-row sm:justify-between mt-5 sm:items-center gap-3 text-[7px] sm:text-xs text-gray-500 border-t pt-3">
+    <div className="flex items-start justify-between w-full gap-2">
+      <div className="flex items-start gap-2">
+        <CgProfile className="text-xl sm:text-2xl text-gray-500" />
+        <div>
+          <p>
+            Organized by: <span className="font-medium text-gray-700">Tech Corp.</span>
+          </p>
+          <p>Submitted June 18, 2025, 12:30 PM</p>
+        </div>
+      </div>
+
+      {/* View button placed beside organizer text on mobile */}
+      <button className="flex items-center gap-1 text-[10px] sm:text-sm text-teal-600 font-medium self-start">
+        View <IoEyeSharp className="text-lg sm:text-base md:text-xl mr-2"/>
+      </button>
+    </div>
+  </div>
+  </div>
+  </div>
+  </div>
+            
+            {/* Right side - Stats Cards */}
+              <div className="w-full md:w-[350px] mr-10 space-y-2 mb-6 md:mb-0 space-y-4">
+              <div className="bg-white shadow p-4 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <FaCalendarAlt className="text-teal-600 mr-4 text-xl" />
+                  <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Total Overall Events</p>
+                  <p className="text-xl font-bold text-gray-700 pl-2">2,00000</p>
+                </div>
               </div>
-            </div>
-            <div className="bg-white shadow p-4 rounded">
-              <div className="flex items-center justify-between">
-                <FaUser className="text-teal-600 mr-4" />
-                <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Active Users</p>
-                <p className="text-xl font-bold text-gray-700 pl-2">203</p>
+              <div className="bg-white shadow p-4 rounded">
+                <div className="flex items-center justify-between">
+                  <FaUserGroup className="text-teal-600 mr-4 text-xl" />
+                  <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Active Users</p>
+                  <p className="text-xl font-bold text-gray-700 pl-2">203</p>
+                </div>
               </div>
-            </div>
-            <div className="bg-white shadow p-4 rounded">
-              <div className="flex items-center justify-between">
-                <FaHome className="text-teal-600 mr-4" />
-                <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Total Revenue</p>
-                <p className="text-xl font-bold text-gray-700 pl-2">₱2,000,000</p>
+              <div className="bg-white shadow p-4 rounded">
+                <div className="flex items-center justify-between">
+                  <FaPesoSign className="text-teal-600 mr-4 text-xl" />
+                  <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Total Revenue</p>
+                  <p className="text-xl font-bold text-gray-700 pl-2">₱2,000,000</p>
+                </div>
               </div>
-            </div>
-            <div className="bg-white shadow p-4 rounded">
-              <div className="flex items-center justify-between">
-                <FaCog className="text-teal-600 mr-4" />
-                <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Pending Approvals</p>
-                <p className="text-xl font-bold text-gray-700 pl-2">2</p>
+              <div className="bg-white shadow p-4 rounded">
+                <div className="flex items-center justify-between">
+                  <FaClock className="text-teal-600 mr-4 text-xl" />
+                  <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Pending Approvals</p>
+                  <p className="text-xl font-bold text-gray-700 pl-2">2</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
-    </div>
-  );
-}
+        </main>
+      </div>
+    );
+  }
 
 
 
-export default AdminDashboard;
+  export default AdminDashboard;

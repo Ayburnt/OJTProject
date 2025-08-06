@@ -16,6 +16,7 @@ import FindMyTicket from './pages/FindmyTicket.jsx';
 import Attendees from './pages/Attendees.jsx';
 import ManageAccount from './pages/ManageAccount.jsx';
 import CreateEvent from './pages/CreateEvent.jsx';
+import VerificationForm from './pages/VerificationForm.jsx';
 import AttendeesDashboard from './pages/AttendeesDashboard.jsx'; 
 import AdminDashboard from './pages/AdminDashboard.jsx'; 
 
@@ -24,8 +25,8 @@ function App() {
   const location = useLocation(); // Get the current location object
 
   // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/attendees-dashboard'  && location.pathname !=='/admin-dashboard';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/attendees-dashboard' && location.pathname !=='/admin-dashboard';
+  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/verification-form' && location.pathname !=='/attendees-dashboard'  && location.pathname !=='/admin-dashboard';
+  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/verification-form' && location.pathname !=='/attendees-dashboard' && location.pathname !=='/admin-dashboard';
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">
@@ -55,8 +56,10 @@ function App() {
           <Route path="/attendees" element={<Attendees />} />
           <Route path="/manage-account" element={<ManageAccount />} />
           <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
-              <Route path="/admin-dashboard" element={<AdminDashboard />} /> 
+          <Route path="/admin-dashboard" element={<AdminDashboard />} /> 
+
           {/* Add more routes as needed */}
         </Routes>
       </main>

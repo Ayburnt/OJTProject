@@ -80,7 +80,7 @@ const ManageAccount= () => {
             <div className="flex flex-col space-y-2 w-full sm:w-auto">
               <Link to="/forgot-password">
               <button
-                className="w-full sm:w-auto px-4 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                className="w-full sm:w-auto px-5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
               >
                 Change Password
               </button>
@@ -88,7 +88,7 @@ const ManageAccount= () => {
               
               <Link to="/verification-form">
               <button
-                className="w-full sm:w-auto px-4 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                className="w-full sm:w-auto px-8 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
               >
                 Verify Account
               </button>
@@ -146,7 +146,7 @@ const ManageAccount= () => {
                     value={profileData.lastName}
                     onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
                     disabled={!isEditing}
-                    className={`w-full px-3 py-2 border rounded-lg text-base ${
+                    className={`w-full px-3 py-3 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
                     } focus:outline-none`}
                   />
