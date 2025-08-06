@@ -1,1 +1,1 @@
-web: gunicorn --bind :$PORT --workers 1 backend.backend.wsgi:application
+web: gunicorn wsgi:application --chdir backend --bind 0.0.0.0:8000
