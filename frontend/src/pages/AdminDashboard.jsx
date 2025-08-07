@@ -5,7 +5,7 @@
   import { FaCheck } from "react-icons/fa6";
   import { RxCross2 } from "react-icons/rx";
   import { FaUserGroup } from "react-icons/fa6";
-  import { FaPesoSign } from "react-icons/fa6";
+  import { LuPhilippinePeso } from "react-icons/lu";
   import { FaClock } from "react-icons/fa6";
   import { IoEyeSharp } from "react-icons/io5";
   import { IoLocationOutline } from "react-icons/io5";
@@ -20,7 +20,7 @@
         {/* Sidebar */}
         <AdminNav />
         {/* Main Content */}
-    <main className="p-1 md:w-full md:w-4/5 md:mx-5 mt-10 md:mt-0 ml-8 mr-8 md:ml-6 md:mr-6">
+    <main className="p-1 md:w-full md:w-4/5 md:mx-5 mt-10 md:mt-0 ml-8 mr-8 md:ml-6 md:mr-6 font-outfit">
 
           <div className="flex justify-end mb-1 mt-10">
           <CgProfile className="hidden md:flex text-[2.5rem] text-gray-400 mr-10" />
@@ -135,17 +135,9 @@
         <FaUserGroup className="text-secondary text-[12px] sm:text-base" />
         <span>2000 Attendees</span>
         </div>
-                {/* in mobile view approve Button */}
-      <button className="bg-teal-600 hover:bg-teal-700 text-white px-2 py-0.5 text-[10px] rounded-md flex items-center gap-1 md:hidden">
-        <FaCheck className="text-[11px]" /> Approve
-      </button>
-      <button className="bg-red-500 hover:bg-red-600 text-white px-3.5 py-0.5 text-[10px] rounded-md flex items-center gap-1 md:hidden">
-        <RxCross2 className="text-[11px]" /> Reject
-      </button>
-    </div>
-          </div>
-        
-
+           </div>
+              </div>
+      
 
       {/* Organizer Info */}
   <div className="flex flex-col sm:flex-row sm:justify-between mt-5 sm:items-center gap-3 text-[7px] sm:text-xs text-gray-500 border-t pt-3">
@@ -188,7 +180,7 @@
               </div>
               <div className="bg-white shadow p-4 rounded">
                 <div className="flex items-center justify-between">
-                  <FaPesoSign className="text-teal-600 mr-4 text-xl" />
+                  <LuPhilippinePeso className="text-teal-600 mr-4 text-xl" />
                   <p className="text-sm text-gray-500 flex-1 text-center border-r border-gray-300 pr-2">Total Revenue</p>
                   <p className="text-xl font-bold text-gray-700 pl-2">₱2,000,000</p>
                 </div>

@@ -14,7 +14,7 @@ const AttendeesDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 text-sm font-outfit flex flex-col">
+    <div className="min-h-screen bg-alice-blue text-sm font-outfit flex flex-col">
       <AttendeesNav />
 
       {/* === Main Content === */}
