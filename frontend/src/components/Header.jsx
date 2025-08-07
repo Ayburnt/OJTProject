@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { CiSearch } from "react-icons/ci";
 const SariSariLogo = "/sariLogo.png";
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { Link, useNavigate } from 'react-router-dom'; // Import Link from react-router-dom
 import useAuth from '../hooks/useAuth';
 
 function Header() {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
   
@@ -12,6 +13,14 @@ function Header() {
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
   };
+
+  const handleCreateEvent = () => {
+    if (isLoggedIn && userRole === 'client') {
+      navigate('/create-event');
+    } else if(!isLoggedIn){
+      navigate('/login');
+    }
+  }
 
   return (
     <header className="bg-white shadow-md py-4 sticky top-0 z-50">
@@ -37,12 +46,12 @@ function Header() {
 
         {/* Desktop Navigation Links */}
         <nav className="hidden lg:flex items-center space-x-6">
-          <Link to="/find-my-ticket" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
+          <Link to="/find-my-ticket" className={`${isLoggedIn && userRole === 'client' ? 'hidden' : 'block'} text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}>
             Find my Tickets
           </Link>
-          <Link to="#" className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium">
+          <button onClick={handleCreateEvent} className={`${isLoggedIn && userRole === "guest" ? 'hidden' : 'block'} cursor-pointer text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}>
             Create Event
-          </Link>
+          </button>
           {isLoggedIn ? (
             <>
               <button className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium cursor-pointer" onClick={logout}>Log out</button>
@@ -71,12 +80,12 @@ function Header() {
       {isMobileMenuOpen && (
         <div className="lg:hidden bg-white py-2 shadow-md">
           <nav className="flex flex-col items-center space-y-3">
-            <Link to="#" className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+            <Link to="#" className={`${isLoggedIn && userRole === 'client' ? 'hidden' : 'block'} font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}>
               Find my Tickets
             </Link>
-            <Link to="#" className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1">
+            <button onClick={handleCreateEvent} className={`${isLoggedIn && userRole === "guest" ? 'hidden' : 'block'} font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}>
               Create Event
-            </Link>
+            </button>
 
             {isLoggedIn ? (
               <>

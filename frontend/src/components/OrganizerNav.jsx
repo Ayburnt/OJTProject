@@ -1,14 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoExitOutline } from "react-icons/io5";
 import { IoIosArrowBack } from "react-icons/io";
 import { FiMenu, FiX } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 
 function OrganizerNav() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
   const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
 
@@ -70,7 +71,7 @@ function OrganizerNav() {
 
             {/* Logo */}
             <div className="mb-15 text-center mt-4">
-              <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10 mx-auto" />
+              <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10 mx-auto  cursor-pointer" onClick={()=> navigate('/')} />
             </div>
 
             {/* Navigation */}
@@ -118,7 +119,7 @@ function OrganizerNav() {
       <div className="hidden md:flex md:flex-col md:justify-between md:h-screen md:w-64 md:bg-white md:p-6 md:shadow fixed top-0 left-0 z-40">
         {/* Logo */}
         <div className="mb-3 mt-2 flex justify-center">
-          <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10" />
+          <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10 cursor-pointer" onClick={()=> navigate('/')} />
         </div>
 
         {/* Navigation */}

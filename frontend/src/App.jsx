@@ -19,7 +19,7 @@ import CreateEvent from './pages/CreateEvent.jsx';
 import VerificationForm from './pages/VerificationForm.jsx';
 import AttendeesDashboard from './pages/AttendeesDashboard.jsx'; 
 import AdminDashboard from './pages/AdminDashboard.jsx'; 
-
+import PrivateRoute from './hooks/protectedRoute.jsx';
 
 function App() {
   const location = useLocation(); // Get the current location object
@@ -48,17 +48,17 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />          
           <Route path="/Events" element={<ViewAllEventsPage />} />
-          <Route path="/events/:id" element={<EventDetailPage />} />
-          <Route path="/organizer-dashboard" element={<OrganizerDashboard />} />
+          <Route path="/events/:id" element={<EventDetailPage />} />          
+          <Route path='/organizer-dashboard' element={<PrivateRoute requiredRole="client"><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
-          <Route path="/my-event" element={<OrganizerEvent />} />
+          <Route path='/my-event' element={<PrivateRoute requiredRole="client"><OrganizerEvent /></PrivateRoute>} />
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
           <Route path="/attendees" element={<Attendees />} />
           <Route path="/manage-account" element={<ManageAccount />} />
-          <Route path="/create-event" element={<CreateEvent />} />
+          <Route path='/create-event' element={<PrivateRoute requiredRole="client"><CreateEvent /></PrivateRoute>} />
           <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
-          <Route path="/admin-dashboard" element={<AdminDashboard />} /> 
+          <Route path='/admin-dashboard' element={<PrivateRoute requiredRole="admin"><AdminDashboard /></PrivateRoute>} />
 
           {/* Add more routes as needed */}
         </Routes>
