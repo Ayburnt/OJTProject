@@ -18,7 +18,7 @@ function Signup({ onAuthSuccess }) {
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
         localStorage.setItem('userEmail', userData.email);
-        
+
         // Store other user data received from backend
         localStorage.setItem('userFirstName', userData.first_name || '');
         localStorage.setItem('userProfile', userData.profile_picture || '');
@@ -33,7 +33,7 @@ function Signup({ onAuthSuccess }) {
             setCompanyName(userData.company_name || '');
             setCompanyWebsite(userData.company_website || '');
             setStep(4); // Navigate to the fill-up form
-        } else {        
+        } else {
             if (userData.role === 'client') {
                 navigate("/client-dashboard");
             } else if (userData.role === 'guest') {
@@ -316,7 +316,7 @@ function Signup({ onAuthSuccess }) {
             if (googleButtonContainer) {
                 window.google.accounts.id.renderButton(
                     googleButtonContainer,
-                    { theme: 'outline', size: 'large', text: 'signup_with', width: '360' }
+                    { theme: 'outline', size: 'large', text: 'signup_with', width: '330' }
                 );
                 googleGsiInitialized.current = true; // Mark GSI as initialized
             } else {
@@ -379,27 +379,27 @@ function Signup({ onAuthSuccess }) {
 
 
     return (
-        <div className="flex items-start justify-center h-screen bg-primary"> {/* Light background like in the image */}
+        <div className="flex items-center justify-center h-screen 2xl:h-screen xl:h-auto xl:py-10 bg-white md:bg-gray-100"> {/* Light background like in the image */}
             <form
-                className="w-[90%] max-w-lg py-12 flex flex-col justify-center items-center font-outfit"
+                className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
                 {step === 1 && (
                     <>
 
-                        <div className="w-full max-w-md flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1 cursor-pointer" onClick={() => navigate('/')}>
+                        <div className="w-full max-w-md flex items-center text-left gap-1 mb-5 cursor-pointer" onClick={() => navigate('/')}>
                             <IoIosArrowBack className="text-secondary text-xl" />
                             <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
                         </div>
 
-                        <div className="w-[45%] max-w-md flex items-center mb-6 ">
+                        <div className="w-[45%] max-w-md flex items-center mb-3">
                             <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
                         </div>
 
-                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-12">Choose your role to get started</p> {/* Improved typography */}
+                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p> {/* Improved typography */}
 
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 w-full transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full md:w-[90%] transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
                             <div
-                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 p-8
+                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 py-4
                                 ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
                                 onClick={() => {
                                     setIsOrganizer(true);
@@ -408,11 +408,11 @@ function Signup({ onAuthSuccess }) {
                                 }}>
 
                                 <HiOutlineCalendarDays className="text-[8rem]" /> {/* Adjusted icon size */}
-                                <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
+                                <p className={`uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
                             </div>
 
                             <div
-                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-8
+                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 py-4
                                 ${isAttendee ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
                                 onClick={() => {
                                     setIsOrganizer(false);
@@ -421,7 +421,7 @@ function Signup({ onAuthSuccess }) {
                                 }}
                             >
                                 <HiOutlineIdentification className="text-[8rem]" /> {/* Adjusted icon size */}
-                                <p className={`uppercase font-outfit text-lg font-bold mt-4 ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
+                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
                             </div>
                         </div>
 
@@ -435,8 +435,8 @@ function Signup({ onAuthSuccess }) {
                                     setRoleMsg("Please select a role to continue.");
                                 }
                             }}> Done </button>
-                            {roleMsg && <p className="text-center text-sm mt-4 text-red-500">{roleMsg}</p>}
-                        <p className="text-gray-600 font-outfit mt-8"> {/* Adjusted margin and color */}
+                        {roleMsg && <p className="text-center text-sm mt-4 text-red-500">{roleMsg}</p>}
+                        <p className="text-gray-600 font-outfit mt-8 text-sm"> {/* Adjusted margin and color */}
                             Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
                         </p>
                     </>
@@ -446,117 +446,115 @@ function Signup({ onAuthSuccess }) {
                 {step === 2 && (
                     <>
                         <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => setStep(1)} />
+                            <IoArrowBackCircle className="text-secondary text-[2rem] ml-5 cursor-pointer" onClick={() => setStep(1)} />
                         </div>
 
                         <h2 className="text-2xl font-bold font-outfit mb-4 text-center">Sign Up</h2>
 
+                        <div className="w-[85%] md:w-[65%] flex flex-col items-center">
+                            <div className="mb-4 w-full">
+                                <label htmlFor="email" className="block mb-2 font-outfit text-sm pl-1 font-medium leading-none">E-mail</label>
+                                <input
+                                    type="email" id="email" name="email"
+                                    className={`w-full px-4 py-1 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
+                                    value={email} onChange={(e) => setEmail(e.target.value)} required />
+                                {emailError && <p className="font-outfit text-red-500 text-sm mt-1">{emailError}</p>}
+                            </div>
 
-                        <div className="mb-4 w-65">
-                            <label htmlFor="email" className="block mb-2 font-outfit text-sm pl-1 font-medium">E-mail</label>
-                            <input
-                                type="email" id="email" name="email"
-                                className={`w-full px-4 py-1 border rounded outline-none focus:ring-2 ${emailError ? 'border-red-500 focus:ring-red-500' : 'border-grey focus:ring-secondary'}`}
-                                value={email} onChange={(e) => setEmail(e.target.value)} required />
-                            {emailError && <p className="font-outfit text-red-500 text-sm mt-1">{emailError}</p>}
+                            <div className="mb-4 w-full">
+                                <label htmlFor="password" className="block mb-2 pl-1 text-sm font-outfit font-medium leading-none">Password</label>
+                                <input
+                                    type="password" id="password" name="password"
+                                    className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
+                                    value={password} onChange={(e) => setPassword(e.target.value)} required />
+                            </div>
+
+                            <div className="mb-4 w-full">
+                                <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium leading-none">Confirm Password</label>
+                                <input
+                                    type="password" id="confirmPassword" name="confirmPassword"
+                                    className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
+                                    value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+                                {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
+                            </div>
+                            <button
+                                className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition"
+                                onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
+                                disabled={isLoading} // Disable button while loading
+                            >
+                                {isLoading ? 'Processing...' : 'Sign up'}
+                            </button>
+
+                            <div className="flex items-center justify-center my-4 w-[80%] max-w-xs">
+                                <div className="flex-grow border-t border-gray-300"></div>
+                                <span className="mx-4 text-gray-500">or</span>
+                                <div className="flex-grow border-t border-gray-300"></div>
+                            </div>
+
+                            {/* This div is where the Google button will be rendered by the GSI script */}
+                            <div id="google-sign-up-button" className="flex justify-center">
+                                {/* Google button will appear here */}
+                            </div>
                         </div>
 
-                        <div className="mb-4 w-65">
-                            <label htmlFor="password" className="block mb-2 pl-1 text-sm font-outfit font-medium">Password</label>
-                            <input
-                                type="password" id="password" name="password"
-                                className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
-                                value={password} onChange={(e) => setPassword(e.target.value)} required />
-                        </div>
-
-                        <div className="mb-6 w-65">
-                            <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium">Confirm Password</label>
-                            <input
-                                type="password" id="confirmPassword" name="confirmPassword"
-                                className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
-                                value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-                            {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
-                        </div>
-                        <button
-                            className="w-65 bg-secondary text-white py-1 font-outfit rounded-lg transition"
-                            onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
-                            disabled={isLoading} // Disable button while loading
-                        >
-                            {isLoading ? 'Processing...' : 'Sign up'}
-                        </button>
-
-                        <div className="flex items-center justify-center mt-7 w-[80%] max-w-xs">
-                            <div className="flex-grow border-t border-gray-300"></div>
-                            <span className="mx-4 text-gray-500">or</span>
-                            <div className="flex-grow border-t border-gray-300"></div>
-                        </div>
-
-                        {/* This div is where the Google button will be rendered by the GSI script */}
-                        <div id="google-sign-up-button" className="flex justify-center mt-5">
-                            {/* Google button will appear here */}
-                        </div>
-
-                        <p className="text-grey font-outfit mt-10">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
+                        <p className="text-grey font-outfit mt-10 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {step2Err && <p className="text-center text-sm mt-4 text-red-500">{step2Err}</p>}
                     </>
                 )}
 
 
                 {step === 3 && (
-                    <div className="w-full text-left font-outfit">
-                        <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => setStep(2)} />
-                        <div className="flex flex-col justify-between h-screen px-4 py-4 bg-primary">
+                    <>
+                        <div className="w-full text-left">
+                            <IoArrowBackCircle className="text-secondary text-[2rem] ml-5 cursor-pointer" onClick={() => setStep(1)} />
+                        </div>
 
-                            <div className="text-center mt-2">
-                                <h2 className="text-3xl font-outfit font-bold"> E-mail <br /> Verification </h2>
-                                <div className="flex justify-center mt-6">
-                                    <HiMail className="text-9xl text-secondary " />
-                                </div>
-                                <p className="text-base p-2 font-bold font-outfit text-left mt-10"> Please enter your verification code </p>
-                                <p className="text-xs p-1 font-outfit text-left "> We have sent a verification to your registered email ID. </p>
 
-                                {otpError === true && <p className="font-outfit text-center text-lg mt-4 text-red-500 font-bold">{otpErrMsg}</p>}
-
-                                {/* Bottom Section: OTP Input Box */}
-                                <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-sm mx-auto text-center">
-                                    <div className={"flex justify-center gap-2 mb-2"} onPaste={handlePaste}>
-                                        {otp.map((digit, index) => (
-                                            <input
-                                                key={index}
-                                                type="text"
-                                                maxLength="1"
-                                                value={digit}
-                                                ref={(el) => (inputsRef.current[index] = el)}
-                                                onChange={(e) => handleChange(e, index)}
-                                                onKeyDown={(e) => handleKeyDown(e, index)}
-                                                className={`w-10 h-12 text-center text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg bg-gray-100 ${otpError ? `border-3 border-red-300` : `border-1 border-gray-300`}`}
-                                            />
-                                        ))}
-                                    </div>
-
-                                    <div className="border-t-1 border-black my-3 w-full"></div>
+                        <h2 className="text-3xl font-outfit font-bold text-center"> E-mail <br /> Verification </h2>
+                        <div className="flex justify-center mt-5">
+                            <HiMail className="text-9xl text-secondary " />
+                        </div>
+                        <div className="w-[90%] md:w-[80%] flex flex-col gap-2 mt-3">
+                            <p className="text-base font-medium font-outfit text-left"> Please enter your verification code </p>
+                            <p className="text-xs font-outfit text-left "> We have sent a verification to your registered email ID. </p>
+                            {otpError === true && <p className="font-outfit text-center text-lg mt-4 text-red-500 font-bold">{otpErrMsg}</p>}
+                            {/* Bottom Section: OTP Input Box */}
+                            <div className="bg-white p-6 rounded-xl mt-5 shadow-md w-full max-w-sm mx-auto text-center">
+                                <div className={"flex justify-center gap-2 mb-2"} onPaste={handlePaste}>
+                                    {otp.map((digit, index) => (
+                                        <input
+                                            key={index}
+                                            type="text"
+                                            maxLength="1"
+                                            value={digit}
+                                            ref={(el) => (inputsRef.current[index] = el)}
+                                            onChange={(e) => handleChange(e, index)}
+                                            onKeyDown={(e) => handleKeyDown(e, index)}
+                                            className={`w-10 h-12 text-center text-xl rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-lg bg-gray-100 ${otpError ? `border-3 border-red-300` : `border-1 border-gray-300`}`}
+                                        />
+                                    ))}
                                 </div>
 
-                                <button
-                                    type="button" onClick={handleOtpVerification} // Call handleOtpVerification
-                                    className="w-[80%] bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 mt-3 font-outfit transition shadow-lg"
-                                    disabled={isVerifyingOtp}
-                                >
-                                    {isVerifyingOtp ? 'Verifying...' : 'Done'}
-                                </button>
+                                <div className="border-t-1 border-black my-3 w-full"></div>
                             </div>
                         </div>
-                    </div>
+                        <button
+                            type="button" onClick={handleOtpVerification} // Call handleOtpVerification
+                            className="w-[70%] bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 mt-10 font-outfit transition shadow-lg"
+                            disabled={isVerifyingOtp}
+                        >
+                            {isVerifyingOtp ? 'Verifying...' : 'Done'}
+                        </button>
+
+
+                    </>
                 )}
 
                 {step === 4 && (
                     // Fillup Information
                     <>
                         <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2rem] mb-5 mt-1 ml-3" onClick={() => {
-                                // Decide where to go back based on how they got to step 4
-                                // If already authenticated (e.g., Google signup), go back to login page
-                                // If manual signup, go back to OTP step
+                            <IoArrowBackCircle className="text-secondary text-[2rem] ml-5 cursor-pointer" onClick={() => {
                                 if (localStorage.getItem('refreshToken')) { // Simple check if user is already "logged in"
                                     navigate("/login"); // Or a specific "profile incomplete" page
                                 } else {
@@ -567,72 +565,75 @@ function Signup({ onAuthSuccess }) {
 
                         <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Create Your Attendee Account</h2>
 
-                        <div className="mb-4 w-80">
-                            <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
-                            <input
-                                type="text" id="firstname" name="firstname"
-                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
+                        <div className="w-[80%] md:w-[70%] flex flex-col items-center">
+                            <div className="mb-4 w-full">
+                                <label htmlFor="firstN" className="block mb-2 pl-1 text-sm font-medium font-outfit"> First Name </label>
+                                <input
+                                    type="text" id="firstname" name="firstname"
+                                    className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+                                    value={firstname} onChange={(e) => setFirstname(e.target.value)} required />
+                            </div>
+
+                            <div className="mb-4 w-full">
+                                <label htmlFor="lastN" className="block mb-2pl-1 text-sm font-medium font-outfit">Last Name</label>
+                                <input
+                                    type="text" id="lastname" name="lastname"
+                                    className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+                                    value={lastname} onChange={(e) => setLastname(e.target.value)} required />
+                            </div>
+
+                            <div className="mb-4 w-full">
+                                <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
+                                <input
+                                    type="tel" id="phoneNo" name="phoneNo" placeholder="e.g. 09xxxxxxxxx" maxLength={11} oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                                    className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+                                    value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
+                            </div>
+
+                            <div className="mb-4 w-full">
+                                <label htmlFor="date" className="block pl-1 mb-2 text-sm font-medium font-outfit">Date of Birth</label>
+                                <input type="date" id="birthday" name="birthday"
+                                    className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+                                    value={birthday} onChange={(e) => setBirthday(e.target.value)} required />
+                            </div>
+
+                            <div className="mb-4 w-full">
+                                <label htmlFor="gender" className="block mb-2 pl-1 text-sm font-medium font-outfit">Gender</label>
+                                <select
+                                    id="gender" name="gender"
+                                    className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+                                    value={gender} onChange={(e) => setGender(e.target.value)} required
+                                >
+                                    <option value="" disabled>Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+
+                            {/* Conditionally render company fields for 'client' role */}
+                            {selectedRoleRef.current === 'client' && (
+                                <>
+                                    <div className="mb-4 w-full">
+                                        <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name</label>
+                                        <input
+                                            type="text" id="companyName" name="companyName"
+                                            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                            value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+                                    </div>
+                                    <div className="mb-4 w-full">
+                                        <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website</label>
+                                        <input
+                                            type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
+                                            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                            value={companyWebsite} onChange={(e) => setCompanyWebsite(e.target.value)} />
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        <div className="mb-4 w-80">
-                            <label htmlFor="lastN" className="block mb-2pl-1 text-sm font-medium font-outfit">Last Name</label>
-                            <input
-                                type="text" id="lastname" name="lastname"
-                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={lastname} onChange={(e) => setLastname(e.target.value)} required />
-                        </div>
 
-                        <div className="mb-4 w-80">
-                            <label htmlFor="phoneNo" className="block mb-2 pl-1 text-sm font-medium font-outfit">Phone Number</label>
-                            <input
-                                type="tel" id="phoneNo" name="phoneNo" placeholder="e.g. 09xxxxxxxxx" maxLength={11} oninput="this.value = this.value.replace(/[^0-9]/g, '')"
-                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={phoneNo} onChange={(e) => setPhoneNo(e.target.value)} required />
-                        </div>
-
-                        <div className="mb-4 w-80">
-                            <label htmlFor="date" className="block pl-1 mb-2 text-sm font-medium font-outfit">Date of Birth</label>
-                            <input type="date" id="birthday" name="birthday"
-                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={birthday} onChange={(e) => setBirthday(e.target.value)} required />
-                        </div>
-
-                        <div className="mb-4 w-80">
-                            <label htmlFor="gender" className="block mb-2 pl-1 text-sm font-medium font-outfit">Gender</label>
-                            <select
-                                id="gender" name="gender"
-                                className="w-full px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
-                                value={gender} onChange={(e) => setGender(e.target.value)} required
-                            >
-                                <option value="" disabled>Select Gender</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                        </div>
-
-                        {/* Conditionally render company fields for 'client' role */}
-                        {selectedRoleRef.current === 'client' && (
-                            <>
-                                <div className="mb-4 w-80">
-                                    <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name</label>
-                                    <input
-                                        type="text" id="companyName" name="companyName"
-                                        className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                        value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
-                                </div>
-                                <div className="mb-4 w-80">
-                                    <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website</label>
-                                    <input
-                                        type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
-                                        className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                        value={companyWebsite} onChange={(e) => setCompanyWebsite(e.target.value)} />
-                                </div>
-                            </>
-                        )}
-
-                        <div className="flex items-center w-65">
+                        <div className="flex items-center w-70">
                             <input
                                 type="checkbox" id="agree" className="mr-2"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
@@ -648,7 +649,7 @@ function Signup({ onAuthSuccess }) {
                             {isLoading ? 'Saving...' : 'Continue'}
                         </button>
                         {message && <p className="font-outfit text-center text-sm mt-4 text-red-500">{message}</p>}
-                        <p className="text-grey font-outfit mt-5">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>                        
+                        <p className="text-grey font-outfit mt-5 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                     </>
                 )}
             </form>

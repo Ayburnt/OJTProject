@@ -62,7 +62,7 @@ function Login({ onAuthSuccess }) {
         });
         window.google.accounts.id.renderButton(
           document.getElementById('google-sign-in-button'),
-          { theme: 'outline', size: 'large', text: 'signin_with', width: '360' } // Customize button
+          { theme: 'outline', size: 'large', text: 'signin_with', width: '330' } // Customize button
         );
       }
     };
@@ -134,44 +134,44 @@ function Login({ onAuthSuccess }) {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen rounded-lg bg-white">
+    <div className="flex items-center justify-center h-screen xl:h-auto 2xl:h-screen xl:py-10 rounded-lg bg-white md:bg-gray-100">
 
       <form onSubmit={handleSubmit}
 
-        className="bg-white p-8 rounded w-[full] py-5 flex flex-col justify-center items-center" >
+        className="bg-white flex flex-col items-center rounded-xl p-5 md:py-10 md:shadow-2xl w-full max-w-lg transform transition-all duration-300 hover:scale-[1.01]" >
         {/* Back button */}
         {/* This will navigate back to the previous page */}
-        <div className="w-full max-w-md mt-15 flex items-center text-left ml-2 mt-1 mb-8 px-6 gap-1 cursor-pointer" onClick={() => navigate('/')}>
-          <IoIosArrowBack className="text-secondary text-xl ml-2" />
+        <div className="w-full max-w-md flex items-center text-left mb-4 gap-1 cursor-pointer" onClick={() => navigate('/')}>
+          <IoIosArrowBack className="text-secondary text-xl" />
           <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
         </div>
 
-        <div className="w-[45%] max-w-md flex items-center mb-6 ">
+        <div className="w-[45%] max-w-md flex items-center">
           <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
         </div>
 
-        <h2 className="text-5xl font-bold font-outfit mb-2 mt-5 text-center">Welcome!</h2>
+        <h2 className="text-5xl font-bold font-outfit mt-4 text-center">Welcome!</h2>
         <hr className="w-70 mb-2 border-t border-gray-600" />
-        <p className="text-center text-sm font-outfit mb-8">Sign in your account</p>
+        <p className="text-center text-sm font-outfit mb-5">Sign in your account</p>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block mb-2 text-sm font-medium">   Your E-mail </label>
+          <label htmlFor="email" className="block mb-2 text-sm font-medium font-outfit leading-none">Your E-mail </label>
           <input type="email" id="email" className="w-80 font-outfit px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
             value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block mb-2 text-sm font-medium"> Password </label>
+          <label htmlFor="password" className="block mb-2 text-sm font-medium font-outfit leading-none">Password </label>
           <input type="password" id="password" className="w-80 font-outfit px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
             value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
 
         {message && <p className="font-outfit text-center text-sm text-red-500">{message}</p>}
         <button type="submit" className="w-72 bg-secondary text-white py-2 rounded hover:bg-blue-600 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
-        <p className="text-center py-4"> or </p>
+        <p className="text-center my-2 text-grey"> or </p>
         <div id="google-sign-in-button" className="flex justify-center"></div>
-       <p class="text-grey font-outfit mt-5">Forgot Password? <a class="text-secondary" href="/forgot-password">Reset it here</a></p>
-        <p className="text-grey font-outfit mt-5">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
+       <p class="text-grey font-outfit mt-5 text-sm">Forgot Password? <a class="text-secondary" href="/forgot-password">Reset it here</a></p>
+        <p className="text-grey font-outfit mt-3 text-sm">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
       </form>
     </div>
 
