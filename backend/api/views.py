@@ -14,6 +14,10 @@ import boto3
 from botocore.exceptions import ClientError
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth import get_user_model # <--- ADD THIS LINE!
+
+
 
 # For authentication and permissions (uncomment and configure if needed)
 # from rest_framework.permissions import IsAuthenticated
@@ -511,3 +515,126 @@ class VerifyOTPView(APIView):
             else:
                 return Response({'detail': 'Invalid or expired verification code.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class ResetOTPView(APIView):
+    """
+    API endpoint to send a 6-digit OTP to the provided email for password reset.
+    Includes a check to ensure the email belongs to a registered user.
+    """
+    authentication_classes = []
+    permission_classes = []
+
+    def post(self, request):
+        serializer = OTPSendSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+
+            # --- IMPORTANT: Add user existence check here ---
+            User = get_user_model()
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                # Return a 400 Bad Request to avoid user enumeration
+                # This tells the user "we can't process this request"
+                # without confirming if the email exists or not.
+                return Response(
+                    {"detail": "No account found with that email address."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # --- End of user existence check ---
+
+            # Generate a 6-digit OTP
+            otp = str(random.randint(100000, 999999))
+
+            # Store OTP in cache with a 5-minute expiry
+            cache.set(f'otp_{email}', otp, timeout=300) # 300 seconds = 5 minutes
+
+            # Render HTML email from template
+            context = {'otp': otp}
+            html_body = render_to_string('api/emails/resetpassword_confirmation.html', context)
+
+            # Plain text fallback
+            text_body = strip_tags(html_body)
+
+            sender_email = settings.DEFAULT_FROM_EMAIL
+            subject = "Your Sari-Sari Events Verification Code"
+
+            # Ensure ses_client is configured and available
+            # You might need to import boto3 and initialize ses_client at the top of views.py
+            # For example:
+            # import boto3
+            # ses_client = boto3.client('ses', region_name=settings.AWS_SES_REGION)
+            # Make sure settings.AWS_SES_REGION is defined in your settings.py
+            global ses_client # If ses_client is defined globally outside the class
+            if not ses_client:
+                return Response({'detail': 'Email service not configured. Cannot send OTP.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            try:
+                response = ses_client.send_email(
+                    Source=sender_email,
+                    Destination={
+                        'ToAddresses': [
+                            email,
+                        ],
+                    },
+                    Message={
+                        'Subject': {
+                            'Data': subject,
+                        },
+                        'Body': {
+                            'Html': {
+                                'Data': html_body,
+                            },
+                            'Text': {
+                                'Data': text_body,
+                            },
+                        },
+                    }
+                )
+                print(f"SES Email sent! Message ID: {response['MessageId']}")
+                return Response({'detail': 'Verification code sent successfully.'}, status=status.HTTP_200_OK)
+            except ClientError as e:
+                error_message = e.response.get('Error', {}).get('Message', 'An AWS SES error occurred.')
+                print(f"SES Error: {error_message}")
+                return Response({'detail': f'Failed to send verification code: {error_message}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            except Exception as e:
+                print(f"General Error sending OTP: {e}")
+                return Response({'detail': 'An unexpected error occurred while sending OTP.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        new_password = request.data.get('new_password')
+
+        if not email or not new_password:
+            return Response(
+                {"detail": "Email and new password are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        User = get_user_model()
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist: # <--- This catches the error if the user doesn't exist
+            return Response(
+                {"detail": "User with this email does not exist."},
+                status=status.HTTP_404_NOT_FOUND # <--- Returns a 404 status
+            )
+
+        # Basic password validation (you should add more robust validation here)
+        if len(new_password) < 6:
+            return Response(
+                {"detail": "New password must be at least 6 characters long."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user.password = make_password(new_password)
+        user.save()
+
+        return Response(
+            {"detail": "Password has been reset successfully."},
+            status=status.HTTP_200_OK
+        )

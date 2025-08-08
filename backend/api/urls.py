@@ -9,6 +9,8 @@ from .views import (
     SendOTPView,          # Use the correct view name
     VerifyOTPView,        # Use the correct view name
     ProfileCompletionView, # Import the new view
+    ResetPasswordView,
+    ResetOTPView,
 )
 
 urlpatterns = [
@@ -20,4 +22,7 @@ urlpatterns = [
     path('auth/otp-send/', SendOTPView.as_view(), name='otp_send'), # Corrected URL path
     path('auth/otp-verify/', VerifyOTPView.as_view(), name='otp_verify'), # Corrected URL path
     path('auth/complete-profile/', ProfileCompletionView.as_view(), name='complete_profile'), # New URL
+    path('auth/reset-password/', ResetPasswordView.as_view(), name='reset-password'), # <--- Use the imported class directly and call .as_view()
+    path('auth/resetotp-password/', ResetOTPView.as_view(), name='reset-password'), # <--- Use the imported class directly and call .as_view()
+
 ]
