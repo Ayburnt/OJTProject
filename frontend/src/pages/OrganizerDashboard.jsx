@@ -53,7 +53,7 @@ function OrganizerDashboard() {
           <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
             <h3 className="text-lg font-semibold">Recent Events</h3>
             <Link to="/create-event">
-              <button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center">
+              <button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center cursor-pointer">
                 Create
               </button>
             </Link>

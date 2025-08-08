@@ -41,7 +41,6 @@
     {/* Tabs */}
   <div className="w-full md:max-w-3xl mx-auto mb-4">
     <div className="flex flex-row gap-1.5 items-center overflow-x-auto hide-scrollbar text-[16px]">
-      {/* All Events */}
       <button
         onClick={() => setSelectedCategory('All Events')}
         className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
@@ -51,8 +50,6 @@
           6
         </span>
       </button>
-
-      {/* Ongoing */}
       <button
         onClick={() => setSelectedCategory('Ongoing')}
         className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
@@ -62,8 +59,6 @@
           3
         </span>
       </button>
-
-      {/* Upcoming */}
       <button
         onClick={() => setSelectedCategory('Upcoming')}
         className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
@@ -73,8 +68,6 @@
           3
         </span>
       </button>
-
-      {/* Canceled */}
       <button
         onClick={() => setSelectedCategory('Canceled')}
         className="group text-secondary hover:text-secondary-500 hover:font-semibold active:text-secondary-500 active:font-semibold focus:text-secondary-500 focus:font-semibold whitespace-nowrap px-3 py-1.5 rounded-full font-outfit cursor-pointer flex items-center gap-1.5"
@@ -90,14 +83,11 @@
 
 
   <div className="bg-white p-6 mb-6 w-full md:max-w-3xl rounded-xl shadow-md">
-    {/* Title */}
     <h3 className="text-xl font-bold mb-4">Events</h3>
-
     {/* Event Card */}
     <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4 shadow-sm">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4 mt-3">
-        {/* Title & Status */}
         <div className="flex flex-col md:flex-row md:items-center md:gap-4">
           <h4 className="text-lg font-semibold text-gray-800">Tuli ni Josh: Kids Party</h4>
         <span className="hidden md:inline-block text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full w-max">
@@ -107,10 +97,10 @@
 
         {/* this is website view Buttons hidden in the mobile view*/}
         <div className="hidden md:flex flex-col sm:flex-row gap-2 md:w-auto">
-          <button className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto">
+          <button className="bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer">
             <FaCheck /> Approve
           </button>
-          <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto">
+          <button className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 text-sm rounded-md flex items-center justify-center gap-2 w-full sm:w-auto cursor-pointer">
             <RxCross2 /> Reject
           </button>
         </div>
@@ -153,7 +143,7 @@
       </div>
 
       {/* View button placed beside organizer text on mobile */}
-      <button className="flex items-center gap-1 text-[10px] sm:text-sm text-teal-600 font-medium self-start">
+      <button className="flex items-center gap-1 text-[10px] sm:text-sm text-teal-600 font-medium self-start cursor-pointer">
         View <IoEyeSharp className="text-lg sm:text-base md:text-xl mr-2"/>
       </button>
     </div>

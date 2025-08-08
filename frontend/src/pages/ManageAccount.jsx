@@ -80,7 +80,7 @@ const ManageAccount= () => {
             <div className="flex flex-col space-y-2 w-full sm:w-auto">
               <Link to="/forgot-password">
               <button
-                className="w-full sm:w-auto px-5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                className="w-full sm:w-auto px-5.5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
               >
                 Change Password
               </button>
@@ -88,14 +88,14 @@ const ManageAccount= () => {
               
               <Link to="/verification-form">
               <button
-                className="w-full sm:w-auto px-8 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors"
+                className="w-full sm:w-auto px-9 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
               >
                 Verify Account
               </button>
             </Link>
             <button
                 onClick={() => handleShowModal('Delete account functionality would go here!')}
-                className="w-full sm:w-auto px-4 py-2 text-lg font-outfit text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                className="w-full sm:w-auto px-4 py-2 text-lg font-outfit text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
               >
                 Delete Account
               </button>
@@ -114,7 +114,7 @@ const ManageAccount= () => {
                 <h3 className="text-lg font-semibold font-outfit text-gray-800">Profile Information</h3>
                 <button
                   onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                  className={`px-4 py-2 rounded-lg transition-colors w-full sm:w-auto ${
+                  className={`px-4 py-2 rounded-lg transition-colors w-full sm:w-auto cursor-pointer ${
                     isEditing
                       ? 'bg-green-600 hover:bg-green-700 text-white'
                       : 'bg-teal-600 hover:bg-teal-700 text-white'
@@ -258,7 +258,7 @@ const ManageAccount= () => {
                   </div>
                   <button
                     onClick={() => setNotifications({...notifications, email: !notifications.email})}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 cursor-pointer ${
                       notifications.email ? 'bg-teal-600' : 'bg-gray-200'
                     }`}
                   >
@@ -275,7 +275,7 @@ const ManageAccount= () => {
                   </div>
                   <button
                     onClick={() => setNotifications({...notifications, sms: !notifications.sms})}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 cursor-pointer ${
                       notifications.sms ? 'bg-teal-600' : 'bg-gray-200'
                     }`}
                   >
@@ -292,7 +292,7 @@ const ManageAccount= () => {
                   </div>
                   <button
                     onClick={() => setNotifications({...notifications, marketing: !notifications.marketing})}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 ${
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 cursor-pointer ${
                       notifications.marketing ? 'bg-teal-600' : 'bg-gray-200'
                     }`}
                   >

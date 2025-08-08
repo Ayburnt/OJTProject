@@ -1,5 +1,6 @@
 import React from "react";
 import { IoIosArrowBack } from "react-icons/io";
+import { IoIosEye } from "react-icons/io";
 import { MdOutlineWarehouse } from "react-icons/md";
 import { IoCalendarClearOutline } from "react-icons/io5";
 import { CiClock2 } from "react-icons/ci";
@@ -16,14 +17,30 @@ function AdminEventControl() {
          <AdminNav />
 
       {/* Back */}
-      <div className="w-full max-w-md flex items-center text-left mt-1 mb-5 gap-1 cursor-pointer" onClick={() => navigate('/')}>
-        <IoIosArrowBack className="text-secondary text-xl" />
-        <span className="text-secondary text-sm font-medium font-outfit">Back</span>
-        </div>
+     <div
+  className="w-full max-w-md flex items-center text-left mb-3 gap-1 cursor-pointer mt-14 md:mt-0"
+  onClick={() => navigate('/')}
+>
+  <IoIosArrowBack className="text-secondary text-xl" />
+  <span className="text-secondary text-sm font-medium font-outfit">Back</span>
+</div>
 
       <div className="flex flex-col lg:flex-row gap-6 md:gap-0">
         {/* Left Main Content */}
-        <div className="flex-1 space-y-4">
+        <div className="flex-1 space-y-4 font-outfit">
+           <h1 className="text-2xl font-semibold text-gray-800">Event Proposal Review</h1>
+        <p className="text-sm text-gray-500">
+          Review and manage incoming event proposals from organizers
+        </p>
+
+        {/* Event Image Placeholder */}
+        <div className="w-full h-48 bg-gray-400 rounded-md mt-4 flex items-center justify-center relative md:w-[95%]">
+          <span className="text-black text-sm font-semibold">Event Image</span>
+          <div className="absolute top-2 right-2 text-white cursor-pointer">
+            <IoIosEye className="text-xl"/>
+          </div>
+        </div>
+
           {/* Event Header */}
           <div className="bg-white p-6 rounded-lg shadow-sm md:w-[95%]">
             <div className="flex items-center justify-between">
@@ -60,7 +77,7 @@ function AdminEventControl() {
               </div>
              
               <div className="flex items-center gap-2">
-                <LuPhilippinePeso /> <span>Event Budget: ₱30,000</span>
+                <LuPhilippinePeso className="text-secondary"/> <span>Event Budget: ₱30,000</span>
               </div>
             </div>
           </div>
@@ -146,10 +163,10 @@ function AdminEventControl() {
 
        {/* Action Buttons */}
          <div className="flex gap-5 mt-4 md:ml-78">
-  <button className="px-24 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all md:px-20 py-2">
+  <button className="px-24 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all md:px-20 py-2 cursor-pointer">
     Accept
   </button>
-  <button className="px-7 py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition-all">
+  <button className="px-7 py-2 bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
     Reject
   </button>
 </div>

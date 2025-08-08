@@ -62,14 +62,14 @@ function AdminNav() {
                        <Link to='/admin-dashboard' className={`${title === 'Dashboard Overview' && `bg-[#009494]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                          <p className={`${title === 'Dashboard Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Dashboard</p>
                        </Link>
-                       <Link to='/#' className={`${title === ' Pag-iisipan pa daw' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Shedules</p>
+                       <Link to='/admin-eventcontrol' className={`${title === 'Event Control Overview' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === 'Event Control Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Event Control</p>
                        </Link>
                        <Link to='/#' className={`${title === ' Pag-iisipan pa daw' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>My Tickets</p>
+                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Pag iisipan pa daw po</p>
                        </Link>
                        <Link to='/#' className={`${title === 'Pag iisipan pa daw' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Manage Account</p>
+                         <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>pag iisipan pa po</p>
                        </Link>
                      </ul>
                    </div>
@@ -102,7 +102,7 @@ function AdminNav() {
                 <ul className="w-full text-center bg-white text-gray-800 font-outfit flex flex-col items-start">
                   <Link
                     to="/admin-dashboard"
-                    className={`${title === 'Overview' ? 'bg-[#009494]' : ''
+                    className={`${title === 'Dashboard Overview' ? 'bg-[#009494]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
@@ -114,15 +114,15 @@ function AdminNav() {
                   </Link>
       
                   <Link
-                    to="/#"
-                    className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#5BD4D4]' : ''
+                    to="/admin-eventcontrol"
+                    className={`${title === 'Event Control Overview' ? 'bg-[#5BD4D4]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === 'Event Control Overview' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                       Pag-iisipan pa daw
+                       Event Control
                     </p>
                   </Link>
       

@@ -92,7 +92,7 @@ const Attendees = () => {
                   <select
                     value={selectedEvent}
                     onChange={(e) => setSelectedEvent(e.target.value)}
-                    className="appearance-none w-full pl-4 pr-8 py-2 rounded-full border border-teal-500 focus:border-teal-600 text-gray-700 bg-white" >
+                    className="appearance-none w-full pl-4 pr-8 py-2 rounded-full border border-teal-500 focus:border-teal-600 text-gray-700 bg-white cursor-pointer" >
                     {mockEvents.map((event) => (
                       <option key={event} value={event}>
                         {event}
@@ -110,7 +110,7 @@ const Attendees = () => {
             <div className="flex w-full justify-end sm:justify-center md:mx-20 lg:mx-4">
           <button
             onClick={downloadCsv}
-            className="min-w-[200px] whitespace-nowrap py-2 px-4 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center text-center"
+            className="min-w-[200px] whitespace-nowrap py-2 px-4 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center text-center cursor-pointer"
           >
             Download Attendees CSV
           </button>

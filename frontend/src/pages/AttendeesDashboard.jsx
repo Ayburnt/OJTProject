@@ -47,7 +47,7 @@ const AttendeesDashboard = () => {
             {['all', 'confirmed', 'pending'].map((tab) => (
               <button
                 key={tab}
-                className={`flex items-center ${
+                className={`flex items-center cursor-pointer ${
                   activeTab === tab
                     ? 'text-secondary border-b-2 border-secondary'
                     : 'text-gray-500'
@@ -55,7 +55,7 @@ const AttendeesDashboard = () => {
                 onClick={() => setActiveTab(tab)}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                <span className="ml-2 px-2 py-1 text-xs rounded-full bg-secondary text-white font-outfit ">
+                <span className="ml-2 px-2 py-1 text-xs rounded-full bg-secondary text-white font-outfit">
                   {ticketCounts[tab]}
                 </span>
               </button>
@@ -96,10 +96,10 @@ const AttendeesDashboard = () => {
           <p className="font-semibold text-black text-sm">₱200.00</p>
         </div>
         <div className="flex gap-3 pt-2">
-          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary">
+          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary cursor-pointer">
             View Info
           </button>
-          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md">
+          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md cursor-pointer">
             <GoDownload className="text-3xl text-white" />
           </div>
         </div>
@@ -139,10 +139,10 @@ const AttendeesDashboard = () => {
           <p className="font-semibold text-black text-sm">₱750.00</p>
         </div>
         <div className="flex gap-3 pt-2">
-          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary">
+          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary cursor-pointer">
             View Info
           </button>
-          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md">
+          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md cursor-pointer">
             <GoDownload className="text-3xl text-white" />
           </div>
         </div>
@@ -182,10 +182,10 @@ const AttendeesDashboard = () => {
           <p className="font-semibold text-black text-sm">₱1,200.00</p>
         </div>
         <div className="flex gap-3 pt-2">
-          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary">
+          <button className="px-6 py-2 text-white text-base font-outfit rounded-md flex-grow bg-secondary cursor-pointer">
             View Info
           </button>
-          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md">
+          <div className="w-[40px] flex justify-center items-center bg-grey rounded-md cursor-pointer">
             <GoDownload className="text-3xl text-white" />
           </div>
         </div>
