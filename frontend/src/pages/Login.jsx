@@ -20,7 +20,7 @@ function Login({ onAuthSuccess }) {
     const userRole = localStorage.getItem('userRole');
     const userCode = localStorage.getItem('userCode');
     if (userRole === 'organizer') {
-      navigate(`/organizer/${userCode}`);
+      navigate(`/org/${userCode}`);
     } else if (userRole === 'guest') {
       navigate("/")
     } else {
@@ -39,7 +39,7 @@ function Login({ onAuthSuccess }) {
 
     // Conditional redirection based on user role
     if (userData.role === 'organizer') {
-      navigate(`/organizer/${userCodePath}`);
+      navigate(`/org/${userCodePath}`);
     } else if (userData.role === 'guest') {
       navigate("/"); // Assuming Home.jsx is at the root path '/'
     } else {

@@ -37,7 +37,7 @@ function Signup({ onAuthSuccess }) {
             setStep(4); // Navigate to the fill-up form
         } else {
             if (userData.role === 'organizer') {
-                navigate(`/organizer/${user_code}`);
+                navigate(`/org/${user_code}`);
             } else {
                 navigate("/dashboard"); // Fallback for other roles like 'admin'
             }
@@ -260,7 +260,7 @@ function Signup({ onAuthSuccess }) {
                 // Final redirect after profile completion
                 const userCodePath = data.user.user_code;
                 if (data.user.role === 'organizer') {
-                    navigate(`/organizer/${userCodePath}`);
+                    navigate(`/org/${userCodePath}`);
                 } else {
                     navigate("/dashboard");
                 }

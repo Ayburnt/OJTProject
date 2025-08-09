@@ -47,7 +47,7 @@ function App() {
   const isPathExcluded = (path) => {
     // Check if the path starts with a dynamic route or is an exact match
     return (
-      path.startsWith('/organizer/') || // Checks for paths like '/organizer/TAN07'
+      path.startsWith('/org/') || // Checks for paths like '/organizer/TAN07'
       excludedPaths.includes(path)
     );
   };
@@ -76,7 +76,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} /> 
-          <Route path='/organizer/:userCode' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
+          <Route path='/org/:userCode' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/my-event' element={<OrganizerEvent />} />
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
