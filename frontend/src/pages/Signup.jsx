@@ -34,10 +34,8 @@ function Signup({ onAuthSuccess }) {
             setCompanyWebsite(userData.company_website || '');
             setStep(4); // Navigate to the fill-up form
         } else {
-            if (userData.role === 'client') {
-                navigate("/client-dashboard");
-            } else if (userData.role === 'guest') {
-                navigate("/");
+            if (userData.role === 'organizer') {
+                navigate("/organizer-dashboard");
             } else {
                 navigate("/dashboard"); // Fallback for other roles like 'admin'
             }
@@ -90,7 +88,7 @@ function Signup({ onAuthSuccess }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isOrganizer, setIsOrganizer] = useState(false);
     const [isAttendee, setIsAttendee] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("guest"); // Default to 'guest'
+    const [selectedRole, setSelectedRole] = useState("organizer"); // Default to 'guest'
 
     // States for Step 4 (Fill up Information)
     const [firstname, setFirstname] = useState("");
@@ -254,10 +252,8 @@ function Signup({ onAuthSuccess }) {
                 localStorage.setItem('isLoggedIn', true);
 
                 // Final redirect after profile completion
-                if (data.user.role === 'client') {
+                if (data.user.role === 'organizer') {
                     navigate("/organizer-dashboard");
-                } else if (data.user.role === 'guest') {
-                    navigate("/");
                 } else {
                     navigate("/dashboard");
                 }
@@ -304,7 +300,7 @@ function Signup({ onAuthSuccess }) {
 
     // New useEffect to initialize and render Google button when script is loaded AND step is 2
     useEffect(() => {
-        if (googleScriptLoaded && window.google && step === 2 && !googleGsiInitialized.current) {
+        if (googleScriptLoaded && window.google && step === 1 && !googleGsiInitialized.current) {
             // Initialize Google Sign-In only once
             window.google.accounts.id.initialize({
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Ensure this is correctly configured in your .env
@@ -383,6 +379,7 @@ function Signup({ onAuthSuccess }) {
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
+                {/*}
                 {step === 1 && (
                     <>
 
@@ -395,9 +392,9 @@ function Signup({ onAuthSuccess }) {
                             <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
                         </div>
 
-                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p> {/* Improved typography */}
+                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p> 
 
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full md:w-[90%] transition-colors duration-500 px-6"> {/* Adjusted gap and added padding */}
+                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full md:w-[90%] transition-colors duration-500 px-6">
                             <div
                                 className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 py-4
                                 ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
@@ -407,8 +404,8 @@ function Signup({ onAuthSuccess }) {
                                     setSelectedRole("client");
                                 }}>
 
-                                <HiOutlineCalendarDays className="text-[8rem]" /> {/* Adjusted icon size */}
-                                <p className={`uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p> {/* Improved typography */}
+                                <HiOutlineCalendarDays className="text-[8rem]" /> 
+                                <p className={`uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p>
                             </div>
 
                             <div
@@ -420,8 +417,8 @@ function Signup({ onAuthSuccess }) {
                                     setSelectedRole("guest");
                                 }}
                             >
-                                <HiOutlineIdentification className="text-[8rem]" /> {/* Adjusted icon size */}
-                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p> {/* Improved typography */}
+                                <HiOutlineIdentification className="text-[8rem]" />
+                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p>
                             </div>
                         </div>
 
@@ -436,17 +433,18 @@ function Signup({ onAuthSuccess }) {
                                 }
                             }}> Done </button>
                         {roleMsg && <p className="text-center text-sm mt-4 text-red-500">{roleMsg}</p>}
-                        <p className="text-gray-600 font-outfit mt-8 text-sm"> {/* Adjusted margin and color */}
-                            Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link> {/* Improved link style */}
+                        <p className="text-gray-600 font-outfit mt-8 text-sm">
+                            Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link>
                         </p>
                     </>
-                )}
+                )} */}
 
 
-                {step === 2 && (
+                {step === 1 && (
                     <>
-                        <div className="w-full text-left">
-                            <IoArrowBackCircle className="text-secondary text-[2rem] ml-5 cursor-pointer" onClick={() => setStep(1)} />
+                        <div className="w-full max-w-md flex items-center text-left gap-1 mb-5 cursor-pointer" onClick={() => navigate('/')}>
+                            <IoIosArrowBack className="text-secondary text-xl" />
+                            <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
                         </div>
 
                         <h2 className="text-2xl font-bold font-outfit mb-4 text-center">Sign Up</h2>
@@ -612,7 +610,7 @@ function Signup({ onAuthSuccess }) {
                             </div>
 
                             {/* Conditionally render company fields for 'client' role */}
-                            {selectedRoleRef.current === 'client' && (
+                            {selectedRoleRef.current === 'organizer' && (
                                 <>
                                     <div className="mb-4 w-full">
                                         <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name</label>

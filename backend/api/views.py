@@ -79,7 +79,7 @@ class UserRegistrationView(APIView):
                 tokens = get_tokens_for_user(user)
 
                 # Determine if profile completion is needed based on role
-                needs_profile_completion = user.role == 'client'
+                needs_profile_completion = user.role == 'organizer'
 
                 # --- Send Account Confirmation Email ---
                 sender_email = settings.DEFAULT_FROM_EMAIL
@@ -164,7 +164,7 @@ class UserLoginView(APIView):
 
             # Determine if profile completion is needed based on role and missing fields
             # For login, if they are a client and any required fields are missing, flag it.
-            needs_profile_completion = user.role == 'client' and (
+            needs_profile_completion = user.role == 'organizer' and (
                 not user.phone_number or
                 not user.birthday or
                 not user.gender or
@@ -210,7 +210,7 @@ class GoogleAuthRegisterView(APIView):
             profile_picture = google_user_info.get('picture', None)
             
             # Get role from serializer's validated_data
-            role = serializer.validated_data.get('role', 'guest')
+            role = serializer.validated_data.get('role', 'organizer')
 
             print(f"VIEWS: Attempting Google registration for email: {email}")
             print(f"VIEWS: Role received from GoogleRegisterSerializer: {role}")
@@ -267,7 +267,7 @@ class GoogleAuthRegisterView(APIView):
                     )
 
             tokens = get_tokens_for_user(user)
-            needs_profile_completion = user.role == 'client' # Flag for frontend
+            needs_profile_completion = user.role == 'organizer' # Flag for frontend
 
             return Response({
                 'message': message,
@@ -324,7 +324,7 @@ class GoogleAuthLoginView(APIView):
             tokens = get_tokens_for_user(user)
             
             # Determine if profile completion is needed based on role and missing fields
-            needs_profile_completion = user.role == 'client' and (
+            needs_profile_completion = user.role == 'organizer' and (
                 not user.phone_number or
                 not user.birthday or
                 not user.gender or

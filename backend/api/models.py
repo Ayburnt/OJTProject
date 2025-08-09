@@ -49,8 +49,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     for first name, last name, profile picture, and role.
     """
     ROLE_CHOICES = (
-        ('guest', 'Guest'), # Added 'guest' role
-        ('client', 'Client'), # Added 'client' role (for organizers)
+        ('organizer', 'Organizer'),
         ('admin', 'Admin'),
     )
 
@@ -58,7 +57,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150, blank=True) # Updated max_length
     last_name = models.CharField(max_length=150, blank=True) # Updated max_length
     profile_picture = models.URLField(max_length=500, blank=True, null=True, default='https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='guest') # Updated max_length and default
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='organizer') # Updated max_length and default
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(auto_now_add=True) # Changed default to auto_now_add

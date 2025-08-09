@@ -38,7 +38,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
     }
 
     if (!requiredRole) {
-        if (userRole === 'client') {
+        if (userRole === 'organizer') {
             return <Navigate to="/organizer-dashboard" replace />;
         } else if (userRole === 'admin') {
             return <Navigate to="/admin-dashboard" replace />;

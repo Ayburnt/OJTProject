@@ -20,7 +20,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     # Added min_length to password fields
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
     confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
-    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='guest') # Updated default role
+    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='organizer') # Updated default role
     phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True) # New field
     birthday = serializers.DateField(required=False, allow_null=True) # New field
     gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
@@ -57,7 +57,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             last_name=validated_data.get('last_name', ''),
             company_name=validated_data.get('company_name', ''),
             company_website=validated_data.get('company_website', ''),
-            role=validated_data.get('role', 'guest'), # Ensure role is set, default to 'guest'
+            role=validated_data.get('role', 'organizer'), # Ensure role is set, default to 'organizer'
             phone_number=validated_data.get('phone_number', None), # Save new field
             birthday=validated_data.get('birthday', None), # Save new field
             gender=validated_data.get('gender', None), # Save new field
@@ -143,7 +143,7 @@ class GoogleRegisterSerializer(BaseGoogleAuthSerializer):
     Serializer for Google registration.
     Expects 'token' and 'role' from the frontend.
     """
-    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='guest', required=False)
+    role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='organizer', required=False)
     # Add other fields here if your Google registration process collects them
     # e.g., phone_number = serializers.CharField(required=False, allow_blank=True)
     # e.g., birthday = serializers.DateField(required=False, allow_null=True)
