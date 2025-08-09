@@ -1,12 +1,12 @@
 import React from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import { CgProfile } from 'react-icons/cg';
-import { TbMessageChatbotFilled } from "react-icons/tb";
 import { Link } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
+import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 
 function OrganizerDashboard() {
-  const {isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
+  const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
   
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-primary font-outfit text-gray-800 overflow-hidden">
@@ -33,7 +33,7 @@ function OrganizerDashboard() {
             </>
           ) : (
             <CgProfile className='hidden md:flex text-[2rem]' />
-          )}                    
+          )}                      
         </header>
 
         {/* Statistic Cards */}
@@ -76,13 +76,10 @@ function OrganizerDashboard() {
             </div>
           </div>
         </section>
-
-        {/* Floating Chat Button */}
-        <button
-          className="fixed bottom-6 right-6 rounded-full p-3 z-50" >
-          <TbMessageChatbotFilled className="text-secondary text-6xl transform -scale-x-100" />
-        </button>
       </main>
+      
+      {/* Include the Chatbot component here */}
+      <Chatbot />
     </div>
   );
 }

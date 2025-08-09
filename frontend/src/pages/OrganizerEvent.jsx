@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
-
+import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
@@ -26,7 +26,6 @@ const OrganizerEvent = () => {
       status: 'Status',
     },
   ];
-
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
@@ -82,10 +81,10 @@ const OrganizerEvent = () => {
             </button>
           </div>
 
-              <Link to="/create-event">
+          <Link to="/create-event">
             <button className='bg-secondary text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
             Create New Event</button>
-              </Link>
+          </Link>
         </div>
 
 
@@ -103,6 +102,9 @@ const OrganizerEvent = () => {
           ))}
         </div>
       </div>
+      
+      {/* Include the Chatbot component here */}
+      <Chatbot />
     </div>
   );
 };
