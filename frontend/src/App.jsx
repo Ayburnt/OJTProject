@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom'; // Import useLocation
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import SignUp from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
@@ -22,12 +22,38 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import AdminEventControl from './pages/AdminEventControl.jsx'; 
 import PrivateRoute from './hooks/protectedRoute.jsx';
 
+// A component that wraps the main App logic
 function App() {
-  const location = useLocation(); // Get the current location object
+  const location = useLocation();
 
-  // Determine if the header should be shown
-  const showHeader = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/verification-form' && location.pathname !=='/attendees-dashboard'  && location.pathname !=='/admin-dashboard' && location.pathname !=='/admin-eventcontrol';
-  const showFooter = location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/organizer-dashboard' && location.pathname !=='/forgot-password' && location.pathname !=='/my-event' && location.pathname !=='/find-my-ticket' && location.pathname !=='/attendees' && location.pathname !=='/manage-account' && location.pathname !=='/create-event' && location.pathname !=='/verification-form' && location.pathname !=='/attendees-dashboard' && location.pathname !=='/admin-dashboard' && location.pathname !=='/admin-eventcontrol';
+  // Define an array of paths where the header and footer should not be shown.
+  // Use startsWith() for dynamic paths like /organizer/:userCode.
+  const excludedPaths = [
+    '/login',
+    '/signup',
+    '/forgot-password',
+    '/my-event',
+    '/find-my-ticket',
+    '/attendees',
+    '/manage-account',
+    '/create-event',
+    '/verification-form',
+    '/attendees-dashboard',
+    '/admin-dashboard',
+    '/admin-eventcontrol'
+  ];
+
+  // A helper function to check if the current path is in the excluded list
+  const isPathExcluded = (path) => {
+    // Check if the path starts with a dynamic route or is an exact match
+    return (
+      path.startsWith('/organizer/') || // Checks for paths like '/organizer/TAN07'
+      excludedPaths.includes(path)
+    );
+  };
+
+  const showHeader = !isPathExcluded(location.pathname);
+  const showFooter = !isPathExcluded(location.pathname);
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans antialiased flex flex-col text-gray-800">
@@ -47,10 +73,10 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />          
+          <Route path="/signup" element={<SignUp />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
-          <Route path="/events/:id" element={<EventDetailPage />} />          
-          <Route path='/organizer-dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
+          <Route path="/events/:id" element={<EventDetailPage />} /> 
+          <Route path='/organizer/:userCode' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/my-event' element={<OrganizerEvent />} />
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
@@ -60,12 +86,10 @@ function App() {
           <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
           <Route path='/admin-dashboard' element={<AdminDashboard />} /> 
-            <Route path='/admin-eventcontrol' element={<AdminEventControl />} /> 
-          {/* Add more routes as needed */}
+          <Route path='/admin-eventcontrol' element={<AdminEventControl />} /> 
         </Routes>
       </main>
 
-      {/* Footer can remain outside if it's always present */}
       {showFooter && <Footer />}
     </div>
   );

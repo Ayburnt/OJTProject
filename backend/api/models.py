@@ -68,6 +68,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True)
+    user_code = models.CharField(unique=True, blank=True, null=True)
     # --- END ADDED NEW FIELDS ---
 
     objects = CustomUserManager()

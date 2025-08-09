@@ -48,6 +48,7 @@ def get_tokens_for_user(user):
         'gender': user.gender,
         'company_name': user.company_name, # Include company info in tokens
         'company_website': user.company_website, # Include company info in tokens
+        'user_code': user.user_code,
     }
 
 # Configure AWS SES client using settings from settings.py
@@ -130,6 +131,7 @@ class UserRegistrationView(APIView):
                         'company_name': user.company_name,
                         'company_website': user.company_website,
                         'needs_profile_completion': needs_profile_completion, # Flag for frontend
+                        'user_code': user.user_code,
                     },
                     'tokens': tokens,
                 }, status=status.HTTP_201_CREATED)
@@ -169,7 +171,8 @@ class UserLoginView(APIView):
                 not user.birthday or
                 not user.gender or
                 not user.company_name or # Assuming company_name is required for clients
-                not user.company_website # Assuming company_website is required for clients
+                not user.company_website or# Assuming company_website is required for clients
+                not user.user_code
             )
 
             return Response({
@@ -186,6 +189,7 @@ class UserLoginView(APIView):
                     'company_name': user.company_name,
                     'company_website': user.company_website,
                     'needs_profile_completion': needs_profile_completion, # Flag for frontend
+                    'user_code': user.user_code,
                 },
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
@@ -245,7 +249,8 @@ class GoogleAuthRegisterView(APIView):
                         gender=None,
                         company_name=None, # Explicitly set to None for new Google users
                         company_website=None, # Explicitly set to None for new Google users
-                        is_active=True
+                        is_active=True,
+                        user_code=None
                     )
                     user.set_unusable_password() # Google users don't have a password
                     user.save()
@@ -283,6 +288,7 @@ class GoogleAuthRegisterView(APIView):
                     'company_name': user.company_name,
                     'company_website': user.company_website,
                     'needs_profile_completion': needs_profile_completion, # Flag for frontend
+                    'user_code': user.user_code
                 },
                 'tokens': tokens,
             }, status=status_code)
@@ -329,7 +335,8 @@ class GoogleAuthLoginView(APIView):
                 not user.birthday or
                 not user.gender or
                 not user.company_name or # Assuming company_name is required for clients
-                not user.company_website # Assuming company_website is required for clients
+                not user.company_website or # Assuming company_website is required for clients
+                not user.user_code
             )
 
             return Response({
@@ -345,7 +352,8 @@ class GoogleAuthLoginView(APIView):
                     'gender': user.gender,
                     'company_name': user.company_name,
                     'company_website': user.company_website,
-                    'needs_profile_completion': needs_profile_completion, # Flag for frontend
+                    'user_code': user.user_code,
+                    'needs_profile_completion': needs_profile_completion, # Flag for frontend                    
                 },
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
@@ -400,8 +408,16 @@ class ProfileCompletionView(APIView):
                     'company_name': user.company_name,
                     'company_website': user.company_website,
                     'needs_profile_completion': False, # Profile is now complete
+                    'user_code': user.user_code,
                 }
             }, status=status.HTTP_200_OK)
+
+        if 'user_code' in serializer.errors:
+            if any(err.code == 'unique' for err in serializer.errors['user_code']):
+                return Response(
+                    {'user_code' : ['The provided user code is already taken. Please choose a different one.']},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         print("ProfileCompletionView serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

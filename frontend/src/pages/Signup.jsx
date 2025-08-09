@@ -22,6 +22,7 @@ function Signup({ onAuthSuccess }) {
         // Store other user data received from backend
         localStorage.setItem('userFirstName', userData.first_name || '');
         localStorage.setItem('userProfile', userData.profile_picture || '');
+        localStorage.setItem('userCode', userData.user_code || '');
 
         if (userData.needs_profile_completion || selectedRole === 'guest') {
             // Pre-fill step 4 fields with any data already available (e.g., from Google)
@@ -32,10 +33,11 @@ function Signup({ onAuthSuccess }) {
             setGender(userData.gender || '');
             setCompanyName(userData.company_name || '');
             setCompanyWebsite(userData.company_website || '');
+            setUserCode(userData.userCode || '');
             setStep(4); // Navigate to the fill-up form
         } else {
             if (userData.role === 'organizer') {
-                navigate("/organizer-dashboard");
+                navigate(`/organizer/${user_code}`);
             } else {
                 navigate("/dashboard"); // Fallback for other roles like 'admin'
             }
@@ -98,6 +100,7 @@ function Signup({ onAuthSuccess }) {
     const [gender, setGender] = useState("");
     const [companyName, setCompanyName] = useState(""); // New field for client
     const [companyWebsite, setCompanyWebsite] = useState(""); // New field for client
+    const [user_code, setUserCode] = useState("");
     const [agree, setAgree] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
@@ -193,6 +196,7 @@ function Signup({ onAuthSuccess }) {
                     gender: null,
                     company_name: null,
                     company_website: null,
+                    user_code:null,
                 });
 
                 const data = registrationResponse.data;
@@ -239,6 +243,7 @@ function Signup({ onAuthSuccess }) {
                 gender: gender,
                 company_name: companyName,
                 company_website: companyWebsite,
+                user_code: user_code,
             });
 
             const data = backendResponse.data;
@@ -250,10 +255,12 @@ function Signup({ onAuthSuccess }) {
                 localStorage.setItem('userProfile', data.user.profile_picture || '');
                 localStorage.setItem('userRole', data.user.role); // Ensure role is consistent
                 localStorage.setItem('isLoggedIn', true);
+                localStorage.setItem('userCode', data.user.user_code);
 
                 // Final redirect after profile completion
+                const userCodePath = data.user.user_code;
                 if (data.user.role === 'organizer') {
-                    navigate("/organizer-dashboard");
+                    navigate(`/organizer/${userCodePath}`);
                 } else {
                     navigate("/dashboard");
                 }
@@ -262,8 +269,19 @@ function Signup({ onAuthSuccess }) {
             }
         } catch (error) {
             console.error('Error during profile completion:', error);
-            const data = error.response?.data;
-            setMessage(data?.detail || 'An error occurred while saving profile information.');
+        
+        const errorData = error.response?.data;
+        
+        // Check for the specific user_code uniqueness error
+        if (errorData && errorData.user_code && errorData.user_code.length > 0) {
+            // Display the specific error message from the backend
+            setMessage(errorData.user_code[0]);
+            // Optional: Set a specific error state for the user_code input field
+            // setUserCodeError(errorData.user_code[0]);
+        } else {
+            // Handle other general errors
+            setMessage(errorData?.detail || 'An error occurred while saving profile information.');
+        }
         } finally {
             setIsLoading(false);
         }
@@ -625,6 +643,14 @@ function Signup({ onAuthSuccess }) {
                                             type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                             value={companyWebsite} onChange={(e) => setCompanyWebsite(e.target.value)} />
+                                    </div>
+                                    <div className="mb-4 w-full">
+                                        <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">User Code</label>
+                                        <input
+                                            type="text" id="user_code" name="user_code" maxLength={5} // Changed type to url
+                                            className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
+                                            placeholder="e.g. JDC123"
+                                            value={user_code} onChange={(e) => setUserCode(e.target.value.toUpperCase())} />
                                     </div>
                                 </>
                             )}

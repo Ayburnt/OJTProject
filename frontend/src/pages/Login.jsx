@@ -18,8 +18,9 @@ function Login({ onAuthSuccess }) {
     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   if(isLoggedIn){
     const userRole = localStorage.getItem('userRole');
-    if (userRole === 'client') {
-      navigate("/organizer-dashboard");
+    const userCode = localStorage.getItem('userCode');
+    if (userRole === 'organizer') {
+      navigate(`/organizer/${userCode}`);
     } else if (userRole === 'guest') {
       navigate("/")
     } else {
@@ -33,10 +34,12 @@ function Login({ onAuthSuccess }) {
     localStorage.setItem('refreshToken', tokens.refresh);
     localStorage.setItem('userRole', userData.role);
     localStorage.setItem('userEmail', userData.email);
+    localStorage.setItem('userCode', userData.user_code);
+    const userCodePath = userData.user_code;
 
     // Conditional redirection based on user role
-    if (userData.role === 'client') {
-      navigate("/organizer-dashboard");
+    if (userData.role === 'organizer') {
+      navigate(`/organizer/${userCodePath}`);
     } else if (userData.role === 'guest') {
       navigate("/"); // Assuming Home.jsx is at the root path '/'
     } else {
@@ -91,7 +94,7 @@ function Login({ onAuthSuccess }) {
       localStorage.setItem('userFirstName', data.user.first_name || '');
       localStorage.setItem('isLoggedIn', true);
       localStorage.setItem('userProfile', data.user.profile_picture || '');
-      
+      actualOnAuthSuccess(data.user, data.tokens);
     } catch (error) {
       console.error('Error during Google sign-in:', error);
       // Axios errors have a 'response' object with 'data' for server errors
@@ -113,7 +116,8 @@ function Login({ onAuthSuccess }) {
       const data = backendResponse.data;
       localStorage.setItem('userFirstName', data.user.first_name || '');
       localStorage.setItem('isLoggedIn', true);
-      localStorage.setItem('userProfile', data.user.profile_picture || '');      
+      localStorage.setItem('userProfile', data.user.profile_picture || '');
+
       setMessage('Sign-in successful!');
       actualOnAuthSuccess(data.user, data.tokens);
     } catch (error) {

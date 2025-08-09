@@ -25,10 +25,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(required=False, allow_null=True) # New field
     gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
     profile_picture = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True) # New field for profile picture
+    user_code = serializers.CharField(max_length=5, required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture') # Added gender
+        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture', 'user_code') # Added gender
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True}, # Made optional for initial registration
             'last_name': {'required': False, 'allow_blank': True},  # Made optional for initial registration
@@ -61,7 +62,8 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             phone_number=validated_data.get('phone_number', None), # Save new field
             birthday=validated_data.get('birthday', None), # Save new field
             gender=validated_data.get('gender', None), # Save new field
-            profile_picture=validated_data.get('profile_picture', 'https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575') # Save new field
+            profile_picture=validated_data.get('profile_picture', 'https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575'), # Save new field
+            user_code=validated_data.get('user_code', '')
         )
         return user
 
@@ -165,7 +167,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = (
             'first_name', 'last_name', 'phone_number', 'birthday', 'gender',
-            'company_name', 'company_website'
+            'company_name', 'company_website', 'user_code'
         )
         # Make all fields optional for partial updates
         extra_kwargs = {
@@ -176,6 +178,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             'gender': {'required': False, 'allow_blank': True, 'allow_null': True},
             'company_name': {'required': False, 'allow_blank': True, 'allow_null': True},
             'company_website': {'required': False, 'allow_blank': True, 'allow_null': True},
+            'user_code': {'required': False, 'allow_blank': True, 'allow_null': True},
         }
         read_only_fields = ('email', 'role') # Email and role should not be updated via this serializer
 
