@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import api, { ACCESS_TOKEN } from "../api.js";
+import api from "../api.js";
 import { IoIosArrowBack } from "react-icons/io";
+import useAuth from "../hooks/useAuth";
 
-
-function Login({ onAuthSuccess }) {
-  useEffect(() => {
-    document.title = "Login | Sari-Sari Events";
-  }, [])
+function Login() {
+  const { login, isLoggedIn, userRole, userCode } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,90 +13,28 @@ function Login({ onAuthSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  if(isLoggedIn){
-    const userRole = localStorage.getItem('userRole');
-    const userCode = localStorage.getItem('userCode');
-    if (userRole === 'organizer') {
-      navigate(`/org/${userCode}`);
-    } else if (userRole === 'guest') {
-      navigate("/")
-    } else {
-      navigate("/");
-    }
-  }
-  },[])  
-
-  const defaultHandleAuthSuccess = (userData, tokens) => {
-    localStorage.setItem(ACCESS_TOKEN, tokens.access);
-    localStorage.setItem('refreshToken', tokens.refresh);
-    localStorage.setItem('userRole', userData.role);
-    localStorage.setItem('userEmail', userData.email);
-    localStorage.setItem('userCode', userData.user_code);
-    const userCodePath = userData.user_code;
-
-    // Conditional redirection based on user role
-    if (userData.role === 'organizer') {
-      navigate(`/org/${userCodePath}`);
-    } else if (userData.role === 'guest') {
-      navigate("/"); // Assuming Home.jsx is at the root path '/'
-    } else {
-      navigate("/dashboard"); // Fallback for other roles or if role is not 'client' or 'guest'
-    }
-  };
-
-  // Use the prop if available, otherwise use the default
-  const actualOnAuthSuccess = onAuthSuccess || defaultHandleAuthSuccess;
+    document.title = "Login | Sari-Sari Events";
+  }, []);
 
   useEffect(() => {
-    // Load Google API script
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => {
-      // Initialize Google Sign-In
-      if (window.google) {
-        window.google.accounts.id.initialize({
-          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // <<-- REPLACE THIS WITH YOUR ACTUAL GOOGLE CLIENT ID
-          callback: handleGoogleSignIn,
-        });
-        window.google.accounts.id.renderButton(
-          document.getElementById('google-sign-in-button'),
-          { theme: 'outline', size: 'large', text: 'signin_with', width: '330' } // Customize button
-        );
+    if (isLoggedIn) {
+      if(userRole === 'organizer'){
+        navigate(`/org/${userCode}`)
+      }if(userRole === 'admin'){
+        navigate(`/admin-dashboard`);
       }
-    };
-    document.body.appendChild(script);
-
-    return () => {
-      // Clean up the script when component unmounts
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
-  }, []);
+    }
+  }, [isLoggedIn, navigate, userCode, userRole]);
 
   const handleGoogleSignIn = async (response) => {
     setIsLoading(true);
     setMessage('');
     try {
-      // Use the imported 'api' instance for the request
       const backendResponse = await api.post('/auth/google/login/', { token: response.credential });
-
-      // Axios automatically parses JSON, so data is directly available
       const data = backendResponse.data;
-
-      setMessage('');
-      actualOnAuthSuccess(data.user, data.tokens);
-      localStorage.setItem('userFirstName', data.user.first_name || '');
-      localStorage.setItem('isLoggedIn', true);
-      localStorage.setItem('userProfile', data.user.profile_picture || '');
-      actualOnAuthSuccess(data.user, data.tokens);
+      login(data.tokens, data.user);
     } catch (error) {
-      console.error('Error during Google sign-in:', error);
-      // Axios errors have a 'response' object with 'data' for server errors
-      setMessage(error.response?.data?.detail || error.response?.data?.message || 'Google Sign-in failed. Please try again.');
+      setMessage(error.response?.data?.detail || 'Google Sign-in failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -107,28 +43,17 @@ function Login({ onAuthSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      // Use the imported 'api' instance for the request
       const backendResponse = await api.post('/auth/login/', { email, password });
-
-      // Axios automatically parses JSON, so data is directly available
       const data = backendResponse.data;
-      localStorage.setItem('userFirstName', data.user.first_name || '');
-      localStorage.setItem('isLoggedIn', true);
-      localStorage.setItem('userProfile', data.user.profile_picture || '');
-
-      setMessage('Sign-in successful!');
-      actualOnAuthSuccess(data.user, data.tokens);
+      login(data.tokens, data.user);
     } catch (error) {
-      console.error('Error during sign-in:', error);
-      // Axios errors have a 'response' object with 'data' for server errors
       const data = error.response?.data;
       if (data) {
         if (data.email) setMessage(`Email: ${data.email[0]}`);
         else if (data.password) setMessage(`Password: ${data.password[0]}`);
         else if (data.non_field_errors) setMessage(data.non_field_errors[0]);
-        else setMessage(data.detail || 'Sign-in failed. Please check your credentials.');
+        else setMessage(data.detail || 'Sign-in failed.');
       } else {
         setMessage('An error occurred during sign-in.');
       }
@@ -137,48 +62,72 @@ function Login({ onAuthSuccess }) {
     }
   };
 
+  // Google Sign-In script loading
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.onload = () => {
+      if (window.google) {
+        window.google.accounts.id.initialize({
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+          callback: handleGoogleSignIn,
+        });
+        window.google.accounts.id.renderButton(
+          document.getElementById('google-sign-in-button'),
+          { theme: 'outline', size: 'large', text: 'signin_with', width: '330' }
+        );
+      }
+    };
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
     <div className="flex items-center justify-center h-screen xl:h-auto 2xl:h-screen xl:py-10 rounded-lg bg-white md:bg-gray-100">
-
       <form onSubmit={handleSubmit}
-
-        className="bg-white flex flex-col items-center rounded-xl p-5 md:py-10 md:shadow-2xl w-full max-w-lg transform transition-all duration-300 hover:scale-[1.01]" >
-        {/* Back button */}
-        {/* This will navigate back to the previous page */}
-        <div className="w-full max-w-md flex items-center text-left mb-4 gap-1 cursor-pointer" onClick={() => navigate('/')}>
+        className="bg-white flex flex-col items-center rounded-xl p-5 md:py-10 md:shadow-2xl w-full max-w-lg">
+        
+        <div className="w-full max-w-md flex items-center mb-4 gap-1 cursor-pointer" onClick={() => navigate('/')}>
           <IoIosArrowBack className="text-secondary text-xl" />
-          <span className="text-secondary text-sm font-medium font-outfit">Back to home</span>
+          <span className="text-secondary text-sm font-medium">Back to home</span>
         </div>
 
         <div className="w-[45%] max-w-md flex items-center">
           <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
         </div>
 
-        <h2 className="text-5xl font-bold font-outfit mt-4 text-center">Welcome!</h2>
-        <hr className="w-70 mb-2 border-t border-gray-600" />
-        <p className="text-center text-sm font-outfit mb-5">Sign in your account</p>
+        <h2 className="text-5xl font-bold mt-4 text-center">Welcome!</h2>
+        <p className="text-center text-sm mb-5">Sign in your account</p>
 
         <div className="mb-4">
-          <label htmlFor="email" className="block mb-2 text-sm font-medium font-outfit leading-none">Your E-mail </label>
-          <input type="email" id="email" className="w-80 font-outfit px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+          <label htmlFor="email" className="block mb-2 text-sm">Your E-mail </label>
+          <input type="email" id="email" className="w-80 px-4 py-1 border rounded"
             value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
 
         <div className="mb-6">
-          <label htmlFor="password" className="block mb-2 text-sm font-medium font-outfit leading-none">Password </label>
-          <input type="password" id="password" className="w-80 font-outfit px-4 py-1 border rounded focus:ring-2 focus:ring-blue-400"
+          <label htmlFor="password" className="block mb-2 text-sm">Password </label>
+          <input type="password" id="password" className="w-80 px-4 py-1 border rounded"
             value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
 
-        {message && <p className="font-outfit text-center text-sm text-red-500">{message}</p>}
-        <button type="submit" className="w-72 bg-secondary text-white py-2 rounded hover:bg-blue-600 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
-        <p className="text-center my-2 text-grey"> or </p>
+        {message && <p className="text-center text-sm text-red-500">{message}</p>}
+        <button type="submit" className="w-72 bg-secondary text-white py-2 rounded-lg transition">{isLoading ? 'Logging in..' : 'Login'}</button>
+        
+        <p className="text-center my-2"> or </p>
         <div id="google-sign-in-button" className="flex justify-center"></div>
-       <p class="text-grey font-outfit mt-5 text-sm">Forgot Password? <a class="text-secondary" href="/forgot-password">Reset it here</a></p>
-        <p className="text-grey font-outfit mt-3 text-sm">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
+
+        <p className="mt-5 text-sm">Forgot Password? <a className="text-secondary" href="/forgot-password">Reset it here</a></p>
+        <p className="mt-3 text-sm">Don't have an account? <Link className="text-secondary" to={'/signup'}>Sign up</Link></p>
       </form>
     </div>
-
   );
 }
 

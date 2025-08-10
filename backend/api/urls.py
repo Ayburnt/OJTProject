@@ -11,6 +11,7 @@ from .views import (
     ProfileCompletionView, # Import the new view
     ResetPasswordView,
     ResetOTPView,
+    CurrentUserView,
 )
 
 urlpatterns = [
@@ -24,5 +25,5 @@ urlpatterns = [
     path('auth/complete-profile/', ProfileCompletionView.as_view(), name='complete_profile'), # New URL
     path('auth/reset-password/', ResetPasswordView.as_view(), name='reset-password'), # <--- Use the imported class directly and call .as_view()
     path('auth/resetotp-password/', ResetOTPView.as_view(), name='reset-password'), # <--- Use the imported class directly and call .as_view()
-
+    path("me/", CurrentUserView.as_view(), name="current-user"),
 ]

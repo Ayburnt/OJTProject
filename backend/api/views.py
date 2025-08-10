@@ -15,13 +15,9 @@ from botocore.exceptions import ClientError
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import get_user_model # <--- ADD THIS LINE!
-
-
-
-# For authentication and permissions (uncomment and configure if needed)
-# from rest_framework.permissions import IsAuthenticated
-# from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.auth import get_user_model
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # Import all necessary serializers
 from .serializers import (
@@ -654,3 +650,23 @@ class ResetPasswordView(APIView):
             {"detail": "Password has been reset successfully."},
             status=status.HTTP_200_OK
         )
+
+class CurrentUserView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        return Response({
+            'email': user.email,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'profile_picture': user.profile_picture,
+            'role': user.role,
+            'phone_number': user.phone_number,
+            'birthday': user.birthday.isoformat() if user.birthday else None,
+            'gender': user.gender,
+            'company_name': user.company_name,
+            'company_website': user.company_website,
+            'user_code': user.user_code,
+        })

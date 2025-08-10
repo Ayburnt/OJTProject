@@ -1,4 +1,4 @@
-//useAuth.js
+// hooks/useAuth.js
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../api.js';
@@ -6,13 +6,18 @@ import { ACCESS_TOKEN } from '../api.js';
 const REFRESH_TOKEN = 'refreshToken';
 const USER_ROLE = 'userRole';
 const USER_EMAIL = 'userEmail';
+const USER_CODE = 'userCode';
+const USER_FIRST_NAME = 'userFirstName';
+const USER_PROFILE = 'userProfile';
+const IS_LOGGED_IN = 'isLoggedIn';
 
 export const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [userEmail, setUserEmail] = useState('');
+  const [userCode, setUserCode] = useState('');
   const [userFirstName, setUserFirstName] = useState('');
-  const [userProfile, setUserProfile] = useState(''); 
+  const [userProfile, setUserProfile] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,64 +25,84 @@ export const useAuth = () => {
     const refreshToken = localStorage.getItem(REFRESH_TOKEN);
     const role = localStorage.getItem(USER_ROLE);
     const email = localStorage.getItem(USER_EMAIL);
-    const firstName = localStorage.getItem('userFirstName');
-    const profile = localStorage.getItem('userProfile');
+    const code = localStorage.getItem(USER_CODE);
+    const firstName = localStorage.getItem(USER_FIRST_NAME);
+    const profile = localStorage.getItem(USER_PROFILE);
+
     if (accessToken && refreshToken && role && email) {
       setIsLoggedIn(true);
       setUserRole(role);
       setUserEmail(email);
+      setUserCode(code || '');
       setUserFirstName(firstName || '');
       setUserProfile(profile || '');
     } else {
-      // If any token/info is missing, clear everything and redirect to login
-      localStorage.removeItem(ACCESS_TOKEN);
-      localStorage.removeItem(REFRESH_TOKEN);
-      localStorage.removeItem(USER_ROLE);
-      localStorage.removeItem(USER_EMAIL);
-      setIsLoggedIn(false);
-      setUserRole('');
-      setUserEmail('');
+      clearAuthData();
     }
-  }, []); // navigate is a stable function from react-router-dom, but good practice to include
+  }, []);
 
-  // Optional: Add login and logout functions to the hook for easier management
-  const login = (accessToken, refreshToken, role, email) => {
-    localStorage.setItem(ACCESS_TOKEN, accessToken);
-    localStorage.setItem(REFRESH_TOKEN, refreshToken);
-    localStorage.setItem(USER_ROLE, role);
-    localStorage.setItem(USER_EMAIL, email);
-    localStorage.setItem('userFirstName', userFirstName || '');
-    localStorage.setItem('userProfile', userProfile || '');
-    localStorage.setItem('isLoggedIn', true);
+  const saveAuthData = (tokens, user) => {
+    localStorage.setItem(ACCESS_TOKEN, tokens.access);
+    localStorage.setItem(REFRESH_TOKEN, tokens.refresh);
+    localStorage.setItem(USER_ROLE, user.role);
+    localStorage.setItem(USER_EMAIL, user.email);
+    localStorage.setItem(USER_CODE, user.user_code);
+    localStorage.setItem(USER_FIRST_NAME, user.first_name || '');
+    localStorage.setItem(USER_PROFILE, user.profile_picture || '');
+    localStorage.setItem(IS_LOGGED_IN, 'true');
+
     setIsLoggedIn(true);
-    setUserRole(role);
-    setUserEmail(email);
-    // You might want to navigate to a dashboard or home page after successful login
-    // navigate('/dashboard'); 
+    setUserRole(user.role);
+    setUserEmail(user.email);
+    setUserCode(user.user_code || '');
+    setUserFirstName(user.first_name || '');
+    setUserProfile(user.profile_picture || '');
   };
 
-  const logout = () => {
+  const clearAuthData = () => {
     localStorage.removeItem(ACCESS_TOKEN);
     localStorage.removeItem(REFRESH_TOKEN);
     localStorage.removeItem(USER_ROLE);
     localStorage.removeItem(USER_EMAIL);
-    localStorage.removeItem('userFirstName');
-    localStorage.removeItem('userProfile');
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem(USER_CODE);
+    localStorage.removeItem(USER_FIRST_NAME);
+    localStorage.removeItem(USER_PROFILE);
+    localStorage.removeItem(IS_LOGGED_IN);
+
     setIsLoggedIn(false);
     setUserRole('');
     setUserEmail('');
-    navigate('/'); // Redirect to login page on logout
+    setUserCode('');
+    setUserFirstName('');
+    setUserProfile('');
+  };
+
+  const login = (tokens, user) => {
+    saveAuthData(tokens, user);
+
+    if (user.role === 'organizer') {
+      navigate(`/org/${user.user_code}`);
+    } else if (user.role === 'admin') {
+      navigate('/admin-dashboard');
+    } else {
+      navigate('/');
+    }
+  };
+
+  const logout = () => {
+    clearAuthData();
+    navigate('/');
   };
 
   return {
     isLoggedIn,
     userRole,
     userEmail,
+    userCode,
     userFirstName,
     userProfile,
-    login,   // Provide the login function
-    logout   // Provide the logout function
+    login,
+    logout
   };
 };
 

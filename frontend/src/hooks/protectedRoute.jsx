@@ -51,8 +51,6 @@ const PrivateRoute = ({ children, requiredRole }) => {
         return <Navigate to="/" replace />;
     }
 
-    console.log("isLoggedIn:", isLoggedIn, "userRole:", userRole, "requiredRole:", requiredRole);
-
     return children;
 };
 

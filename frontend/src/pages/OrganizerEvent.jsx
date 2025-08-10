@@ -81,9 +81,8 @@ const OrganizerEvent = () => {
             </button>
           </div>
 
-          <Link to="/create-event">
-            <button className='bg-secondary text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
-            Create New Event</button>
+          <Link to="/create-event" className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
+            Create New Event
           </Link>
         </div>
 
