@@ -32,6 +32,7 @@ oauthlib==3.3.1
 packaging==24.2
 paramiko==3.5.1
 pathspec==0.12.1
+pillow==11.3.0
 psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
@@ -43,6 +44,7 @@ python-dotenv==1.1.1
 pythonnet==3.0.5
 pytz==2025.2
 PyYAML==6.0.2
+qrcode==8.2
 requests==2.32.4
 requests-oauthlib==2.0.0
 rsa==4.9.1

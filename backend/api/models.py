@@ -2,6 +2,9 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.core.files import File
+from io import BytesIO
+import qrcode
 
 class CustomUserManager(BaseUserManager):
     """
@@ -69,6 +72,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     birthday = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True)
     user_code = models.CharField(unique=True, blank=True, null=True)
+    qr_profile_link = models.URLField(max_length=500, blank=True, null=True)
+    qr_code_image = models.ImageField(upload_to="qr_codes/", blank=True, null=True)
     # --- END ADDED NEW FIELDS ---
 
     objects = CustomUserManager()
@@ -91,3 +96,35 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         Returns the short name for the user.
         """
         return self.first_name
+
+    def save(self, *args, **kwargs):
+        # Only generate QR if user_code exists
+        if self.user_code:
+            self.qr_profile_link = f"http://localhost:5173/org/{self.user_code}/dashboard"
+
+            import qrcode
+            from io import BytesIO
+            from django.core.files import File
+
+            qr = qrcode.QRCode(
+                version=1,
+                box_size=10,
+                border=5
+            )
+            qr.add_data(self.qr_profile_link)
+            qr.make(fit=True)
+
+            img = qr.make_image(fill_color="black", back_color="white")
+
+            buffer = BytesIO()
+            img.save(buffer, format="PNG")
+            file_name = f"qr_{self.user_code}.png"
+
+            # Only save the QR code once
+            if not self.qr_code_image:
+                self.qr_code_image.save(file_name, File(buffer), save=False)
+
+        super().save(*args, **kwargs)
+
+
+

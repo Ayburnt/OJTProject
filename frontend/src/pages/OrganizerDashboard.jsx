@@ -6,7 +6,7 @@ import useAuth from '../hooks/useAuth';
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 
 function OrganizerDashboard() {
-  const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
+  const { isLoggedIn, userCode, userEmail, userFirstName, userProfile, logout } = useAuth();
   
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-primary font-outfit text-gray-800 overflow-hidden">
@@ -52,7 +52,7 @@ function OrganizerDashboard() {
         <section className="bg-white rounded-xl shadow-md p-6 mb-6 font-outfit">
           <div className="flex justify-between items-center mb-4 flex-wrap gap-4">
             <h3 className="text-lg font-semibold">Recent Events</h3>
-            <Link to="/create-event">
+            <Link to={`/org/${userCode}/create-event`}>
               <button className="bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center cursor-pointer">
                 Create
               </button>

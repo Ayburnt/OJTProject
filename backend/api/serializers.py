@@ -26,10 +26,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
     profile_picture = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True) # New field for profile picture
     user_code = serializers.CharField(max_length=5, required=False, allow_blank=True, allow_null=True)
+    qr_code_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture', 'user_code') # Added gender
+        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture', 'user_code', 'qr_profile_link', 'qr_code_image', 'qr_code_image_url') # Added gender
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True}, # Made optional for initial registration
             'last_name': {'required': False, 'allow_blank': True},  # Made optional for initial registration
@@ -63,9 +64,16 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             birthday=validated_data.get('birthday', None), # Save new field
             gender=validated_data.get('gender', None), # Save new field
             profile_picture=validated_data.get('profile_picture', 'https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575'), # Save new field
-            user_code=validated_data.get('user_code', '')
+            user_code=validated_data.get('user_code', ''),
+            qr_profile_link=validated_data.get('qr_profile_link', ''),
+            qr_code_image=validated_data.get('qr_code_image','')
         )
         return user
+    
+    def get_qr_code_image_url(self, obj):
+        if obj.qr_code_image:
+            return obj.qr_code_image.url
+        return None
 
 class UserLoginSerializer(serializers.Serializer):
     """

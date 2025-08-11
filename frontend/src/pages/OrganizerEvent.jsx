@@ -3,9 +3,11 @@ import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
+import useAuth from '../hooks/useAuth';
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
+  const {userCode} = useAuth();
   const events = [
     {
       name: 'Tech Conference 2023',
@@ -81,7 +83,7 @@ const OrganizerEvent = () => {
             </button>
           </div>
 
-          <Link to="/create-event" className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
+          <Link to={`/org/${userCode}/create-event`} className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
             Create New Event
           </Link>
         </div>
