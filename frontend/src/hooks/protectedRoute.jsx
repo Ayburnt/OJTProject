@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../api.js';
+import useAuth from './useAuth.js';
 
 const REFRESH_TOKEN = 'refreshToken';
 const USER_ROLE = 'userRole';
@@ -9,6 +10,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userRole, setUserRole] = useState('');
     const [isLoading, setIsLoading] = useState(true);
+    const { userCode } = useAuth();
 
     useEffect(() => {
         const accessToken = localStorage.getItem(ACCESS_TOKEN);
@@ -39,7 +41,7 @@ const PrivateRoute = ({ children, requiredRole }) => {
 
     if (!requiredRole) {
         if (userRole === 'organizer') {
-            return <Navigate to="/organizer-dashboard" replace />;
+            return <Navigate to={`/org/${userCode}/dashboard`} replace />;
         } else if (userRole === 'admin') {
             return <Navigate to="/admin-dashboard" replace />;
         } else {

@@ -3,12 +3,17 @@ import React, { useState, memo } from 'react';
 function CEStep1({
   formData,
   setFormData,
-  handleChange
+  handleChange,
 }) {
   return (
     <>
       <FormSection title="EVENT DETAILS">
         <EventTitleInput initialValue={formData.eventTitle} onBlurCallback={val => setFormData({ ...formData, eventTitle: val })} />
+        <EventCodeInput
+  initialValue={formData.eventCode}
+  onBlurCallback={val => setFormData({ ...formData, eventCode: val })}
+/>
+
         <EventDescriptionTextarea initialValue={formData.eventDescription} onBlurCallback={val => setFormData({ ...formData, eventDescription: val })} />
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mt-4`}>
           <div>
@@ -83,11 +88,59 @@ const EventTitleInput = memo(({ initialValue, onBlurCallback }) => {
   const handleChange = (e) => { setTitle(e.target.value); };
   return (
     <div>
-      <label htmlFor="eventTitle" className="block text-sm font-medium text-gray-700">Event Title</label>
+      <label htmlFor="eventTitle" className="block text-sm font-medium text-gray-700 mt-4">Event Title</label>
       <input type="text" id="eventTitle" name="eventTitle" value={title} onChange={handleChange} onBlur={handleBlur} placeholder="e.g., Technolympics Summit 2000" className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />
     </div>
   );
 });
+
+
+
+const EventCodeInput = memo(({ initialValue, onBlurCallback, onChangeCallback }) => {
+  const [eventCode, setEventCode] = useState(initialValue);
+
+  const handleBlur = () => {
+    onBlurCallback(eventCode);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, type, files } = e.target;
+    const sanitizedValue = value.replace(/\s/g, '');
+
+    setEventCode(sanitizedValue); // Update local state
+
+    // Create a synthetic event with sanitized value
+    const sanitizedEvent = {
+      target: {
+        name,
+        value: sanitizedValue,
+        type,
+        files,
+      },
+    };
+
+    onChangeCallback(sanitizedEvent); // Pass to original handleChange
+  };
+
+  return (
+    <div>
+      <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700 mt-4">Event Code</label>
+      <input
+        type="text"
+        id="eventCode"
+        name="eventCode"
+        maxLength={50}
+        value={eventCode}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        placeholder="e.g., technolympics-summit-2000"
+        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
+      />
+    </div>
+  );
+});
+
+
 
 const EventDescriptionTextarea = memo(({ initialValue, onBlurCallback }) => {
   const [description, setDescription] = useState(initialValue);

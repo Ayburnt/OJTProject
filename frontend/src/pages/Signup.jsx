@@ -37,9 +37,9 @@ function Signup({ onAuthSuccess }) {
             setStep(4); // Navigate to the fill-up form
         } else {
             if (userData.role === 'organizer') {
-                navigate(`/org/${user_code}`);
+                navigate(`/org/${user_code}/dashboard`);
             } else {
-                navigate("/dashboard"); // Fallback for other roles like 'admin'
+                navigate("/"); // Fallback for other roles like 'admin'
             }
         }
     };
@@ -260,9 +260,9 @@ function Signup({ onAuthSuccess }) {
                 // Final redirect after profile completion
                 const userCodePath = data.user.user_code;
                 if (data.user.role === 'organizer') {
-                    navigate(`/org/${userCodePath}`);
+                    navigate(`/org/${userCodePath}/dashboard`);
                 } else {
-                    navigate("/dashboard");
+                    navigate("/");
                 }
             } else {
                 setMessage(data.detail || 'Failed to save profile information. Please try again.');

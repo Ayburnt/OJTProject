@@ -88,8 +88,8 @@ function App() {
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}
           <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
-          <Route path='/admin-dashboard' element={<AdminDashboard />} /> 
-          <Route path='/admin-eventcontrol' element={<AdminEventControl />} /> 
+          <Route path='/admin-dashboard' element={<PrivateRoute requiredRole={'admin'}><AdminDashboard /></PrivateRoute>} /> 
+          <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
         </Routes>
       </main>
 

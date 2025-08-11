@@ -669,4 +669,6 @@ class CurrentUserView(APIView):
             'company_name': user.company_name,
             'company_website': user.company_website,
             'user_code': user.user_code,
+            'qr_code_image': request.build_absolute_uri(user.qr_code_image.url) if user.qr_code_image else None,
+            'qr_profile_link': user.qr_profile_link
         })

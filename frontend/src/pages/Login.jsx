@@ -19,7 +19,7 @@ function Login() {
   useEffect(() => {
     if (isLoggedIn) {
       if(userRole === 'organizer'){
-        navigate(`/org/${userCode}`)
+        navigate(`/org/${userCode}/dashboard`)
       }if(userRole === 'admin'){
         navigate(`/admin-dashboard`);
       }

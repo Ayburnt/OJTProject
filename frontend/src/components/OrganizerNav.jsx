@@ -17,11 +17,11 @@ function OrganizerNav() {
 
   const pathConfig = [
     {
-      pattern: "/org/:userCode",
+      pattern: "/org/:userCode/dashboard",
       exact: true,
       title: "Dashboard Overview",
       docTitle: "Dashboard | Sari-Sari Events",
-      link: (userCode) => `/org/${userCode}`,
+      link: (userCode) => `/org/${userCode}/dashboard`,
       color: "#009494"
     },
     {

@@ -4,14 +4,19 @@ import CreateEventRegForm from './CreateEventRegForm.jsx';
 import CEStep1 from '../components/CEStep1.jsx';
 import CEStep2 from '../components/CEStep2.jsx';
 import CEStep3 from '../components/CEStep3.jsx';
+import { useNavigate } from 'react-router-dom';
+import useAuth from '../hooks/useAuth.js';
 
 // Main App component
 const CreateEvent = () => {
   const [step, setStep] = useState(1);
+  const navigate = useNavigate();
+  const { userCode } = useAuth();
   const totalSteps = 4; // Now there are 4 steps
 
   const [formData, setFormData] = useState({
     eventTitle: '',
+    eventCode: '',
     eventDescription: '',
     eventCategory: 'Concert',
     eventType: 'Virtual',
@@ -49,6 +54,18 @@ const CreateEvent = () => {
       ...prevData,
       [name]: type === 'file' ? files[0] : value,
     }));
+  };
+
+  const handleCodeChange = (e) => {
+    const { name, value } = e.target;
+
+  // Remove all spaces from input
+  const sanitizedValue = value.replace(/\s/g, '');
+
+  setFormData((prev) => ({
+    ...prev,
+    [name]: sanitizedValue,
+  }));
   };
 
   const handleTicketChange = (id, e) => {
@@ -127,91 +144,141 @@ const CreateEvent = () => {
   };
 
   const handleSaveDraft = () => {
-    console.log("Saving draft:", formData);
+    if (formData.eventTitle === '' && formData.eventDescription === '' && formData.eventCode === '') {
+      navigate(`/org/${userCode}/my-event`);
+      setIsCancelConfirm(false);
+    } else {
+      setIsCancelConfirm(true);
+    }
   };
 
+  const [isCancelConfirm, setIsCancelConfirm] = useState(false);
+
   return (
-    <div className="bg-alice-blue min-h-screen flex items-center justify-center font-outfit p-4 sm:p-8 text-gray-900 antialiased">      
-      <div className="max-w-3xl w-full">
-    
-          <div className="flex items-center gap-1 mb-8 cursor-pointer text-teal-600 hover:text-teal-700 transition-colors duration-200" onClick={handleBack}>
-            <IoIosArrowBack className="text-2xl" />
-            <span className="text-xl font-medium">Back</span>
-          </div>
-  
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Create a New Event</h1>
-          <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
-        </div>
+    <>
+      {isCancelConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsCancelConfirm(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
+              aria-label="Close"
+            >
+              &times;
+            </button>
 
-        {/* Step Indicator */}
-        <div className="flex justify-center items-center mb-12 space-x-6">
-          {[1, 2, 3, 4].map(s => ( // Updated to 4 steps
-            <div key={s} className="flex flex-col items-center">
-              <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
-                ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700'}`}>
-                {s}
-              </div>
-              <span className="mt-2 text-sm text-gray-600">
-                {s === 1 && "Details"}
-                {s === 2 && "Date & Location"}
-                {s === 3 && "Ticketing"}
-                {s === 4 && "Registration Form"}
-              </span>
-            </div>
-          ))}
-        </div>
+            {/* Message */}
+            <h2 className="text-lg font-semibold mb-2 text-gray-800">
+              You have unsaved changes
+            </h2>
+            <p className="mb-6 text-base text-gray-600">
+              What would you like to do before exiting?
+            </p>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {step === 1 && (
-            <CEStep1 formData={formData} setFormData={setFormData} handleChange={handleChange} />
-          )}
-
-          {step === 2 && (
-            <CEStep2 formData={formData} setFormData={setFormData} handleCheckboxChange={handleCheckboxChange} handleChange={handleChange} />
-          )}
-
-          {step === 3 && (
-            <CEStep3 formData={formData} handleTicketChange={handleTicketChange} removeTicketType={removeTicketType} addTicketType={addTicketType} />
-          )}
-
-          {step === 4 && (
-            <CreateEventRegForm />
-          )}
-
-          {/* Buttons Section for navigation and submission */}
-          <div className="flex justify-between items-center mt-8">
-      
-            <div className="flex justify-end ml-auto space-x-4">
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-4">
               <button
-                type="button"
-                onClick={handleSaveDraft}
-                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200"
+                onClick={() => navigate(`/org/${userCode}/my-event`)}
+                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
+              >
+                Discard Changes
+              </button>
+              <button
+
+                className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
               >
                 Save Draft
               </button>
-              {step < totalSteps ? (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200"
-                >
-                  Next
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200"
-                >
-                  Submit
-                </button>
-              )}
             </div>
           </div>
-        </form>
+        </div>
+      )}
+
+      <div className="bg-alice-blue min-h-screen flex items-center justify-center font-outfit p-4 sm:p-8 text-gray-900 antialiased">
+
+        <div className="max-w-3xl w-full">
+
+          <div className={`${step === 1 ? 'hidden' : 'flex'} items-center gap-1 mb-8 cursor-pointer text-teal-600 hover:text-teal-700 transition-colors duration-200`} onClick={handleBack}>
+            <IoIosArrowBack className="text-2xl" />
+            <span className="text-xl font-medium">Back</span>
+          </div>
+
+          <div className="mb-8 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Create a New Event</h1>
+            <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
+          </div>
+
+          {/* Step Indicator */}
+          <div className="flex justify-center items-center mb-12 space-x-6">
+            {[1, 2, 3, 4].map(s => ( // Updated to 4 steps
+              <div key={s} className="flex flex-col items-center">
+                <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
+                ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700'}`}>
+                  {s}
+                </div>
+                <span className="mt-2 text-sm text-gray-600">
+                  {s === 1 && "Details"}
+                  {s === 2 && "Date & Location"}
+                  {s === 3 && "Ticketing"}
+                  {s === 4 && "Registration Form"}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {step === 1 && (
+              <CEStep1 formData={formData} setFormData={setFormData} handleChange={handleChange} />
+            )}
+
+            {step === 2 && (
+              <CEStep2 formData={formData} setFormData={setFormData} handleCheckboxChange={handleCheckboxChange} handleChange={handleChange} />
+            )}
+
+            {step === 3 && (
+              <CEStep3 formData={formData} handleTicketChange={handleTicketChange} removeTicketType={removeTicketType} addTicketType={addTicketType} />
+            )}
+
+            {step === 4 && (
+              <CreateEventRegForm />
+            )}
+
+            {/* Buttons Section for navigation and submission */}
+            <div className="flex justify-between items-center mt-8">
+
+              <div className="flex justify-end ml-auto space-x-4">
+                <button
+                  type="button"
+                  onClick={handleSaveDraft}
+                  className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                {step < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    Submit
+                  </button>
+                )}
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
+
 };
 
 export default CreateEvent;
@@ -261,7 +328,7 @@ const Checkbox = memo(({ id, name, value, label, checkedValues, onChange }) => {
         <div className="w-5 h-5 flex items-center justify-center border-2 rounded-md transition-colors duration-200 peer-checked:bg-teal-500 peer-checked:border-teal-500">
           {isChecked && (
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check">
-              <path d="M20 6 9 17l-5-5"/>
+              <path d="M20 6 9 17l-5-5" />
             </svg>
           )}
         </div>
@@ -365,17 +432,17 @@ const CustomDateInput = memo(({ label, id, name, value, onChange }) => {
       <div className="relative">
         <input type="text" id={id} ref={inputRef} value={value} readOnly onFocus={() => setIsCalendarOpen(true)} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />
         <button type="button" onClick={() => setIsCalendarOpen(!isCalendarOpen)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/><path d="M16 18h.01"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
         </button>
       </div>
       <div ref={calendarRef} className={`absolute z-10 mt-2 p-4 bg-white rounded-xl shadow-lg border border-gray-200 transition-opacity duration-200 ${isCalendarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="flex justify-between items-center mb-4">
           <button type="button" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))} className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-left"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <span className="font-semibold">{monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}</span>
           <button type="button" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1))} className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6" /></svg>
           </button>
         </div>
         <div className="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 mb-2">
@@ -444,7 +511,7 @@ const RegistrationFormBuilder = ({ questions, onAddQuestion, onUpdateQuestion, o
                     className="flex-1 bg-transparent border-0 border-b border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200"
                   />
                   <button type="button" onClick={() => removeOption(index)} className="text-gray-400 hover:text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
                   </button>
                 </div>
               ))}

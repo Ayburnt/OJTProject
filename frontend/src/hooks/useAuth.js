@@ -8,6 +8,7 @@ const USER_ROLE = 'userRole';
 const USER_EMAIL = 'userEmail';
 const USER_CODE = 'userCode';
 const USER_FIRST_NAME = 'userFirstName';
+const USER_LAST_NAME = 'userLastName';
 const USER_PROFILE = 'userProfile';
 const IS_LOGGED_IN = 'isLoggedIn';
 
@@ -17,6 +18,7 @@ export const useAuth = () => {
   const [userEmail, setUserEmail] = useState('');
   const [userCode, setUserCode] = useState('');
   const [userFirstName, setUserFirstName] = useState('');
+  const [userLastName, setUserLastName] = useState('');
   const [userProfile, setUserProfile] = useState('');
   const navigate = useNavigate();
 
@@ -27,6 +29,7 @@ export const useAuth = () => {
     const email = localStorage.getItem(USER_EMAIL);
     const code = localStorage.getItem(USER_CODE);
     const firstName = localStorage.getItem(USER_FIRST_NAME);
+    const lastName = localStorage.getItem(USER_LAST_NAME);
     const profile = localStorage.getItem(USER_PROFILE);
 
     if (accessToken && refreshToken && role && email) {
@@ -36,6 +39,7 @@ export const useAuth = () => {
       setUserCode(code || '');
       setUserFirstName(firstName || '');
       setUserProfile(profile || '');
+      setUserLastName(lastName || '');
     } else {
       clearAuthData();
     }
@@ -48,6 +52,7 @@ export const useAuth = () => {
     localStorage.setItem(USER_EMAIL, user.email);
     localStorage.setItem(USER_CODE, user.user_code);
     localStorage.setItem(USER_FIRST_NAME, user.first_name || '');
+    localStorage.setItem(USER_LAST_NAME, user.last_name || '');
     localStorage.setItem(USER_PROFILE, user.profile_picture || '');
     localStorage.setItem(IS_LOGGED_IN, 'true');
 
@@ -56,6 +61,7 @@ export const useAuth = () => {
     setUserEmail(user.email);
     setUserCode(user.user_code || '');
     setUserFirstName(user.first_name || '');
+    setUserLastName(user.last_name || '');
     setUserProfile(user.profile_picture || '');
   };
 
@@ -66,6 +72,7 @@ export const useAuth = () => {
     localStorage.removeItem(USER_EMAIL);
     localStorage.removeItem(USER_CODE);
     localStorage.removeItem(USER_FIRST_NAME);
+    localStorage.removeItem(USER_LAST_NAME);
     localStorage.removeItem(USER_PROFILE);
     localStorage.removeItem(IS_LOGGED_IN);
 
@@ -74,6 +81,7 @@ export const useAuth = () => {
     setUserEmail('');
     setUserCode('');
     setUserFirstName('');
+    setUserLastName('');
     setUserProfile('');
   };
 
@@ -81,7 +89,7 @@ export const useAuth = () => {
     saveAuthData(tokens, user);
 
     if (user.role === 'organizer') {
-      navigate(`/org/${user.user_code}`);
+      navigate(`/org/${user.user_code}/dashboard`);
     } else if (user.role === 'admin') {
       navigate('/admin-dashboard');
     } else {
@@ -100,6 +108,7 @@ export const useAuth = () => {
     userEmail,
     userCode,
     userFirstName,
+    userLastName,
     userProfile,
     login,
     logout

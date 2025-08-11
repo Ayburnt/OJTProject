@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiUpload } from "react-icons/fi";
 import OrganizerNav from '../components/OrganizerNav';
 import { Link } from 'react-router-dom';
+import api from '../api';
  // Import OrganizerNav component
 
 
@@ -9,6 +10,7 @@ import { Link } from 'react-router-dom';
 const ManageAccount= () => {
   // State for managing edit mode and the profile data
   const [isEditing, setIsEditing] = useState(false);
+  const [userData, setUserData] = useState([]);
   const [profileData, setProfileData] = useState({
     firstName: 'Lester',
     lastName: 'James',
@@ -45,39 +47,58 @@ const ManageAccount= () => {
     setShowModal(true);
   };
 
+  useEffect(() => {
+    const fetchProfile = async() => {
+      try{
+        const res = await api.get(`/me/`);
+        console.log('USER: ', res.data);
+        setUserData(res.data);
+      }catch(err){
+        console.log(err.message);
+        setUserData([]);
+      }
+    }
+
+    fetchProfile();
+  }, [])
+
   return (
     <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 font-outfit">
    <OrganizerNav />
 
       {/* Main content area */}
-      <main className="flex-1 p-4 lg:p-8 max-w-5xl mx-auto w-full lg:translate-x-25">
-
-
+      <main className="flex-1 p-4 lg:p-8 max-w-5xl mt-15 md:mt-0 mx-auto w-full lg:translate-x-25">
         
         {/* Profile Picture and Account Actions */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-7 flex-1">
-          <div className="flex flex-col lg:flex-row  items-center sm:items-start justify-between gap-6">
+          <div className="flex flex-col lg:flex-row w-full items-center sm:items-start justify-between gap-6">
             {/* Left side: Profile image and name */}
-            <div className="flex items-center space-x-4">
-              <div className="relative w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
-                <span className="text-white text-lg lg:text-2xl font-outfit font-bold">
-                  {profileData.firstName[0]}{profileData.lastName[0]}
-                </span>
+            <div className="flex flex-col md:flex-row items-center">
+            {userData.qr_code_image && (
+                <div className='w-2/4 md:w-1/4'>
+                  <img src={userData.qr_code_image} alt="" className='aspect-square w-full' />
+                </div>
+              )}
+              <div className='flex space-x-4 items-center'>
+                <div className="relative w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                
+                <img src={userData.profile_picture} className='rounded-full border-2 border-gray-500' alt="" />
                 <button
                   onClick={() => handleShowModal('Photo upload functionality would go here!')}
                   className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
                   aria-label="Upload photo"
                 >
                   <FiUpload className="text-teal-500" />
-                </button>
+                </button>                
               </div>
               <div>
-                <h4 className="font-semibold font-outfit text-gray-800 text-3xl">{profileData.firstName} {profileData.lastName}</h4>
-                <p className="text-lg font-outfit text-gray-500">{profileData.role}</p>
-              </div>
-            </div>
+                <h4 className="font-semibold font-outfit text-gray-800 text-3xl">{userData.first_name} {userData.last_name}</h4>
+                <p className="text-lg font-outfit text-gray-500">Event Organizer</p>
+              </div>     
+              </div>                       
+            </div>            
             {/* Right side: Account actions, now stacked vertically */}
-            <div className="flex flex-col space-y-2 w-full sm:w-auto">
+            <div className="flex flex-col space-y-2 w-full sm:w-auto">              
               <Link to="/forgot-password">
               <button
                 className="w-full sm:w-auto px-5.5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
@@ -130,8 +151,8 @@ const ManageAccount= () => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">First Name</label>
                   <input
                     type="text"
-                    value={profileData.firstName}
-                    onChange={(e) => setProfileData({...profileData, firstName: e.target.value})}
+                    value={userData.first_name}
+                    onChange={(e) => setUserData({...userData, first_name: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full  px-4 py-3 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -143,8 +164,8 @@ const ManageAccount= () => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Last Name</label>
                   <input
                     type="text"
-                    value={profileData.lastName}
-                    onChange={(e) => setProfileData({...profileData, lastName: e.target.value})}
+                    value={userData.last_name}
+                    onChange={(e) => setUserData({...userData, last_name: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full px-3 py-3 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -156,8 +177,8 @@ const ManageAccount= () => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Email</label>
                   <input
                     type="email"
-                    value={profileData.email}
-                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                    value={userData.email}
+                    onChange={(e) => setUserData({...userData, email: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -169,8 +190,8 @@ const ManageAccount= () => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Phone</label>
                   <input
                     type="tel"
-                    value={profileData.phone}
-                    onChange={(e) => setProfileData({...profileData, phone: e.target.value})}
+                    value={userData.phone_number}
+                    onChange={(e) => setUserData({...userData, phone_number: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -182,8 +203,8 @@ const ManageAccount= () => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company</label>
                   <input
                     type="text"
-                    value={profileData.company}
-                    onChange={(e) => setProfileData({...profileData, company: e.target.value})}
+                    value={userData.company_name}
+                    onChange={(e) => setProfileData({...userData, company_name: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -192,11 +213,11 @@ const ManageAccount= () => {
                 </div>
                 {/* Company Email */}
                 <div>
-                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company Email</label>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company website</label>
                   <input
                     type="email"
-                    value={profileData.companyEmail}
-                    onChange={(e) => setProfileData({...profileData, companyEmail: e.target.value})}
+                    value={userData.company_website}
+                    onChange={(e) => setProfileData({...userData, company_website: e.target.value})}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border rounded-lg text-base ${
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
@@ -215,20 +236,7 @@ const ManageAccount= () => {
                       isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
                     } focus:outline-none`}
                   />
-                </div>
-                {/* Role */}
-                <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Role</label>
-                  <input
-                    type="text"
-                    value={profileData.role}
-                    onChange={(e) => setProfileData({...profileData, role: e.target.value})}
-                    disabled={!isEditing}
-                    className={`w-full px-3 py-2 border rounded-lg text-base ${
-                      isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                  />
-                </div>
+                </div>                
               </div>
               
               {/* Bio */}

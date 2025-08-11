@@ -7,7 +7,7 @@ import useAuth from '../hooks/useAuth';
 function Header() {
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isLoggedIn, userRole, userEmail, userFirstName, userProfile, logout } = useAuth();
+  const { isLoggedIn, userRole, userLastName, userFirstName, userProfile, logout, userCode } = useAuth();
   
 
   const toggleMobileMenu = () => {
@@ -21,16 +21,18 @@ function Header() {
       navigate('/login');
     }
   }
+  
+  const [ isAccDD, setIsAccDD ] = useState(false);
 
   return (
     <header className="bg-white shadow-md py-4 sticky top-0 z-50">
       <div className="container mx-auto px-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2" onClick={() => navigate('/')}>
           <img
             src={SariSariLogo}
             alt="SariSari Logo"
-            className="h-10 md:h-12 object-contain rounded-md"
+            className="h-10 md:h-12 object-contain rounded-md cursor-pointer"
           />
         </div>
 
@@ -53,10 +55,14 @@ function Header() {
             Create Event
           </button>
           {isLoggedIn ? (
-            <>
-              <button className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium cursor-pointer" onClick={logout}>Log out</button>
-              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
-              <p className="text-gray-700 transition-colors text-base font-medium">{userFirstName}</p>
+            <>              
+              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover cursor-pointer" onClick={() => {setIsAccDD(!isAccDD)}} />}
+              
+              <div className={`${isAccDD ? 'grid' : 'hidden'} shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border-1 border-gray-300 rounded-b-lg w-full max-w-[15%]`}>
+                <p className='font-outfit block border-b-1 border-gray-300 w-full text-center bg-secondary text-white text-gray-700 transition-colors text-base py-2'>{userFirstName} {userLastName}</p>
+                <button onClick={() => navigate(`/org/${userCode}/dashboard`)} className="border-b-1 border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer">Dashboard</button>
+                <button className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer" onClick={logout}>Log out</button>  
+              </div>              
             </>
           ) : (
             <>
@@ -88,10 +94,14 @@ function Header() {
             </button>
 
             {isLoggedIn ? (
-              <>
-              <button className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1" onClick={logout}>Log out</button>
-              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
-              <p className='font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1'>{userFirstName}</p>
+              <>              
+              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" onClick={() => {setIsAccDD(!isAccDD)}} />}
+              <div className={`${isAccDD ? 'grid' : 'hidden'} grid-cols-1 place-items-center overflow-hidden border-1 border-gray-300 rounded-xl w-full max-w-sm`}>
+                <p className='font-outfit block border-b-1 border-gray-300 w-full text-center bg-secondary text-white text-gray-700 hover:text-teal-600 transition-colors text-base py-2'>{userFirstName} {userLastName}</p>
+                <button onClick={() => navigate(`/org/${userCode}/dashboard`)} className="border-b-1 border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer">Dashboard</button>
+                <button className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer" onClick={logout}>Log out</button>  
+              </div>
+              
               </>
             ) : (
               <>
