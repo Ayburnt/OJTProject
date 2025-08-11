@@ -65,8 +65,8 @@ function AdminNav() {
                        <Link to='/admin-eventcontrol' className={`${title === 'Event Control Overview' && `bg-[#5BD4D4]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                          <p className={`${title === 'Event Control Overview' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Event Control</p>
                        </Link>
-                       <Link to='/#' className={`${title === ' Pag-iisipan pa daw' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Pag iisipan pa daw po</p>
+                       <Link to='/admin-attendees' className={`${title === 'Attendees Overview' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}> Attendees </p>
                        </Link>
                        <Link to='/#' className={`${title === 'Pag iisipan pa daw' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                          <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>pag iisipan pa po</p>
@@ -127,15 +127,15 @@ function AdminNav() {
                   </Link>
       
                   <Link
-                    to="/#"
-                    className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#FF965D]' : ''
+                    to="/admin-attendees"
+                    className={`${title === 'Attendees' ? 'bg-[#FF965D]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === ' Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === 'Attendees' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                       Pag-iisipan pa daw
+                       Attendees
                     </p>
                   </Link>
       
