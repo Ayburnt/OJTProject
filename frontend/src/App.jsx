@@ -76,7 +76,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} /> 
-          <Route path='/org/:userCode' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
+          <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/org/:userCode/my-event' element={<PrivateRoute requiredRole={'organizer'}><OrganizerEvent /></PrivateRoute>} />
           <Route path='/org/:userCode/attendees' element={<PrivateRoute requiredRole={'organizer'}><Attendees /></PrivateRoute>} />
@@ -84,7 +84,8 @@ function App() {
           {/* <Route path="/attendees" element={<Attendees />} />*/}
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           <Route path="/manage-account" element={<ManageAccount />} />
-          <Route path='/create-event' element={<CreateEvent />} />
+          <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
+          {/* <Route path='/create-event' element={<CreateEvent />} /> */}
           <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
           <Route path='/admin-dashboard' element={<AdminDashboard />} /> 
