@@ -196,7 +196,7 @@ function Signup({ onAuthSuccess }) {
                     gender: null,
                     company_name: null,
                     company_website: null,
-                    user_code:null,
+                    user_code: null,
                 });
 
                 const data = registrationResponse.data;
@@ -269,19 +269,19 @@ function Signup({ onAuthSuccess }) {
             }
         } catch (error) {
             console.error('Error during profile completion:', error);
-        
-        const errorData = error.response?.data;
-        
-        // Check for the specific user_code uniqueness error
-        if (errorData && errorData.user_code && errorData.user_code.length > 0) {
-            // Display the specific error message from the backend
-            setMessage(errorData.user_code[0]);
-            // Optional: Set a specific error state for the user_code input field
-            // setUserCodeError(errorData.user_code[0]);
-        } else {
-            // Handle other general errors
-            setMessage(errorData?.detail || 'An error occurred while saving profile information.');
-        }
+
+            const errorData = error.response?.data;
+
+            // Check for the specific user_code uniqueness error
+            if (errorData && errorData.user_code && errorData.user_code.length > 0) {
+                // Display the specific error message from the backend
+                setMessage(errorData.user_code[0]);
+                // Optional: Set a specific error state for the user_code input field
+                // setUserCodeError(errorData.user_code[0]);
+            } else {
+                // Handle other general errors
+                setMessage(errorData?.detail || 'An error occurred while saving profile information.');
+            }
         } finally {
             setIsLoading(false);
         }
@@ -647,10 +647,18 @@ function Signup({ onAuthSuccess }) {
                                     <div className="mb-4 w-full">
                                         <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">User Code</label>
                                         <input
-                                            type="text" id="user_code" name="user_code" maxLength={5} // Changed type to url
+                                            type="text" id="user_code" name="user_code" maxLength={25}
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                            placeholder="e.g. JDC123"
-                                            value={user_code} onChange={(e) => setUserCode(e.target.value.toUpperCase())} />
+                                            placeholder="e.g. JOHN-DOE2025"
+                                            value={user_code}
+                                            onChange={(e) =>
+                                                setUserCode(
+                                                    e.target.value
+                                                        .replace(/\s+/g, "") // remove all spaces
+                                                        .toUpperCase()
+                                                )
+                                            }
+                                        />
                                     </div>
                                 </>
                             )}
