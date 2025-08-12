@@ -25,7 +25,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     birthday = serializers.DateField(required=False, allow_null=True) # New field
     gender = serializers.CharField(max_length=10, required=False, allow_blank=True, allow_null=True) # Added gender field
     profile_picture = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True) # New field for profile picture
-    user_code = serializers.CharField(max_length=5, required=False, allow_blank=True, allow_null=True)
+    user_code = serializers.CharField(max_length=25, required=False, allow_blank=True, allow_null=True)
     qr_code_image_url = serializers.SerializerMethodField()
 
     class Meta:
