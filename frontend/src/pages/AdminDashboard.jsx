@@ -16,15 +16,15 @@ function AdminDashboard() {
   const { isLoggedIn, userEmail } = useAuth(); // ✅ Get email from auth
 
   // ✅ Get only the part before @
-  const displayName = userEmail ? userEmail.split('@')[0] : "Guest";
+  const displayName = userEmail ? userEmail.split('@')[0] : "Organizer";
 
   return (
-    <div className="min-h-screen bg-alice-blue flex flex-col md:flex-row font-outfit">
+   <div className="h-screen bg-alice-blue font-outfit grid grid-cols-6 xl:grid-cols-9">
       {/* Sidebar */}
       <AdminNav />
 
       {/* Main Content */}
-      <main className="p-1 md:w-full md:w-4/5 md:mx-5 mt-10 md:mt-0 ml-8 mr-8 md:ml-6 md:mr-6 font-outfit">
+     <main className="font-outfit overflow-y-scroll bg-red-200 col-span-6 w-full xl:col-span-7 flex items-center flex-col">
 
         <div className="flex justify-end mb-1 mt-10">
           {isLoggedIn && (
@@ -32,7 +32,7 @@ function AdminDashboard() {
           )}
         </div>
 
-        <div className="mb-8 text-center md:text-center lg:pl-35 mb-12">
+        <div className="mb-8 text-center md:text-center mb-12">
           <h2 className="text-3xl font-medium text-gray-700">
             Good Morning,{" "}
             <span className="text-teal-600 font-bold">{displayName}</span>
@@ -41,7 +41,7 @@ function AdminDashboard() {
             Here's what's happening with your events today.
           </p>
         </div>
-        <div className="flex flex-col-reverse md:flex-row md:gap-x-10 md:ml-70">
+        <div className="flex flex-col-reverse lg:flex-row gap-6">
           {/* Left side - Recent Events */}
           <div className="flex-1">
             {/* Tabs */}
@@ -88,7 +88,7 @@ function AdminDashboard() {
 
 
 
-            <div className="bg-white p-6 mb-6 w-full md:max-w-3xl rounded-xl shadow-md">
+            <div className="bg-white p-6 mb-6 w-[80%] md:max-w-3xl rounded-xl shadow-md mx-auto">
               <h3 className="text-xl font-bold mb-4">Events</h3>
               {/* Event Card */}
               <div className="bg-white border border-gray-200 rounded-lg p-5 mb-4 shadow-sm">
@@ -139,7 +139,7 @@ function AdminDashboard() {
                 <div className="flex flex-col sm:flex-row sm:justify-between mt-5 sm:items-center gap-3 text-[7px] sm:text-xs text-gray-500 border-t pt-3">
                   <div className="flex items-start justify-between w-full gap-2">
                     <div className="flex items-start gap-2">
-                      <CgProfile className="text-xl sm:text-2xl text-gray-500" />
+                      <CgProfile className="hidden md:flex text-[2.5rem] text-gray-400" />
                       <div>
                         <p>
                           Organized by: <span className="font-medium text-gray-700">Tech Corp.</span>
@@ -159,7 +159,7 @@ function AdminDashboard() {
           </div>
 
           {/* Right side - Stats Cards */}
-          <div className="w-full md:w-[350px] mr-10 space-y-2 mb-6 md:mb-0 space-y-4">
+          <div className="w-[80%] md:w-[350px] mr-10 space-y-2 mb-6 md:mb-0 space-y-4">
             <div className="bg-white shadow p-4 rounded-lg">
               <div className="flex items-center justify-between">
                 <FaCalendarAlt className="text-teal-600 mr-4 text-xl" />

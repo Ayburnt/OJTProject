@@ -91,7 +91,7 @@ function AdminNav() {
       )}
 
       {/* Desktop Sidebar */}
-            <div className="hidden md:flex md:flex-col md:justify-between md:h-screen md:w-64 md:bg-white md:p-6 md:shadow fixed top-0 left-0 z-40">
+            <div className="hidden col-span-2 md:flex md:flex-col md:justify-between md:h-screen md:w-full md:bg-white md:p-6 md:shadow z-40">
               {/* Logo */}
               <div className="mb-3 mt-2 flex justify-center">
                 <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-10" />

@@ -10,22 +10,23 @@ import { LuPhilippinePeso } from "react-icons/lu";
 import { CgProfile } from "react-icons/cg";
 import { BsSend } from "react-icons/bs";
 import AdminNav from "../components/AdminNav";
+import { useNavigate } from "react-router-dom";
 
 function AdminEventControl() {
+  const navigate = useNavigate();
   return (
-    <div className="min-h-screen bg-aliceblue p-6 font-outfit md:ml-73">
+    <div className="h-screen bg-aliceblue font-outfit grid grid-cols-1 md:grid-cols-6 xl:grid-cols-9 md:[80%] lg:[75%]">
          <AdminNav />
 
+<div className="font-outfit overflow-y-scroll col-span-6 w-full md:col-span-4 xl:col-span-7 flex items-center flex-col">
       {/* Back */}
-     <div
-  className="w-full max-w-md flex items-center text-left mb-3 gap-1 cursor-pointer mt-14 md:mt-0"
-  onClick={() => navigate('/')}
->
-  <IoIosArrowBack className="text-secondary text-xl" />
-  <span className="text-secondary text-sm font-medium font-outfit">Back</span>
-</div>
+        <div className="w-full max-w-md flex items-center text-left mb-3 gap-1 cursor-pointer mt-18 lg:mt-2 lg:self-start lg:ml-10"
+        onClick={() => navigate('/')} >
+        <IoIosArrowBack className="text-secondary text-xl" />
+        <span className="text-secondary text-sm font-medium font-outfit">Back</span>
+      </div>
 
-      <div className="flex flex-col lg:flex-row gap-6 md:gap-0">
+      <div className="flex flex-col lg:flex-row gap-6 md:gap-0 w-[90%]">
         {/* Left Main Content */}
         <div className="flex-1 space-y-4 font-outfit">
            <h1 className="text-2xl font-semibold text-gray-800">Event Proposal Review</h1>
@@ -118,14 +119,14 @@ function AdminEventControl() {
         </div>
 
         {/* Right Sidebar */}
-        <aside className="space-y-4 w-full lg:w-72 md:mr-10">
+        <aside className="space-y-4 w-full lg:w-72 md:w-[94%]">
   {/* Event Organizer */}
-  <div className="bg-white p-7 rounded-lg shadow-sm">
+  <div className="bg-white p-7 rounded-lg shadow-sm md: mt-3">
     <h4 className="font-semibold text-xl text-gray-700">Event Organizer</h4>
     <div className="flex items-center gap-3 mt-2">
       <CgProfile className="text-5xl text-gray-500 mr-3 md:mt-3" />
       <div>
-        <p className="text-sm font-medium text-gray-800 md:mt-3">Jesselle P. Ramos</p>
+        <p className="text-sm font-medium text-gray-800 md:mt-3">Dinasour R. Roar</p>
         <p className="text-xs text-gray-500">organizer@email.com</p>
         <p className="text-xs text-gray-500">09262037594</p>
       </div>
@@ -161,16 +162,16 @@ function AdminEventControl() {
 </aside>
       </div>
 
-       {/* Action Buttons */}
-         <div className="flex gap-5 mt-4 md:ml-78">
-  <button className="px-24 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all md:px-20 py-2 cursor-pointer">
+{/* Action Buttons */}
+<div className="flex gap-5 mt-4 mb-5 justify-center">
+  <button className="px-20 py-2 md:px-20 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all cursor-pointer">
     Accept
   </button>
-  <button className="px-7 py-2 bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
+  <button className="px-6 py-2 md:px-7  bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
     Reject
   </button>
 </div>
-
+</div>
     </div>
   );
 }
