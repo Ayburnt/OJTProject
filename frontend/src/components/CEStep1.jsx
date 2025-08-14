@@ -1,155 +1,133 @@
-import React, { useState, memo } from 'react';
+import React from 'react';
+
+const FormSection = ({ title, children }) => (
+  <div className="p-4 md:p-6 rounded-2xl mb-6 bg-white shadow-sm">
+    <h2 className="text-xl md:text-2xl font-bold mb-4 text-gray-800">{title}</h2>
+    <div className='px-4 w-full flex flex-col gap-4'>
+      {children}
+    </div>
+  </div>
+);
+
+const InputField = ({ label, inputType, inputName, inputValue, inputOnChange, inputPlaceholder }) => (
+  <div className='flex flex-col w-full gap-2'>
+    <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
+    <input className="w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3"
+      type={inputType} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} />
+  </div>
+)
+
+const EventCodeInput = ({ label, inputType, inputName, inputValue, inputOnChange, inputPlaceholder, maxLength }) => (
+  <div className='flex flex-col w-full gap-2'>
+    <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
+    <input className="w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3"
+      type={inputType} maxLength={maxLength} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} />
+  </div>
+)
+
+const EventDescInput = ({ label, inputName, inputValue, inputOnChange, inputPlaceholder }) => (
+  <div className='flex flex-col w-full gap-2'>
+    <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
+    <textarea rows={4} name={inputName} value={inputValue} onChange={inputOnChange} placeholder={inputPlaceholder}
+      className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
+    ></textarea>
+  </div>
+)
+
 
 function CEStep1({
   formData,
-  setFormData,
-  handleChange,
+  handleEventChange,
+  isPosterErr,
+  posterErr
 }) {
   return (
     <>
       <FormSection title="EVENT DETAILS">
-        <EventTitleInput initialValue={formData.eventTitle} onBlurCallback={val => setFormData({ ...formData, eventTitle: val })} />
-        <EventCodeInput
-  initialValue={formData.eventCode}
-  onBlurCallback={val => setFormData({ ...formData, eventCode: val })}
-/>
+        <InputField label='Event Title' inputType='text' inputName='title'
+          inputValue={formData.title} inputOnChange={handleEventChange}
+          inputPlaceholder='e.g., Technolympics Summit 2000'
+        />
+        <EventCodeInput label='Event Code' inputType='text' inputName='event_code'
+          inputValue={formData.event_code} inputOnChange={handleEventChange}
+          inputPlaceholder='e.g., TS-2000' maxLength={50}
+        />
+        <EventDescInput label='Event Description' inputName='description'
+          inputValue={formData.description} inputOnChange={handleEventChange}
+          inputPlaceholder='Tell attendees what to expect: the agenda, speakers, etc.'
+        />
 
-        <EventDescriptionTextarea initialValue={formData.eventDescription} onBlurCallback={val => setFormData({ ...formData, eventDescription: val })} />
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mt-4`}>
-          <div>
-            <label htmlFor="eventCategory" className="block text-sm font-medium text-gray-700">Event Category</label>
-            <select id="eventCategory" name="eventCategory" value={formData.eventCategory} onChange={handleChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer">
-              <option>Concert</option>
-              <option>Workshop</option>
-              <option>Conference</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="eventCategory" className={`block text-sm italic ${formData.eventCategory !== 'Other' ? 'text-gray-400' : 'text-gray-700'}`}>Please specify</label>
-            <input type="text" disabled={formData.eventCategory !== 'Other'} className={`${formData.eventCategory !== 'Other' ? 'cursor-not-allowed border-gray-100' : 'border-gray-300'} block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
-          </div>
+        <div className='flex flex-col w-full gap-2'>
+          <label htmlFor="category" className="font-outfit text-sm leading-none m-0 text-gray-700">Event Category</label>
+          <select id="category" name="category"
+            value={formData.category}
+            onChange={handleEventChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer">
+            <option value="">Select</option>
+            <option value='corporate'>Corporate Event</option>
+            <option value='social'>Social Event</option>
+            <option value='cultural'>Cultural Event</option>
+            <option value='sports'>Sports & Recreational Event</option>
+            <option value='government'>Political & Government Event</option>
+            <option value='educational'>Educational Event</option>
+            <option value="fundraising">Fundraising Event</option>
+          </select>
         </div>
 
-        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4`}>
           <div>
-            <label htmlFor="eventType" className="block text-sm font-medium text-gray-700">Event Type</label>
-            <select id="eventType" name="eventType" value={formData.eventType} onChange={handleChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4  cursor-pointer">
-              <option value='Virtual'>Virtual</option>
-              <option>In-person</option>
+            <label htmlFor="event_type" className="font-outfit text-sm leading-none m-0 text-gray-700">Event Type</label>
+            <select id="event_type" name="event_type" value={formData.event_type} onChange={handleEventChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4  cursor-pointer">
+              <option value="">Select</option>
+              <option value='virtual'>Virtual</option>
+              <option value='in-person'>In-person</option>
             </select>
           </div>
 
           <div>
-            <label htmlFor="eventType" className={`block text-sm ${formData.eventType !== 'Virtual' ? 'text-gray-400' : 'text-gray-700'}`}>Meeting Plaform</label>
-            <input type="text" disabled={formData.eventType !== 'Virtual'} placeholder='e.g. Google Meet' className={`${formData.eventType !== 'Virtual' ? 'cursor-not-allowed border-gray-100' : 'border-gray-300'} rounded-xl block w-full bg-white border-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
+            <label htmlFor="event_type" className={`text-sm ${formData.event_type !== 'virtual' ? 'text-gray-400' : 'text-gray-700'} font-outfit text-sm leading-none m-0`}>Meeting Plaform</label>
+            <input type="text" name='meeting_platform' value={formData.meeting_platform} disabled={formData.event_type !== 'virtual'} onChange={handleEventChange} placeholder='e.g. Google Meet' className={`${formData.event_type !== 'virtual' ? 'cursor-not-allowed border-gray-100' : 'border-gray-300'} mt-1 rounded-xl block w-full bg-white border-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
           </div>
 
-          {formData.eventType === 'Virtual' && (
+          {formData.event_type === 'virtual' && (
             <div className='sm:col-span-2'>
-              <label htmlFor="eventCategory" className={`block text-sm italic text-gray-700`}>Meeting Link</label>
-              <input type="url" disabled={formData.eventType !== 'Virtual'} className={`border-gray-300 block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
+              <label htmlFor="event_type" className={`block text-sm text-gray-700`}>Meeting Link</label>
+              <input type="url" name='meeting_link' value={formData.meeting_link} disabled={formData.event_type !== 'virtual'} onChange={handleEventChange} className={`border-gray-300 block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
             </div>
           )}
         </div>
-
       </FormSection>
 
       <FormSection title="EVENT IMAGE / POSTER">
         <p className="text-sm text-gray-500 mb-4">Main Event Image / Poster</p>
-        <div className="flex justify-center items-center w-full h-64 border-2 border-gray-300 border-dashed rounded-xl relative overflow-hidden">
-          {formData.eventImage ? (
-            <img src={URL.createObjectURL(formData.eventImage)} alt="Event Poster Preview" className="object-cover w-full h-full" />
+        <div className={`flex justify-center items-center aspect-16/9 border-2 ${isPosterErr ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-xl relative overflow-hidden`}>
+          {formData.event_poster ? (
+            formData.event_poster instanceof File ? (
+              <img
+                src={URL.createObjectURL(formData.event_poster)}
+                alt="Event Poster Preview"
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <img
+                src={formData.event_poster} // Use string URL directly (e.g., from backend)
+                alt="Event Poster Preview"
+                className="object-cover w-full h-full"
+              />
+            )
           ) : (
             <span className="text-gray-500">Upload an image here</span>
           )}
-          <input id="eventImage" name="eventImage" type="file" accept="image/*" onChange={handleChange} className="hidden" />
-          <button type="button" onClick={() => document.getElementById('eventImage').click()} className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer">
+
+          <input id="event_poster" name="event_poster" type="file" accept="image/*" onChange={handleEventChange} className="hidden" />
+          <button type="button" onClick={() => document.getElementById('event_poster').click()} className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer">
             Upload
           </button>
         </div>
+        {isPosterErr && (
+          <p className='text-xs text-red-500 font-medium'>{posterErr}</p>
+        )}
       </FormSection>
     </>
   )
 }
 export default CEStep1;
-
-const FormSection = ({ title, children }) => (
-  <div className="p-4 md:p-6 rounded-2xl mb-6 bg-white shadow-sm">
-    <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-800">{title}</h2>
-    {children}
-  </div>
-);
-
-const EventTitleInput = memo(({ initialValue, onBlurCallback }) => {
-  const [title, setTitle] = useState(initialValue);
-  const handleBlur = () => { onBlurCallback(title); };
-  const handleChange = (e) => { setTitle(e.target.value); };
-  return (
-    <div>
-      <label htmlFor="eventTitle" className="block text-sm font-medium text-gray-700 mt-4">Event Title</label>
-      <input type="text" id="eventTitle" name="eventTitle" value={title} onChange={handleChange} onBlur={handleBlur} placeholder="e.g., Technolympics Summit 2000" className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />
-    </div>
-  );
-});
-
-
-
-const EventCodeInput = memo(({ initialValue, onBlurCallback, onChangeCallback }) => {
-  const [eventCode, setEventCode] = useState(initialValue);
-
-  const handleBlur = () => {
-    onBlurCallback(eventCode);
-  };
-
-  const handleChange = (e) => {
-    const { name, value, type, files } = e.target;
-    const sanitizedValue = value.replace(/\s/g, '');
-
-    setEventCode(sanitizedValue); // Update local state
-
-    // Create a synthetic event with sanitized value
-    const sanitizedEvent = {
-      target: {
-        name,
-        value: sanitizedValue,
-        type,
-        files,
-      },
-    };
-
-    onChangeCallback(sanitizedEvent); // Pass to original handleChange
-  };
-
-  return (
-    <div>
-      <label htmlFor="eventCode" className="block text-sm font-medium text-gray-700 mt-4">Event Code</label>
-      <input
-        type="text"
-        id="eventCode"
-        name="eventCode"
-        maxLength={50}
-        value={eventCode}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        placeholder="e.g., technolympics-summit-2000"
-        className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
-      />
-    </div>
-  );
-});
-
-
-
-const EventDescriptionTextarea = memo(({ initialValue, onBlurCallback }) => {
-  const [description, setDescription] = useState(initialValue);
-  const handleBlur = () => { onBlurCallback(description); };
-  const handleChange = (e) => { setDescription(e.target.value); };
-  return (
-    <div>
-      <label htmlFor="eventDescription" className="block text-sm font-medium text-gray-700 mt-4">Event Description</label>
-      <textarea id="eventDescription" name="eventDescription" value={description} onChange={handleChange} onBlur={handleBlur} rows="4" placeholder="Tell attendees what to expect: the agenda, speakers, etc." className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"></textarea>
-    </div>
-  );
-});
