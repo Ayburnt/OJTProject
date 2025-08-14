@@ -64,6 +64,7 @@ class Event(models.Model):
     event_qr_image = models.ImageField(upload_to="event/qr_codes/", blank=True, null=True)
     posting_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     isFee_paid = models.BooleanField(default=False)
+    seating_map = models.ImageField(upload_to="event/seating_maps/", blank=True, null=True)
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -126,7 +127,6 @@ class Ticket_Type(models.Model):
 
     ticket_name = models.CharField(max_length=100)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    seating_map = models.ImageField(upload_to="event/seating_map/", blank=True, null=True)
     quantity_total = models.IntegerField()
     quantity_available = models.IntegerField()
     is_selling = models.BooleanField(default=False)
