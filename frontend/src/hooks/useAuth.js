@@ -66,15 +66,7 @@ export const useAuth = () => {
   };
 
   const clearAuthData = () => {
-    localStorage.removeItem(ACCESS_TOKEN);
-    localStorage.removeItem(REFRESH_TOKEN);
-    localStorage.removeItem(USER_ROLE);
-    localStorage.removeItem(USER_EMAIL);
-    localStorage.removeItem(USER_CODE);
-    localStorage.removeItem(USER_FIRST_NAME);
-    localStorage.removeItem(USER_LAST_NAME);
-    localStorage.removeItem(USER_PROFILE);
-    localStorage.removeItem(IS_LOGGED_IN);
+    localStorage.clear();
 
     setIsLoggedIn(false);
     setUserRole('');
