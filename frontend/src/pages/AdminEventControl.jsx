@@ -164,10 +164,10 @@ function AdminEventControl() {
 
 {/* Action Buttons */}
 <div className="flex gap-5 mt-4 mb-5 justify-center">
-  <button className="px-20 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all cursor-pointer">
+  <button className="px-20 py-2 md:px-20 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all cursor-pointer">
     Accept
   </button>
-  <button className="px-6 py-2 bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
+  <button className="px-6 py-2 md:px-7  bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
     Reject
   </button>
 </div>
