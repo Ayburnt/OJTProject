@@ -104,7 +104,8 @@ INSTALLED_APPS = [
     'api',
     'events',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'verification'
 ]
 
 MIDDLEWARE = [
@@ -126,7 +127,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DEBUG = os.getenv("DEBUG")
+DEBUG = True
 
 DATABASES = {
     'default': {

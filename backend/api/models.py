@@ -56,6 +56,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('admin', 'Admin'),
     )
 
+    VERIFICATION_STATUS_CHOICES = (
+        ('unverified', 'Unverified'),
+        ('pending', 'Pending'),
+        ('verified', 'Verified'),
+        ('declined', 'Declined'),
+    )
+
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=150, blank=True) # Updated max_length
     last_name = models.CharField(max_length=150, blank=True) # Updated max_length
@@ -70,10 +77,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     company_website = models.URLField(max_length=500, blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
-    gender = models.CharField(max_length=10, blank=True, null=True)
+    gender = models.CharField(max_length=10, blank=True, null=True) # Re-added the gender field
     user_code = models.CharField(unique=True, blank=True, null=True)
     qr_profile_link = models.URLField(max_length=500, blank=True, null=True)
     qr_code_image = models.ImageField(upload_to="qr_codes/", blank=True, null=True)
+    
+    # --- ADDED NEW VERIFICATION_STATUS FIELD ---
+    verification_status = models.CharField(
+        max_length=20,
+        choices=VERIFICATION_STATUS_CHOICES,
+        default='unverified'
+    )
     # --- END ADDED NEW FIELDS ---
 
     objects = CustomUserManager()
@@ -99,12 +113,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def save(self, *args, **kwargs):
         # Only generate QR if user_code exists
-        if self.user_code:
+        if self.user_code and not self.qr_code_image:
             self.qr_profile_link = f"https://event.sari-sari.com/org/{self.user_code}/dashboard"
-
-            import qrcode
-            from io import BytesIO
-            from django.core.files import File
 
             qr = qrcode.QRCode(
                 version=1,
@@ -120,11 +130,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             img.save(buffer, format="PNG")
             file_name = f"qr_{self.user_code}.png"
 
-            # Only save the QR code once
-            if not self.qr_code_image:
-                self.qr_code_image.save(file_name, File(buffer), save=False)
+            self.qr_code_image.save(file_name, File(buffer), save=False)
 
         super().save(*args, **kwargs)
-
-
-

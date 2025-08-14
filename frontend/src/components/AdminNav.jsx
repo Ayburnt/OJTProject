@@ -68,8 +68,8 @@ function AdminNav() {
                        <Link to='/admin-attendees' className={`${title === 'Attendees Overview' && `bg-[#FF965D  ]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
                          <p className={`${title === ' Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}> Attendees </p>
                        </Link>
-                       <Link to='/#' className={`${title === 'Pag iisipan pa daw' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
-                         <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>pag iisipan pa po</p>
+                       <Link to='/admin-review' className={`${title === 'Admin Review' && `bg-[#EF4B4C]`} w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}>
+                         <p className={`${title === 'Pag-iisipan pa daw' && `bg-[#EEEEEE]`} py-3 ml-5 pl-3 font-outfit`}>Admin Review</p>
                        </Link>
                      </ul>
                    </div>
@@ -130,7 +130,7 @@ function AdminNav() {
                     to="/admin-attendees"
                     className={`${title === 'Attendees' ? 'bg-[#FF965D]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
-                  >
+                  > 
                     <p
                       className={`${title === 'Attendees' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
@@ -140,15 +140,15 @@ function AdminNav() {
                   </Link>
       
                   <Link
-                    to="/#"
-                    className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#EF4B4C]' : ''
+                    to="/admin-review"
+                    className={`${title === 'Admin Review' ? 'bg-[#EF4B4C]' : ''
                       } w-full text-start cursor-pointer hover:text-teal-600 transition-colors`}
                   >
                     <p
-                      className={`${title === 'Pag-iisipan pa daw' ? 'bg-[#EEEEEE]' : ''
+                      className={`${title === 'Admin Review' ? 'bg-[#EEEEEE]' : ''
                         } py-3 ml-5 pl-3 font-outfit`}
                     >
-                      Pag-iisipan pa daw
+                      Admin Review
                     </p>
                   </Link>
                 </ul>
