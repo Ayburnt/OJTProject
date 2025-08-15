@@ -116,10 +116,10 @@ export default function AdminReviewPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="h-screen bg-aliceblue font-outfit grid grid-cols-1 md:grid-cols-6 xl:grid-cols-9">
       <AdminNav />
 
-      <main className="pt-16 md:pt-8 md:ml-64 px-4 md:px-8 pb-12">
+      <main className="overflow-y-scroll col-span-6 md:col-span-4 xl:col-span-7 flex flex-col px-6 mt-10 md:px-8 lg:px-12 py-6">
         {!selected ? (
           <div className="bg-white rounded-2xl shadow border p-6">
             <div className="flex items-center justify-between flex-wrap gap-3 mb-4">

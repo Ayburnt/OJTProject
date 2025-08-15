@@ -21,6 +21,7 @@ import AttendeesDashboard from './pages/AttendeesDashboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx'; 
 import AdminEventControl from './pages/AdminEventControl.jsx'; 
 import AdminReviewPage from './pages/AdminReviewPage.jsx';
+import AdminAttendees from './pages/AdminAttendees.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 
@@ -44,7 +45,8 @@ function App() {
     '/admin-dashboard',
     '/admin-eventcontrol',
     '/admin-review',
-    '/change-password'
+    '/change-password',
+    '/admin-attendees'
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -97,6 +99,8 @@ function App() {
           <Route path='/admin-dashboard' element={<PrivateRoute requiredRole={'admin'}><AdminDashboard /></PrivateRoute>} /> 
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
+          <Route path='/admin-attendees' element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
+
 
         </Routes>
       </main>

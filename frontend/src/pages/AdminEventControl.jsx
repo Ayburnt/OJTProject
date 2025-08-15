@@ -18,7 +18,7 @@ function AdminEventControl() {
     <div className="h-screen bg-aliceblue font-outfit grid grid-cols-1 md:grid-cols-6 xl:grid-cols-9 md:[80%] lg:[75%]">
          <AdminNav />
 
-<div className="font-outfit overflow-y-scroll col-span-6 w-full md:col-span-4 xl:col-span-7 flex items-center flex-col">
+<div className="font-outfit overflow-y-scroll col-span-6 w-full md:col-span-4 xl:col-span-7 flex items-center flex-col lg:mt-5">
       {/* Back */}
         <div className="w-full max-w-md flex items-center text-left mb-3 gap-1 cursor-pointer mt-18 lg:mt-2 lg:self-start lg:ml-10"
         onClick={() => navigate('/')} >
@@ -163,14 +163,14 @@ function AdminEventControl() {
       </div>
 
 {/* Action Buttons */}
-<div className="flex gap-5 mt-4 mb-5 justify-center">
-  <button className="px-20 py-2 md:px-20 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all cursor-pointer">
-    Accept
-  </button>
-  <button className="px-6 py-2 md:px-7  bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
-    Reject
-  </button>
-</div>
+  <div className="flex gap-5 mt-6 mb-5 justify-center lg:justify-left lg:mr-65">
+    <button className="px-20 py-2 md:px-20 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-all cursor-pointer">
+      Accept
+    </button>
+    <button className="px-6 py-2 md:px-7 bg-red text-primary rounded-md hover:bg-red-500 transition-all cursor-pointer">
+      Reject
+    </button>
+  </div>
 </div>
     </div>
   );
