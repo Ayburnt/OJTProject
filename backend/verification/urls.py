@@ -1,11 +1,26 @@
 # verifications/urls.py
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 from .views import OrganizerApplicationViewSet
 
-router = DefaultRouter()
-router.register(r'organizer-applications', OrganizerApplicationViewSet, basename='organizer-application')
+organizer_applications = OrganizerApplicationViewSet.as_view({
+    'post': 'create',
+})
+
+pending = OrganizerApplicationViewSet.as_view({
+    'get': 'pending',
+})
+
+accept = OrganizerApplicationViewSet.as_view({
+    'patch': 'accept',
+})
+
+decline = OrganizerApplicationViewSet.as_view({
+    'patch': 'decline',
+})
 
 urlpatterns = [
-    path('', include(router.urls)),
+    path('organizer-applications/', organizer_applications, name='organizerapplications-create'),
+    path('organizer-applications/pending/', pending, name='organizerapplications-pending'),
+    path('organizer-applications/<int:pk>/accept/', accept, name='organizerapplications-accept'),
+    path('organizer-applications/<int:pk>/decline/', decline, name='organizerapplications-decline'),
 ]

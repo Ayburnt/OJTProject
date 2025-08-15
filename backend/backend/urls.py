@@ -8,7 +8,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('events/', include('events.urls')),
-    path('api/', include('verification.urls')), # Include your new app's URLs
+    path('api/', include('verification.urls')),
+    path('', include('verification.urls')),
+
 
 ]
 
