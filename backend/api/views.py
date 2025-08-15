@@ -18,6 +18,8 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
+
 
 # Import all necessary serializers
 from .serializers import (
@@ -672,3 +674,28 @@ class CurrentUserView(APIView):
             'qr_code_image': request.build_absolute_uri(user.qr_code_image.url) if user.qr_code_image else None,
             'qr_profile_link': user.qr_profile_link
         })
+        
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    user = request.user
+    current_password = request.data.get("current_password")
+    new_password = request.data.get("new_password")
+
+    if not current_password or not new_password:
+        return Response({"detail": "Both current and new passwords are required."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if not user.check_password(current_password):
+        return Response({"detail": "Current password is incorrect."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    if len(new_password) < 6:
+        return Response({"detail": "New password must be at least 6 characters."},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    user.set_password(new_password)
+    user.save()
+
+    return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+

@@ -130,10 +130,10 @@ const ManageAccount = () => {
                   <p className="text-lg font-outfit text-gray-500">Event Organizer</p>
                 </div>
               </div>
-            </div>
+              </div>  
 
             <div className="flex flex-col space-y-2 w-full sm:w-auto">
-              <Link to="/forgot-password">
+              <Link to="/org/:userCode/change-password">
                 <button
                   className="w-full sm:w-auto px-5.5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                 >

@@ -21,6 +21,7 @@ import AttendeesDashboard from './pages/AttendeesDashboard.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx'; 
 import AdminEventControl from './pages/AdminEventControl.jsx'; 
 import AdminReviewPage from './pages/AdminReviewPage.jsx';
+import ChangePassword from './pages/ChangePassword.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 
 // A component that wraps the main App logic
@@ -42,7 +43,8 @@ function App() {
     '/attendees-dashboard',
     '/admin-dashboard',
     '/admin-eventcontrol',
-    '/admin-review'
+    '/admin-review',
+    '/change-password'
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -87,6 +89,8 @@ function App() {
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           <Route path="/manage-account" element={<ManageAccount />} />
           <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
+          <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
+
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}
           <Route path="/verification-form" element={<VerificationForm />} />
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
