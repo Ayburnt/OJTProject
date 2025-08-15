@@ -37,14 +37,25 @@ export default function LocationPicker({ value, onChange, handleLocationChange }
   }, [searchTerm]);
 
   const handleSelect = (loc) => {
+  const lat = parseFloat(loc.lat);
+  const lng = parseFloat(loc.lon);
+
+  // Update marker position
+  setMarkerPos({ lat, lng });
+
+  // Update parent component
+  onChange?.({ name: loc.display_name, lat, lng });
+
   handleLocationChange({
     place_id: loc.place_id,
     name: loc.display_name.split(",")[0],
     address: loc.display_name,
   });
+
   setSearchTerm(loc.display_name);
   setSuggestions([]);
 };
+
 
 
 

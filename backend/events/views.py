@@ -1,4 +1,5 @@
 # events/views.py
+import json
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -9,8 +10,14 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Event
 from .serializers import EventSerializer
 from .permissions import IsOwnerOrReadOnly # Assuming you've created this file
+from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.exceptions import ParseError
+from .parsers import NestedMultiPartParser
+
 
 class EventListCreateAPIView(APIView):
+    # Use the new custom parser
+    parser_classes = [NestedMultiPartParser, FormParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -20,14 +27,16 @@ class EventListCreateAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        # The 'created_by' field is set within the serializer's create method
-        with transaction.atomic():
-            serializer = EventSerializer(data=request.data, context={'request': request})
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            # This line won't be reached if raise_exception=True, but it's good practice
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # The custom parser will handle the nested data reconstruction
+        
+        serializer = EventSerializer(
+            data=request.data['data'],
+            context={'request': request, 'files': request.FILES}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventRetrieveUpdateDestroyAPIView(APIView):

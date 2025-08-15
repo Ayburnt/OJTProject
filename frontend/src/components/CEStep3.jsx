@@ -101,11 +101,7 @@ function CEStep3({
                 className="mt-1 block w-full bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
               />
             </div>
-            <div className="flex justify-start items-center">
-              <button type="button" className="w-full px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer">
-                Upload Seating Map
-              </button>
-            </div>
+
           </div>
           <div className="flex justify-start mt-4">
             <button

@@ -58,22 +58,24 @@ function CEStep2({
 
 
         <h3 className="block text-sm font-medium text-gray-700 mt-4 mb-2">Date & Time</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+        <div className={`grid grid-cols-1 gap-6 mb-4 ${formData.duration_type === 'multiple' ? 'md:grid-cols-2' : 'md:grid-cols-1'}`}>
           <CustomDateInput
-            label="Start Date"
+            label={`${formData.duration_type === 'multiple' ? 'Start Date' : 'Date'}`}
             id="start_date"
             name="start_date"
             value={formData.start_date}
-            onChange={handleEventChange}
+            onChange={handleEventChange}            
           />
 
-          <CustomDateInput
+          {formData.duration_type === 'multiple' && (
+            <CustomDateInput
             label="End Date"
             id="end_date"
             name="end_date"
             value={formData.end_date}
             onChange={handleEventChange}
           />
+          )}            
 
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -347,7 +349,7 @@ const CustomDateInput = memo(({ label, id, name, value, onChange }) => {
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div className="relative">
+    <div className="relative z-100">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
       <div className="relative">
         <input type="text" id={id} ref={inputRef} value={value} readOnly onFocus={() => setIsCalendarOpen(true)} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />

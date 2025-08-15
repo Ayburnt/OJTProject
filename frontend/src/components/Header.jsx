@@ -15,8 +15,8 @@ function Header() {
   };
 
   const handleCreateEvent = () => {
-    if (isLoggedIn && userRole === 'client') {
-      navigate('/create-event');
+    if (isLoggedIn && userRole === 'organizer') {
+      navigate(`/org/${userCode}/create-event`);
     } else if(!isLoggedIn){
       navigate('/login');
     }

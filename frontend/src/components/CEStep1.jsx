@@ -94,7 +94,57 @@ function CEStep1({
               <input type="url" name='meeting_link' value={formData.meeting_link} disabled={formData.event_type !== 'virtual'} onChange={handleEventChange} className={`border-gray-300 block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
             </div>
           )}
+          
         </div>
+
+        <div className="col-span-2">
+            <label className="font-outfit text-sm leading-none m-0 text-gray-700">
+              Set your audience
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Single-day event */}
+              <input
+                type="radio"
+                id="audience_public"
+                name="audience"
+                value="public"
+                checked={formData.audience === "public"}
+                onChange={handleEventChange}
+                className="hidden peer/public"
+              />
+              <label
+                htmlFor="audience_public"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/public:bg-teal-500 peer-checked/public:border-teal-500 peer-checked/public:text-white"
+              >
+                <span className="text-sm font-medium">Public</span>
+              </label>
+
+              {/* Multi-day event */}
+              <input
+                type="radio"
+                id="audience_private"
+                name="audience"
+                value="private"
+                checked={formData.audience === "private"}
+                onChange={handleEventChange}
+                className="hidden peer/private"
+              />
+              <label
+                htmlFor="audience_private"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/private:bg-teal-500 peer-checked/private:border-teal-500 peer-checked/private:text-white"
+              >
+                <span className="text-sm font-medium">Private</span>
+              </label>
+            </div>
+          </div>
+
+          {formData.audience === 'private' && (
+            <InputField label='Event Private Code' inputType='text' inputName='private_code'
+              inputValue={formData.private_code} inputOnChange={handleEventChange}
+              inputPlaceholder='e.g., my-event-password'
+            />
+          )}
       </FormSection>
 
       <FormSection title="EVENT IMAGE / POSTER">
