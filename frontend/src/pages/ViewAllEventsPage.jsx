@@ -1,20 +1,19 @@
 // src/pages/ViewAllEventsPage.jsx
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 function ViewAllEventsPage() {
-  // --- Scroll to top on component mount ---
   useEffect(() => {
-    window.scrollTo(0, 0); // Scrolls to the top-left corner of the window
-  }, []); // Empty dependency array ensures this runs only once after initial render
+    window.scrollTo(0, 0);
+  }, []);
 
-  // --- Dummy Data for All Events ---
   const allEvents = [
     {
       id: 1,
       title: 'Skechers Friendship Walk 2025',
       date: '23 August 2025',
       location: 'Đường Trần Bạch Đằng - Thủ Thiêm',
+      organizer: 'Meow Meow',
       imageUrl: 'https://s3-ap-southeast-1.amazonaws.com/jomrun-images-new/cover_images/cover_image_opiCp9U70j4YpeT.jpg',
       shortDescription: 'Join the annual Skechers Friendship Walk to promote an active lifestyle and connect communities.',
       category: 'Sports'
@@ -24,6 +23,7 @@ function ViewAllEventsPage() {
       title: 'Art & Design Expo 2025',
       date: 'Aug 5, 2025',
       location: 'SMX Convention Center, Pasay City',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/93D3A2/FFFFFF?text=Art+Design+Expo',
       shortDescription: 'Explore cutting-edge art installations, innovative design concepts, and interact with renowned artists.',
       category: 'Entertainment'
@@ -33,6 +33,7 @@ function ViewAllEventsPage() {
       title: 'The WHOLSESOME Hobbies Club: Booktroverts',
       date: '18 January 2025',
       location: 'theCOMMONS Thonglor',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/F0D9B1/000000?text=Booktroverts+Club',
       shortDescription: 'A series hosted by Read Me Again x theCOMMONS for book lovers and introverts.',
       category: 'Lifestyle'
@@ -42,6 +43,7 @@ function ViewAllEventsPage() {
       title: 'Summer Music Festival',
       date: 'July 20, 2025',
       location: 'Open Air Grounds, Taguig',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/FFDDC1/000000?text=Music+Festival',
       shortDescription: 'An electrifying music festival featuring local and international artists. Get ready to dance!',
       category: 'Entertainment'
@@ -51,6 +53,7 @@ function ViewAllEventsPage() {
       title: 'Manila Food & Wine Fair',
       date: 'Sept 15-17, 2025',
       location: 'World Trade Center, Pasay',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/D0F0C0/000000?text=Food+Wine+Fair',
       shortDescription: 'A culinary journey showcasing the best of local and international cuisines and wines.',
       category: 'Lifestyle'
@@ -60,6 +63,7 @@ function ViewAllEventsPage() {
       title: 'Tech Innovations Summit',
       date: 'Oct 10-12, 2025',
       location: 'SMX Convention Center, Pasay City',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/A7DBD8/000000?text=Tech+Summit',
       shortDescription: 'Discover the future of technology with leading experts and groundbreaking innovations.',
       category: 'Business'
@@ -69,6 +73,7 @@ function ViewAllEventsPage() {
       title: 'Local Artisan Market',
       date: 'Nov 1, 2025',
       location: 'Makati Greenbelt',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/FFC0CB/000000?text=Artisan+Market',
       shortDescription: 'Support local craftsmen and discover unique handmade goods.',
       category: 'Lifestyle'
@@ -78,6 +83,7 @@ function ViewAllEventsPage() {
       title: 'Philippine Historical Tour',
       date: 'Dec 1-5, 2025',
       location: 'Intramuros, Manila',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/ADD8E6/000000?text=Historical+Tour',
       shortDescription: 'Journey through time and explore the rich history of the Philippines.',
       category: 'Entertainment'
@@ -87,6 +93,7 @@ function ViewAllEventsPage() {
       title: 'National Book Fair',
       date: 'Sept 20-24, 2025',
       location: 'SM Megamall, Mandaluyong',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/D3D3D3/000000?text=Book+Fair',
       shortDescription: 'A grand exhibition of books, authors, and literary events.',
       category: 'Entertainment'
@@ -96,6 +103,7 @@ function ViewAllEventsPage() {
       title: 'Gaming Convention PH',
       date: 'Nov 15-16, 2025',
       location: 'World Trade Center, Pasay',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/C0C0C0/000000?text=Gaming+Con',
       shortDescription: 'Immerse yourself in the world of video games, esports, and cosplay.',
       category: 'Entertainment'
@@ -105,6 +113,7 @@ function ViewAllEventsPage() {
       title: 'Sustainable Living Expo',
       date: 'Oct 5-7, 2025',
       location: 'Quezon City Circle',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/B0E0E6/000000?text=Eco+Expo',
       shortDescription: 'Learn about eco-friendly practices and sustainable products for a greener lifestyle.',
       category: 'Lifestyle'
@@ -114,6 +123,7 @@ function ViewAllEventsPage() {
       title: 'International Film Festival',
       date: 'Jan 20-26, 2026',
       location: 'Cinemas Nationwide',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/87CEFA/000000?text=Film+Fest',
       shortDescription: 'Showcasing the best of global cinema, independent films, and documentaries.',
       category: 'Entertainment'
@@ -123,6 +133,7 @@ function ViewAllEventsPage() {
       title: 'Fitness & Wellness Summit',
       date: 'Feb 10-12, 2026',
       location: 'MOA Arena, Pasay',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/A0DCF0/000000?text=Fitness+Summit',
       shortDescription: 'Expert talks, workshops, and demonstrations on health, fitness, and mental well-being.',
       category: 'Sports'
@@ -132,6 +143,7 @@ function ViewAllEventsPage() {
       title: 'Fashion Week Manila',
       date: 'Mar 1-5, 2026',
       location: 'The Peninsula Manila',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/FFB6C1/000000?text=Fashion+Week',
       shortDescription: 'Witness the latest trends from top designers and emerging talents.',
       category: 'Lifestyle'
@@ -141,6 +153,7 @@ function ViewAllEventsPage() {
       title: 'Pet Lovers Fair',
       date: 'April 20, 2026',
       location: 'Tiendesitas, Pasig',
+      organizer: 'Meow Meow',
       imageUrl: 'https://via.placeholder.com/600x400/98FB98/000000?text=Pet+Fair',
       shortDescription: 'A fun-filled day for pet owners and animal enthusiasts with various activities.',
       category: 'Lifestyle'
@@ -160,7 +173,6 @@ function ViewAllEventsPage() {
   useEffect(() => {
     setEventsToShow(initialEventsToShow);
   }, [activeCategory]);
-
 
   const handleSeeMore = () => {
     setEventsToShow(prevCount => Math.min(prevCount + eventsIncrement, filteredEvents.length));
@@ -206,7 +218,7 @@ function ViewAllEventsPage() {
                     className="w-full h-48 object-cover"
                   />
                   <div className="p-5 flex flex-col flex-grow">
-                    <h2 className="text-xl font-semibold text-gray-900 mb-2 leading-tight">
+                    <h2 className="text-xl font-semibold text-gray-900 mb-1 leading-tight">
                       {event.title}
                     </h2>
                     <p className="text-gray-600 text-sm mb-2">
@@ -214,6 +226,9 @@ function ViewAllEventsPage() {
                     </p>
                     <p className="text-gray-600 text-sm mb-4">
                       <span className="font-medium">Location:</span> {event.location}
+                    </p>
+                    <p className="text-gray-600 text-sm mb-2">
+                      <span className="font-medium">Organizer:</span> {event.organizer}
                     </p>
                     <p className="text-gray-700 text-base mb-4 flex-grow">
                       {event.shortDescription}
@@ -229,7 +244,6 @@ function ViewAllEventsPage() {
               ))}
             </div>
 
-            {/* "See More" button - only rendered if there are more events to show */}
             {hasMore && (
               <div className="text-center mt-16">
                 <button

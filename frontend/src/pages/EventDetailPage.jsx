@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaChevronDown, FaChevronUp, FaTicketAlt } from 'react-icons/fa';
+import { FaRegUser } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 function EventDetailPage() {
+
+     const navigate = useNavigate();
     const { id } = useParams();
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -14,6 +18,7 @@ function EventDetailPage() {
             title: 'Skechers Friendship Walk 2025',
             date: '23 August 2025, 07:59 - 24 August 2035, 11:00',
             location: 'Đường Trần Bạch Đằng - Thủ Thiêm',
+            organizer: 'Meow Meow',
             ageRestriction: 'Must be 6+',
             imageUrl: 'https://s3-ap-southeast-1.amazonaws.com/jomrun-images-new/cover_images/cover_image_opiCp9U70j4YpeT.jpg',
             description: "‘Friendship Walk’ is an annual sports event organized by Skechers, a leading fashion and athletic footwear brand in the United States. Its goal is to promote an active lifestyle and connect communities, one step at a time. \n\nFollowing the resounding success of the 2024 season, Skechers Friendship Walk 2025 is on a grander scale and with even more vibrant energy. It will continue to be an unmissable gathering for sports lovers, from professional athletes to those who enjoy running and walking for leisure. \n\nMore than just a sports event, Friendship Walk serves a profound humanitarian mission – fostering community bonds and spreading kindness. Skechers joins hands with charitable organizations such as Operation Smile Vietnam and Thi Đua Ngheo Vietnam, working together to bring bright smiles and beautiful actions to society. \n\nLet’s walk together – for health, the community, and a journey full of meaning!",
@@ -38,6 +43,7 @@ function EventDetailPage() {
             title: 'Art & Design Expo',
             date: 'Aug 5, 2025, 10:00 - 17:00',
             location: 'SMX Convention Center, Pasay City',
+            organizer: 'Meow Meow',
             ageRestriction: 'All Ages',
             imageUrl: 'https://via.placeholder.com/1920x800/93D3A2/FFFFFF?text=Art+Design+Expo+Banner',
             description: "Explore cutting-edge art installations, innovative design concepts, and interact with renowned artists and designers. Workshops and talks available. This expo aims to bring together creators and enthusiasts from across the globe, fostering a vibrant community of artistic expression and innovation. Experience live demonstrations, interactive exhibits, and opportunities to purchase unique pieces directly from the artists.",
@@ -120,14 +126,21 @@ function EventDetailPage() {
                 <div className="flex flex-col lg:flex-row lg:gap-8">
                     <div className="lg:w-1/3 order-first lg:order-last mb-8 lg:mb-0">
                         <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28">
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-4">
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-12">
                                 {event.title}
                             </h1>
-                            <div className="flex justify-end mb-4">
-                                <button className="text-gray-600 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-gray-100">
-                                    <FaShareAlt className="text-xl" />
-                                </button>
-                            </div>
+                            
+                             <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
+                                <div className="flex items-center space-x-3">
+                                    <button type="button"
+                                onClick={() => navigate("/organizer-dashboard")}
+                                className="flex items-center space-x-3 p-0 bg-transparent border-none">
+                                    <FaRegUser className="text-teal-600 text-lg" />
+                                    
+                                    <span>{event.organizer}</span>
+                                    </button>
+                                </div>
+                    
                             <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
                                 <div className="flex items-center space-x-3">
                                     <FaCalendarAlt className="text-teal-600 text-lg" />
@@ -137,13 +150,22 @@ function EventDetailPage() {
                                     <FaMapMarkerAlt className="text-teal-600 text-lg" />
                                     <span>{event.location}</span>
                                 </div>
-                                {event.ageRestriction && (
-                                    <div className="flex items-center space-x-3">
-                                        <span className="font-semibold text-gray-800 text-lg">
-                                            {event.ageRestriction}
-                                        </span>
-                                    </div>
+                               
+                               {event.ageRestriction && (
+                                <div className="flex items-center justify-between">
+                                    <span className="font-semibold text-gray-800 text-lg">
+                                    {event.ageRestriction}
+                                    </span>
+                                    <button
+                                    className="text-gray-600 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+                                    onClick={() => console.log("Share clicked")}
+                                    >
+                                    <FaShareAlt className="text-xl" />
+                                    </button>
+                                </div>
                                 )}
+
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -208,7 +230,7 @@ function EventDetailPage() {
                                                                                 value={selectedTickets[`${category.name}-${ticket.type}`] || 0}
                                                                                 onChange={(e) => handleQuantityChange(category.name, ticket.type, e.target.value)}
                                                                             >
-                                                                                {[...Array(11).keys()].map(num => (
+                                                                             {[...Array(11).keys()].map(num => (
                                                                                     <option key={num} value={num}>{num}</option>
                                                                                 ))}
                                                                             </select>
