@@ -43,6 +43,7 @@ const ManageAccount = () => {
       const res = await api.get(`/me/`);
       setUserData(res.data);
       setError(null);
+      console.log(res.data);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
       setError('Failed to load profile. Please try again.');

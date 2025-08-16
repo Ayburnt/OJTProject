@@ -1,33 +1,54 @@
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 import useAuth from '../hooks/useAuth';
+import api from '../events.js';
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
-  const {userCode} = useAuth();
-  const events = [
-    {
-      name: 'Tech Conference 2023',
-      img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Multicolor-Abstract-Sunset-Party-Poster-724x1024.jpg',
-      date: '2026-12-40 at 5:69 PM',
-      location: 'SMX Pasay Manila',
-      attendees: '100000 Attendees',
-      price: 'Price',
-      status: 'Status',
-    },
-    {
-      name: 'Meow',
-      img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Purple-Black-Tropical-Party-Club-Poster-724x1024.jpg',
-      date: '2026-12-40 at 5:69 PM',
-      location: 'SMX Pasay Manila',
-      attendees: '100000 Attendees',
-      price: 'Price',
-      status: 'Status',
-    },
-  ];
+  const [events, setEvents] = useState([]);
+  const { userCode, isLoggedIn, userRole } = useAuth();
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+
+      try {
+        const res = await api.get(`/list-create/`);
+        console.log(res.data);
+        setEvents(res.data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+        
+      }
+    }
+
+    fetchEventDetails();
+  },[])
+
+  
+
+  // const events = [
+  //   {
+  //     name: 'Tech Conference 2023',
+  //     img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Multicolor-Abstract-Sunset-Party-Poster-724x1024.jpg',
+  //     date: '2026-12-40 at 5:69 PM',
+  //     location: 'SMX Pasay Manila',
+  //     attendees: '100000 Attendees',
+  //     price: 'Price',
+  //     status: 'Status',
+  //   },
+  //   {
+  //     name: 'Meow',
+  //     img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Purple-Black-Tropical-Party-Club-Poster-724x1024.jpg',
+  //     date: '2026-12-40 at 5:69 PM',
+  //     location: 'SMX Pasay Manila',
+  //     attendees: '100000 Attendees',
+  //     price: 'Price',
+  //     status: 'Status',
+  //   },
+  // ];
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
@@ -93,17 +114,18 @@ const OrganizerEvent = () => {
           {events.map((event, i) => (
             <EventCard
               key={i}
-              eventPoster={event.img}
+              eventPoster={`http://127.0.0.1:8000${event.event_poster}`}
               eventStatus={event.status}
-              eventName={event.name}
-              eventDate={event.date}
-              eventLocation={event.location}
+              eventName={event.title}
+              eventDate={`${event.start_date === event.end_date ? event.start_date : event.start_date, `-`, event.end_date}`}
+              eventLocation={event.venue_name}
               eventAttendees={event.attendees}
+              ticketTypes={event.ticket_types}
             />
           ))}
         </div>
       </div>
-      
+
       {/* Include the Chatbot component here */}
       <Chatbot />
     </div>

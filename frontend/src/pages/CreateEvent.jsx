@@ -345,6 +345,7 @@ const CreateEventForm = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
+      navigate(`/org/${userCode}/my-event`);
       console.log('Event created:');
     } catch (err) {
       console.error('Error creating event:', err.response?.data || err.message);
