@@ -107,7 +107,7 @@ function EventDetailPage() {
             {/* Banner */}
             <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden">
                 <img
-                    src={`http://127.0.0.1:8000${eventDetails.event_poster}`}
+                    src={eventDetails.event_poster}
                     alt={eventDetails.title}
                     className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -130,16 +130,26 @@ function EventDetailPage() {
                                 </div>
                             )}
 
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-12">
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-5">
                                 {eventDetails.title}
                             </h1>
 
                             <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
+                                <div className='w-full items-center justify-center flex'>
+                                    <a
+                                        href={eventDetails.event_qr_image}
+                                        download={`event-${eventDetails.event_code}-qr.png`}
+                                        target='_blank'
+                                        className='w-[80%] aspect-square object-contain'
+                                    >
+                                        <img src={eventDetails.event_qr_image} alt={eventDetails.title} />
+                                    </a>
+                                </div>
                                 <div className="flex items-center space-x-3">
                                     <button
                                         type="button"
                                         onClick={() => navigate("/organizer-dashboard")}
-                                        className="flex items-center space-x-3 p-0 bg-transparent border-none"
+                                        className="flex cursor-pointer items-center space-x-3 p-0 bg-transparent border-none"
                                     >
                                         <FaRegUser className="text-teal-600 text-lg" />
                                         <span>

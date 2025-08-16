@@ -1,13 +1,45 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import { CgProfile } from 'react-icons/cg';
 import { Link } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
+import api from '../events.js'
 
 function OrganizerDashboard() {
   const { isLoggedIn, userCode, userEmail, userFirstName, userProfile, logout } = useAuth();
-  
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const fetchEventDetails = async () => {
+
+      try {
+        const res = await api.get(`/list-create/`);
+        console.log(res.data);
+        setEvents(res.data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+
+      }
+    }
+
+    fetchEventDetails();
+  }, []);
+
+  function formatDateTime(dateStr, timeStr) {
+    const dt = new Date(`${dateStr}T${timeStr}`); // combine date + time
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",   // full month name
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,    // 12-hour format with AM/PM
+    }).format(dt);
+  }
+
+
+
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-primary font-outfit text-gray-800 overflow-hidden">
       {/* Organizer Navigation - visible on all screen sizes */}
@@ -19,7 +51,7 @@ function OrganizerDashboard() {
         <header className="flex justify-between items-center bg-white rounded-xl p-4 mb-6 shadow">
           <div className="w-full flex flex-col items-center text-center">
             <h2 className="text-lg sm:text-2xl text-secondary font-outfit">
-              Good Morning, <span className="font-semibold">{userFirstName}</span>              
+              Good Morning, <span className="font-semibold">{userFirstName}</span>
             </h2>
 
             <p className="text-sm text-gray-500">
@@ -29,11 +61,11 @@ function OrganizerDashboard() {
 
           {isLoggedIn ? (
             <>
-            {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 lg:w-10 lg:h-10 hidden md:flex aspect-square rounded-full object-cover" />}
+              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 lg:w-10 lg:h-10 hidden md:flex aspect-square rounded-full object-cover" />}
             </>
           ) : (
             <CgProfile className='hidden md:flex text-[2rem]' />
-          )}                      
+          )}
         </header>
 
         {/* Statistic Cards */}
@@ -60,15 +92,41 @@ function OrganizerDashboard() {
           </div>
           {/* Event Placeholder */}
           <div className="flex flex-col gap-4 font-outfit">
-            <div className="border p-10 rounded-lg flex justify-between items-center text-gray-400">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-teal-500 rounded-full" />
-                <div>
-                  <p className="font-medium">Tuli ni juswa vergara</p>
-                  <p className="text-sm text-gray-500">August 5, 2025 <br/> • 250 Attendees</p>
+            {events.map((event, i) => {
+              const totalTickets = event.ticket_types.reduce(
+                (sum, ticket) => sum + ticket.quantity_total,
+                0
+              );
+              return (
+
+                <div key={i} className="border p-5 rounded-lg flex justify-between items-center text-gray-400">
+                  <div className="grid grid-cols-4 place-items-center gap-4">
+                    <div className='aspect-square'>
+                      <a
+                        href={event.event_qr_image}
+                        download={`event-${event.event_code}-qr.png`}
+                        target='_blank'
+                      >
+                        <img
+                          src={event.event_qr_image}
+                          alt="Event QR"
+                          className="w-40 h-40 object-contain rounded"
+                        />
+                      </a>
+                    </div>
+                    <div className='col-span-3 place-items-start w-full'>
+                      <p className="font-medium">{event.title}</p>
+                      <p className="text-sm text-gray-500">
+                        {event.start_date === event.end_date
+                          ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
+                          : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
+                        <br /> • {totalTickets} tickets
+                      </p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              )
+            })}
 
             {/* Placeholder box */}
             <div className="border p-10 rounded-lg h-20 flex items-center justify-center text-gray-400 font-outfit">
@@ -77,7 +135,7 @@ function OrganizerDashboard() {
           </div>
         </section>
       </main>
-      
+
       {/* Include the Chatbot component here */}
       <Chatbot />
     </div>

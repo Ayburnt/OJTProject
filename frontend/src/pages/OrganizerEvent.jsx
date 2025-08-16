@@ -20,35 +20,26 @@ const OrganizerEvent = () => {
         setEvents(res.data);
       } catch (err) {
         console.error("Error fetching events:", err);
-        
+
       }
     }
 
     fetchEventDetails();
-  },[])
+  }, [])
 
-  
 
-  // const events = [
-  //   {
-  //     name: 'Tech Conference 2023',
-  //     img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Multicolor-Abstract-Sunset-Party-Poster-724x1024.jpg',
-  //     date: '2026-12-40 at 5:69 PM',
-  //     location: 'SMX Pasay Manila',
-  //     attendees: '100000 Attendees',
-  //     price: 'Price',
-  //     status: 'Status',
-  //   },
-  //   {
-  //     name: 'Meow',
-  //     img: 'https://www.eventbookings.com/wp-content/uploads/2023/06/Purple-Black-Tropical-Party-Club-Poster-724x1024.jpg',
-  //     date: '2026-12-40 at 5:69 PM',
-  //     location: 'SMX Pasay Manila',
-  //     attendees: '100000 Attendees',
-  //     price: 'Price',
-  //     status: 'Status',
-  //   },
-  // ];
+
+  function formatDateTime(dateStr, timeStr) {
+    const dt = new Date(`${dateStr}T${timeStr}`); // combine date + time
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      month: "long",   // full month name
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,    // 12-hour format with AM/PM
+    }).format(dt);
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
@@ -114,10 +105,12 @@ const OrganizerEvent = () => {
           {events.map((event, i) => (
             <EventCard
               key={i}
-              eventPoster={`http://127.0.0.1:8000${event.event_poster}`}
+              eventPoster={event.event_poster}
               eventStatus={event.status}
               eventName={event.title}
-              eventDate={`${event.start_date === event.end_date ? event.start_date : event.start_date, `-`, event.end_date}`}
+              eventDate={event.start_date === event.end_date
+                ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
+                : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
               eventLocation={event.venue_name}
               eventAttendees={event.attendees}
               ticketTypes={event.ticket_types}

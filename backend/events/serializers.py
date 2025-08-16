@@ -47,12 +47,34 @@ class EventSerializer(serializers.ModelSerializer):
     event_poster = serializers.ImageField(required=False, allow_null=True)
     seating_map = serializers.ImageField(required=False, allow_null=True)
 
+        # Use SerializerMethodField for absolute URLs
+    event_poster_url = serializers.SerializerMethodField(read_only=True)
+    seating_map_url = serializers.SerializerMethodField(read_only=True)
+    event_qr_image_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Event
         fields = '__all__'
         read_only_fields = ['created_by']
+        
+    def get_event_poster_url(self, obj):
+        request = self.context.get('request')
+        if obj.event_poster:
+            return request.build_absolute_uri(obj.event_poster.url)
+        return None
 
+    def get_seating_map_url(self, obj):
+        request = self.context.get('request')
+        if obj.seating_map:
+            return request.build_absolute_uri(obj.seating_map.url)
+        return None
+
+    def get_event_qr_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.event_qr_image:
+            return request.build_absolute_uri(obj.event_qr_image.url)
+        return None
+    
     # ...existing code...
     def create(self, validated_data):
         print("validated_data before file assignment:", validated_data)

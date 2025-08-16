@@ -19,7 +19,7 @@ class EventPublicView(APIView):
 
     def get(self, request):
         events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(events, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -31,7 +31,7 @@ class EventListCreateAPIView(APIView):
 
     def get(self, request, *args, **kwargs):
         events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
+        serializer = EventSerializer(events, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
@@ -104,5 +104,5 @@ class EventDetailView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = EventSerializer(event)
+        serializer = EventSerializer(event, context={"request": request})
         return Response(serializer.data)

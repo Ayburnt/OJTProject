@@ -41,6 +41,7 @@ const ManageAccount = () => {
       setLoading(true);
       // Make sure the API call is authenticated
       const res = await api.get(`/me/`);
+      console.log(res.data);
       setUserData(res.data);
       setError(null);
       console.log(res.data);
