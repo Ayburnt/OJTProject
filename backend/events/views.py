@@ -6,13 +6,21 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Event
 from .serializers import EventSerializer
 from .permissions import IsOwnerOrReadOnly # Assuming you've created this file
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import ParseError
 from .parsers import NestedMultiPartParser
+
+class EventPublicView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        events = Event.objects.all()
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class EventListCreateAPIView(APIView):
