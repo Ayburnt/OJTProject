@@ -47,7 +47,7 @@ function RecommendedEvents() {
             <Link key={i} to={`/events/${event.event_code}`} className="block">
               <EventCard eventPoster={`http://127.0.0.1:8000${event.event_poster}`} eventTitle={event.title}
                 eventDate={`${event.start_date === event.end_date ? event.start_date : event.start_date, `-`, event.end_date}`}
-                eventLocation={event.venue_place} eventCreator={event.created_by}
+                eventLocation={event.venue_place} eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
               />
             </Link>
           ))}

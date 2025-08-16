@@ -91,3 +91,18 @@ class EventRetrieveUpdateDestroyAPIView(APIView):
         
         event.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+class EventDetailView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, event_code):
+        try:
+            event = Event.objects.get(event_code=event_code)
+        except Event.DoesNotExist:
+            return Response(
+                {"error": "Event not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = EventSerializer(event)
+        return Response(serializer.data)

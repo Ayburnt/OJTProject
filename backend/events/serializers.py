@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from .models import Event, Ticket_Type, Reg_Form_Template, Reg_Form_Question, Question_Option
 from django.db import transaction
+from api.models import CustomUser
 
 # Serializer for Question_Option
 class QuestionOptionSerializer(serializers.ModelSerializer):
@@ -31,8 +32,15 @@ class TicketTypeSerializer(serializers.ModelSerializer):
         model = Ticket_Type
         fields = '__all__'
         extra_kwargs = {'event': {'required': False}}
+        
+        
+class userserializer(serializers.ModelSerializer):
+    class Meta:
+        model= CustomUser
+        fields = ["first_name", "last_name", "email"] 
 
 class EventSerializer(serializers.ModelSerializer):
+    created_by = userserializer(read_only=True)
     ticket_types = TicketTypeSerializer(many=True)
     reg_form_templates = RegFormTemplateSerializer(many=True, required=False)
     reg_form_questions = RegFormQuestionSerializer(many=True, required=False)    

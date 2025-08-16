@@ -83,7 +83,7 @@ function App() {
           <Route path="/signup" element={<SignUp />} /> 
           <Route path="/sample" element={<Sample />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
-          <Route path="/events/:id" element={<EventDetailPage />} /> 
+          <Route path="/events/:eventcode" element={<EventDetailPage />} /> 
           <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/org/:userCode/my-event' element={<PrivateRoute requiredRole={'organizer'}><OrganizerEvent /></PrivateRoute>} />

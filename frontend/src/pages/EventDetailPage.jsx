@@ -1,86 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaChevronDown, FaChevronUp, FaTicketAlt } from 'react-icons/fa';
+import { useParams, useNavigate } from 'react-router-dom';
+import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaTicketAlt } from 'react-icons/fa';
 import { FaRegUser } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import api from '../events.js';
 
 function EventDetailPage() {
+    const [eventDetails, setEventDetails] = useState(null);
+    const [qrCode, setQrCode] = useState(null);   // NEW: QR Code state
+    const [openCategories, setOpenCategories] = useState({});
+    const [discountCode, setDiscountCode] = useState('');
+    const [discountStatus, setDiscountStatus] = useState({ applied: false, message: '' });
+    const [selectedTickets, setSelectedTickets] = useState({});
+    const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-     const navigate = useNavigate();
-    const { id } = useParams();
+    const navigate = useNavigate();
+    const { eventcode } = useParams();
+
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-    // --- Dummy Data for Demonstration ---
-    const eventData = {
-        1: {
-            title: 'Skechers Friendship Walk 2025',
-            date: '23 August 2025, 07:59 - 24 August 2035, 11:00',
-            location: 'Đường Trần Bạch Đằng - Thủ Thiêm',
-            organizer: 'Meow Meow',
-            ageRestriction: 'Must be 6+',
-            imageUrl: 'https://s3-ap-southeast-1.amazonaws.com/jomrun-images-new/cover_images/cover_image_opiCp9U70j4YpeT.jpg',
-            description: "‘Friendship Walk’ is an annual sports event organized by Skechers, a leading fashion and athletic footwear brand in the United States. Its goal is to promote an active lifestyle and connect communities, one step at a time. \n\nFollowing the resounding success of the 2024 season, Skechers Friendship Walk 2025 is on a grander scale and with even more vibrant energy. It will continue to be an unmissable gathering for sports lovers, from professional athletes to those who enjoy running and walking for leisure. \n\nMore than just a sports event, Friendship Walk serves a profound humanitarian mission – fostering community bonds and spreading kindness. Skechers joins hands with charitable organizations such as Operation Smile Vietnam and Thi Đua Ngheo Vietnam, working together to bring bright smiles and beautiful actions to society. \n\nLet’s walk together – for health, the community, and a journey full of meaning!",
-            ticketCategories: [
-                {
-                    name: '5KM',
-                    tickets: [
-                        { type: '5KM EARLY BIRD', price: '250.000 VND', status: 'available' },
-                        { type: '5KM REGULAR', price: '300.000 VND', status: 'available' },
-                    ]
-                },
-                {
-                    name: '10KM',
-                    tickets: [
-                        { type: '10KM EARLY BIRD', price: '350.000 VND', status: 'available' },
-                        { type: '10KM REGULAR', price: '400.000 VND', status: 'sold out' },
-                    ]
-                },
-            ],
-        },
-        2: {
-            title: 'Art & Design Expo',
-            date: 'Aug 5, 2025, 10:00 - 17:00',
-            location: 'SMX Convention Center, Pasay City',
-            organizer: 'Meow Meow',
-            ageRestriction: 'All Ages',
-            imageUrl: 'https://via.placeholder.com/1920x800/93D3A2/FFFFFF?text=Art+Design+Expo+Banner',
-            description: "Explore cutting-edge art installations, innovative design concepts, and interact with renowned artists and designers. Workshops and talks available. This expo aims to bring together creators and enthusiasts from across the globe, fostering a vibrant community of artistic expression and innovation. Experience live demonstrations, interactive exhibits, and opportunities to purchase unique pieces directly from the artists.",
-            ticketCategories: [
-                {
-                    name: 'General Admission',
-                    tickets: [
-                        { type: 'Adult', price: '₱800', status: 'available' },
-                        { type: 'Student', price: '₱600', status: 'available' },
-                    ]
-                },
-                {
-                    name: 'VIP Pass',
-                    tickets: [
-                        { type: 'VIP Early Bird', price: '₱1,500', status: 'available' },
-                        { type: 'VIP Regular', price: '₱2,000', status: 'available' },
-                    ]
-                },
-            ],
-        },
-    };
+    useEffect(() => {
+        const fetchEvent = async () => {
+            try {
+                const res = await api.get(`/events/${eventcode}/`);
+                setEventDetails(res.data);
 
-    const event = eventData[id];
-    const [agreeToTerms, setAgreeToTerms] = useState(false);
-    const [openCategories, setOpenCategories] = useState({});
-    const [discountCode, setDiscountCode] = useState('');
-    const [discountStatus, setDiscountStatus] = useState({ applied: false, message: '' });
-    // New state to manage ticket quantities
-    const [selectedTickets, setSelectedTickets] = useState({});
+                // If backend also provides qr_code field
+                if (res.data.qr_code) {
+                    setQrCode(res.data.qr_code); // Example: "/media/qrcodes/123.png"
+                }
 
-    // Calculate total selected tickets
-    const totalTicketsSelected = Object.values(selectedTickets).reduce((sum, current) => sum + current, 0);
+                console.log("Fetched Event:", res.data);
+            } catch (err) {
+                console.error("Error fetching event:", err);
+            }
+        };
+
+        fetchEvent();
+    }, [eventcode]);
 
     const toggleCategory = (categoryName) => {
-        setOpenCategories(prev => ({
+        setOpenCategories((prev) => ({
             ...prev,
-            [categoryName]: !prev[categoryName]
+            [categoryName]: !prev[categoryName],
         }));
     };
 
@@ -91,85 +54,140 @@ function EventDetailPage() {
             setDiscountStatus({ applied: false, message: 'Invalid code.' });
         }
     };
-    
-    // New function to handle quantity change
-    const handleQuantityChange = (categoryName, ticketType, quantity) => {
-        const key = `${categoryName}-${ticketType}`;
-        setSelectedTickets(prev => ({
+
+    const handleQuantityChange = (ticketId, quantity) => {
+        setSelectedTickets((prev) => ({
             ...prev,
-            [key]: parseInt(quantity, 10)
+            [ticketId]: parseInt(quantity, 10),
         }));
     };
 
-    if (!event) {
+    const totalTicketsSelected = Object.values(selectedTickets).reduce(
+        (sum, current) => sum + current,
+        0
+    );
+
+    if (!eventDetails) {
         return (
             <div className="container mx-auto px-4 py-20 text-center">
-                <h2 className="text-3xl font-bold text-red-600 mb-4">Event Not Found</h2>
-                <p className="text-gray-700">The event you are looking for does not exist or has been removed.</p>
-                <Link to="/" className="mt-8 inline-block bg-teal-600 text-white px-6 py-3 rounded-full hover:bg-teal-700 transition-colors">
-                    Go Back to Home
-                </Link>
+                <h2 className="text-3xl font-bold text-gray-600 mb-4">Loading event...</h2>
             </div>
         );
     }
 
+    function formatAgeRestriction(value) {
+        switch (value) {
+            case "all":
+                return "All Ages Allowed";
+            case "18+":
+                return "18 and Above Only";
+            case "kids":
+                return "Kids Only";
+            case "guardian_needed":
+                return "Minors Allowed with Guardian";
+            default:
+                return value;
+        }
+    }
+
+    function formatDateTime(dateStr, timeStr) {
+        const dateObj = new Date(`${dateStr}T${timeStr}`);
+        return dateObj.toLocaleString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+        });
+    }
+
     return (
         <div className="bg-gray-100 min-h-screen">
+            {/* Banner */}
             <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden">
                 <img
-                    src={event.imageUrl}
-                    alt={event.title}
+                    src={`http://127.0.0.1:8000${eventDetails.event_poster}`}
+                    alt={eventDetails.title}
                     className="absolute inset-0 w-full h-full object-cover"
                 />
             </section>
+
             <div className="relative z-10 -mt-40 md:-mt-56 lg:-mt-80 container mx-auto px-4">
                 <div className="flex flex-col lg:flex-row lg:gap-8">
+                    {/* Sidebar */}
                     <div className="lg:w-1/3 order-first lg:order-last mb-8 lg:mb-0">
                         <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28">
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-12">
-                                {event.title}
-                            </h1>
-                            
-                             <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
-                                <div className="flex items-center space-x-3">
-                                    <button type="button"
-                                onClick={() => navigate("/organizer-dashboard")}
-                                className="flex items-center space-x-3 p-0 bg-transparent border-none">
-                                    <FaRegUser className="text-teal-600 text-lg" />
-                                    
-                                    <span>{event.organizer}</span>
-                                    </button>
+
+                            {/* QR Code Above Title */}
+                            {qrCode && (
+                                <div className="flex justify-center mb-6">
+                                    <img
+                                        src={`http://127.0.0.1:8000/events/${qrCode}`}
+                                        alt="Event QR Code"
+                                        className="w-32 h-32 object-contain"
+                                    />
                                 </div>
-                    
+                            )}
+
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-12">
+                                {eventDetails.title}
+                            </h1>
+
                             <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
                                 <div className="flex items-center space-x-3">
-                                    <FaCalendarAlt className="text-teal-600 text-lg" />
-                                    <span>{event.date}</span>
-                                </div>
-                                <div className="flex items-center space-x-3">
-                                    <FaMapMarkerAlt className="text-teal-600 text-lg" />
-                                    <span>{event.location}</span>
-                                </div>
-                               
-                               {event.ageRestriction && (
-                                <div className="flex items-center justify-between">
-                                    <span className="font-semibold text-gray-800 text-lg">
-                                    {event.ageRestriction}
-                                    </span>
                                     <button
-                                    className="text-gray-600 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-                                    onClick={() => console.log("Share clicked")}
+                                        type="button"
+                                        onClick={() => navigate("/organizer-dashboard")}
+                                        className="flex items-center space-x-3 p-0 bg-transparent border-none"
                                     >
-                                    <FaShareAlt className="text-xl" />
+                                        <FaRegUser className="text-teal-600 text-lg" />
+                                        <span>
+                                            {eventDetails.created_by.first_name}{" "}
+                                            {eventDetails.created_by.last_name}
+                                        </span>
                                     </button>
                                 </div>
-                                )}
 
-                            </div>
+                                <div className="flex items-start space-x-4">
+                                    <FaCalendarAlt className="text-teal-600 text-2xl mt-1" />
+                                    <div>
+                                        <h3 className="text-lg font-semibold text-gray-800">Event Schedule</h3>
+                                        <p className="text-gray-600">
+                                            {formatDateTime(eventDetails.start_date, eventDetails.start_time)}
+                                            {" – "}
+                                            {formatDateTime(eventDetails.end_date, eventDetails.end_time)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center space-x-3">
+                                    <FaMapMarkerAlt className="text-teal-600 text-lg" />
+                                    <span>
+                                        {eventDetails.venue_name}, {eventDetails.venue_address}
+                                    </span>
+                                </div>
+
+                                {eventDetails.age_restriction && (
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-semibold text-gray-800 text-lg">
+                                            Age: {formatAgeRestriction(eventDetails.age_restriction)}
+                                        </span>
+                                        <button
+                                            className="text-gray-600 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-gray-100"
+                                            onClick={() => console.log("Share clicked")}
+                                        >
+                                            <FaShareAlt className="text-xl" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
+
+                    {/* Main Content */}
                     <div className="lg:w-2/3">
+                        {/* Nav */}
                         <div className="sticky top-20 bg-white shadow-md rounded-lg mb-8 z-20 overflow-hidden">
                             <nav className="flex justify-around items-center border-b border-gray-200 py-3 px-4">
                                 <a
@@ -186,73 +204,67 @@ function EventDetailPage() {
                                 </a>
                             </nav>
                         </div>
-                        <div id="description-section" className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
+
+                        {/* Description */}
+                        <div
+                            id="description-section"
+                            className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8"
+                        >
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
                                 Description
                             </h2>
                             <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                {event.description}
+                                {eventDetails.description}
                             </p>
                         </div>
-                        <div id="tickets-section" className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
+
+                        {/* Tickets */}
+                        <div
+                            id="tickets-section"
+                            className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8"
+                        >
                             <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
                                 Tickets
                             </h2>
-                            {event.ticketCategories && event.ticketCategories.length > 0 ? (
+                            {eventDetails.ticket_types &&
+                                eventDetails.ticket_types.length > 0 ? (
                                 <div className="space-y-4">
-                                    {event.ticketCategories.map((category, catIndex) => (
-                                        <div key={catIndex} className="border border-gray-200 rounded-lg overflow-hidden">
-                                            <button
-                                                className="w-full flex justify-between items-center p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-                                                onClick={() => toggleCategory(category.name)}
-                                            >
-                                                <span className="font-semibold text-gray-800 text-lg">{category.name}</span>
-                                                {openCategories[category.name] ? (
-                                                    <FaChevronUp className="text-gray-600" />
-                                                ) : (
-                                                    <FaChevronDown className="text-gray-600" />
-                                                )}
-                                            </button>
-                                            {openCategories[category.name] && (
-                                                <div className="p-4 bg-white border-t border-gray-200">
-                                                    <div className="space-y-3">
-                                                        {category.tickets.map((ticket, ticketIndex) => (
-                                                            <div key={ticketIndex} className="flex justify-between items-center py-2 border-b border-dashed border-gray-100 last:border-b-0">
-                                                                <span className="text-gray-700">{ticket.type}</span>
-                                                                <div className="flex items-center space-x-4">
-                                                                    <span className="text-lg font-bold text-orange-600">
-                                                                        {ticket.price}
-                                                                    </span>
-                                                                    {ticket.status === 'available' ? (
-                                                                        <div className="flex items-center space-x-2">
-                                                                            <select
-                                                                                className="p-2 border border-gray-300 rounded-md"
-                                                                                value={selectedTickets[`${category.name}-${ticket.type}`] || 0}
-                                                                                onChange={(e) => handleQuantityChange(category.name, ticket.type, e.target.value)}
-                                                                            >
-                                                                             {[...Array(11).keys()].map(num => (
-                                                                                    <option key={num} value={num}>{num}</option>
-                                                                                ))}
-                                                                            </select>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <span className="bg-gray-200 text-gray-600 px-4 py-2 rounded-full text-sm">
-                                                                            Sale Ended
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            </div>
+                                    {eventDetails.ticket_types.map((ticket, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex justify-between items-center py-2 border-b border-dashed border-gray-100 last:border-b-0"
+                                        >
+                                            <span className="text-gray-700">{ticket.ticket_name}</span>
+                                            <div className="flex items-center space-x-4">
+                                                <span className="text-lg font-bold text-orange-600">
+                                                    {ticket.price}
+                                                </span>
+                                                <div className="flex items-center space-x-2">
+                                                    <select
+                                                        className="p-2 border border-gray-300 rounded-md"
+                                                        value={selectedTickets[ticket.id] || 0}
+                                                        onChange={(e) =>
+                                                            handleQuantityChange(ticket.id, e.target.value)
+                                                        }
+                                                    >
+                                                        {[...Array(11).keys()].map((num) => (
+                                                            <option key={num} value={num}>
+                                                                {num}
+                                                            </option>
                                                         ))}
-                                                    </div>
+                                                    </select>
                                                 </div>
-                                            )}
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-center text-gray-600">No tickets available at this time.</p>
+                                <p className="text-center text-gray-600">
+                                    No tickets available at this time.
+                                </p>
                             )}
-                            
+
+                            {/* Discount */}
                             <div className="mt-8 pt-6 border-t border-gray-200">
                                 <h3 className="text-xl font-bold text-gray-800 mb-4">
                                     <FaTicketAlt className="inline-block mr-2 text-teal-600" />
@@ -274,12 +286,16 @@ function EventDetailPage() {
                                     </button>
                                 </div>
                                 {discountStatus.message && (
-                                    <p className={`mt-2 text-sm ${discountStatus.applied ? 'text-green-600' : 'text-red-600'}`}>
+                                    <p
+                                        className={`mt-2 text-sm ${discountStatus.applied ? "text-green-600" : "text-red-600"
+                                            }`}
+                                    >
                                         {discountStatus.message}
                                     </p>
                                 )}
                             </div>
 
+                            {/* Terms */}
                             <div className="mt-8 pt-6 border-t border-gray-200">
                                 <label className="flex items-start cursor-pointer">
                                     <input
@@ -289,16 +305,19 @@ function EventDetailPage() {
                                         onChange={(e) => setAgreeToTerms(e.target.checked)}
                                     />
                                     <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                                        By checking this box, I hereby agree that my information will be shared to our Event Organizer.
+                                        By checking this box, I hereby agree that my information
+                                        will be shared to our Event Organizer.
                                     </span>
                                 </label>
                             </div>
 
+                            {/* Buy Button */}
                             <div className="mt-6">
                                 <button
-                                    className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${
-                                        (agreeToTerms && totalTicketsSelected > 0) ? 'bg-orange-500 hover:bg-orange-600 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    }`}
+                                    className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${agreeToTerms && totalTicketsSelected > 0
+                                        ? "bg-orange-500 hover:bg-orange-600 text-white"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                        }`}
                                     disabled={!agreeToTerms || totalTicketsSelected === 0}
                                 >
                                     Buy Tickets ({totalTicketsSelected})
