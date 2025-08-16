@@ -1,6 +1,19 @@
 # events/models.py
 from django.db import models
 from django.conf import settings
+import os
+from datetime import datetime
+
+def unique_event_poster_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{instance.event_code}_poster_{datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+    return os.path.join("event/event_posters/", filename)
+
+def unique_seating_map_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = f"{instance.event_code}_seating_{datetime.now().strftime('%Y%m%d%H%M%S')}.{ext}"
+    return os.path.join("event/seating_maps/", filename)
+
 
 class Event(models.Model):
     """
@@ -48,7 +61,7 @@ class Event(models.Model):
     event_type = models.CharField(max_length=50)
     meeting_platform = models.CharField(max_length=100, blank=True, null=True)
     meeting_link = models.URLField(max_length=500, blank=True, null=True)
-    event_poster = models.ImageField(upload_to="event/event_posters/", blank=True, null=True)
+    event_poster = models.ImageField(upload_to=unique_event_poster_path, blank=True, null=True)
     duration_type = models.CharField(max_length=50, choices=DURATION_CHOICES)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
@@ -64,7 +77,7 @@ class Event(models.Model):
     event_qr_image = models.ImageField(upload_to="event/qr_codes/", blank=True, null=True)
     posting_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     isFee_paid = models.BooleanField(default=False)
-    seating_map = models.ImageField(upload_to="event/seating_maps/", blank=True, null=True)
+    seating_map = models.ImageField(upload_to=unique_seating_map_path, blank=True, null=True)
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -79,7 +92,7 @@ class Event(models.Model):
         """
         Returns the product's name as a string representation.
         """
-        return f"{self.name} event, created by {self.created_by.user_code}."
+        return f"{self.title} event, created by {self.created_by.user_code}."
     
     def save(self, *args, **kwargs):
         # Only generate QR if user_code exists

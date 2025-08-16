@@ -24,6 +24,7 @@ import AdminReviewPage from './pages/AdminReviewPage.jsx';
 import AdminAttendees from './pages/AdminAttendees.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
+import Sample from './pages/sample.jsx';
 
 // A component that wraps the main App logic
 function App() {
@@ -80,6 +81,7 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} /> 
+          <Route path="/sample" element={<Sample />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} /> 
           <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />

@@ -35,7 +35,10 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     ticket_types = TicketTypeSerializer(many=True)
     reg_form_templates = RegFormTemplateSerializer(many=True, required=False)
-    reg_form_questions = RegFormQuestionSerializer(many=True, required=False)
+    reg_form_questions = RegFormQuestionSerializer(many=True, required=False)    
+    event_poster = serializers.ImageField(required=False, allow_null=True)
+    seating_map = serializers.ImageField(required=False, allow_null=True)
+
 
     class Meta:
         model = Event
@@ -44,6 +47,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     # ...existing code...
     def create(self, validated_data):
+        print("validated_data before file assignment:", validated_data)
         # Extract nested data
         ticket_types_data = validated_data.pop('ticket_types', [])
         reg_form_templates_data = validated_data.pop('reg_form_templates', [])
@@ -52,8 +56,13 @@ class EventSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             validated_data['created_by'] = request.user
+        if request and request.FILES.get('event_poster'):
+            validated_data['event_poster'] = request.FILES['event_poster']
+        if request and request.FILES.get('seating_map'):
+            validated_data['seating_map'] = request.FILES['seating_map']
 
         files = self.context.get('files', None)
+        print("FILES IN CONTEXT:", files)
         if files:
             if files.get('event_poster'):
                 validated_data['event_poster'] = files['event_poster']
@@ -64,6 +73,7 @@ class EventSerializer(serializers.ModelSerializer):
                 validated_data['event_poster'] = request.FILES['event_poster']
             if request.FILES.get('seating_map'):
                 validated_data['seating_map'] = request.FILES['seating_map']   
+        print("validated_data after file assignment:", validated_data)
 
         # --- Status logic ---
         all_free = all(

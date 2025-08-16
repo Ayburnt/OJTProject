@@ -17,7 +17,7 @@ from .parsers import NestedMultiPartParser
 
 class EventListCreateAPIView(APIView):
     # Use the new custom parser
-    parser_classes = [NestedMultiPartParser, FormParser]
+    parser_classes = [NestedMultiPartParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
@@ -27,15 +27,20 @@ class EventListCreateAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
+        
+        print("FILES:", request.FILES)
+        print("DATA:", request)
+
         # The custom parser will handle the nested data reconstruction
         
         serializer = EventSerializer(
-            data=request.data['data'],
-            context={'request': request, 'files': request.FILES}
+            data=request.data,
+            context={'request': request},
         )
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        print("SERIALIZER ERRORS:", serializer.errors)  # <-- Add this
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
