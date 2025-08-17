@@ -5,7 +5,7 @@ export const ACCESS_TOKEN = "access";
 export const REFRESH_TOKEN = "refresh";
 
 const api = axios.create({
-  baseURL: //import.meta.env.VITE_API_URL || 
+  baseURL: import.meta.env.VITE_EVENTS_URL || 
   "http://127.0.0.1:8000/events",
 });
 
