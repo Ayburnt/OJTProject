@@ -43,15 +43,27 @@ function RecommendedEvents() {
         </div>
  {/* Event Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7 md:gap-9">
-          {events.map((event, i) => (
-            <Link key={i} to={`/events/${event.event_code}`} className="block">
-              <EventCard eventPoster={event.event_poster} eventTitle={event.title}
-                eventDate={`${event.start_date === event.end_date ? event.start_date : event.start_date, `-`, event.end_date}`}
-                eventLocation={event.venue_place} eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
-              />
-            </Link>
-          ))}
-        </div>
+  {Array.isArray(events) && events.length > 0 ? (
+    events.map((event, i) => (
+      <Link key={i} to={`/events/${event.event_code}`} className="block">
+        <EventCard
+          eventPoster={event.event_poster}
+          eventTitle={event.title}
+          eventDate={
+            event.start_date === event.end_date
+              ? event.start_date
+              : `${event.start_date} - ${event.end_date}`
+          }
+          eventLocation={event.venue_place}
+          eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
+        />
+      </Link>
+    ))
+  ) : (
+    <p className="text-gray-500">No events available yet.</p>
+  )}
+</div>
+
 
         <div className="text-center mt-16">
           {/* Corrected "View All Events" button to a Link component */}

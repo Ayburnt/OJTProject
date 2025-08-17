@@ -102,7 +102,8 @@ const OrganizerEvent = () => {
 
 
         <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
-          {events.map((event, i) => (
+          {Array.isArray(events) && events.length > 0 ? (
+            events.map((event, i) => (
             <EventCard
               key={i}
               eventPoster={event.event_poster}
@@ -115,7 +116,10 @@ const OrganizerEvent = () => {
               eventAttendees={event.attendees}
               ticketTypes={event.ticket_types}
             />
-          ))}
+          ))
+          ):(
+            <p className="text-gray-500">No events available.</p>
+          )}          
         </div>
       </div>
 

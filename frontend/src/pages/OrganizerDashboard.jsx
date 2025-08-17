@@ -7,7 +7,7 @@ import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 import api from '../events.js'
 
 function OrganizerDashboard() {
-  const { isLoggedIn, userCode, userEmail, userFirstName, userProfile, logout } = useAuth();
+  const { isLoggedIn, userCode, userFirstName, userProfile } = useAuth();
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
@@ -92,7 +92,8 @@ function OrganizerDashboard() {
           </div>
           {/* Event Placeholder */}
           <div className="flex flex-col gap-4 font-outfit">
-            {events.map((event, i) => {
+            {Array.isArray(events) && events.length > 0 ? (
+              events.map((event, i) => {
               const totalTickets = event.ticket_types.reduce(
                 (sum, ticket) => sum + ticket.quantity_total,
                 0
@@ -126,7 +127,10 @@ function OrganizerDashboard() {
                   </div>
                 </div>
               )
-            })}
+            })
+            ):(
+              <p className="text-gray-500">No events available yet.</p>
+            )}            
 
             {/* Placeholder box */}
             <div className="border p-10 rounded-lg h-20 flex items-center justify-center text-gray-400 font-outfit">
