@@ -97,7 +97,7 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         # Only generate QR if user_code exists
         if self.event_code:
-            self.event_qr_link = f"https://event.sari-sari.com/event/{self.event_code}"
+            self.event_qr_link = f"https://event.sari-sari.com/events/{self.event_code}"
 
             import qrcode
             from io import BytesIO
