@@ -117,9 +117,9 @@ function EventDetailPage() {
                 <div className="flex flex-col lg:flex-row lg:gap-8">
                     {/* Sidebar */}
                     <div className="lg:w-1/3 order-first lg:order-last mb-8 lg:mb-0">
-                        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28">
+                        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28 space-y-6">
 
-                            {/* QR Code Above Title */}
+                            {/* QR Code Above */}
                             {qrCode && (
                                 <div className="flex justify-center mb-6">
                                     <img
@@ -130,70 +130,70 @@ function EventDetailPage() {
                                 </div>
                             )}
 
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight mb-5">
+                            {/* Title */}
+                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight text-center mb-5">
                                 {eventDetails.title}
                             </h1>
 
-                            <div className="space-y-4 text-gray-700 text-base mb-6 pb-6 border-b border-gray-200">
-                                <div className='w-full items-center justify-center flex'>
-                                    <a
-                                        href={eventDetails.event_qr_image}
-                                        download={`event-${eventDetails.event_code}-qr.png`}
-                                        target='_blank'
-                                        className='w-[80%] aspect-square object-contain'
-                                    >
-                                        <img src={eventDetails.event_qr_image} alt={eventDetails.title} />
-                                    </a>
-                                </div>
+                            {/* Organizer */}
+                            <div>
+                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Organized by</h3>
                                 <div className="flex items-center space-x-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate("/organizer-dashboard")}
-                                        className="flex cursor-pointer items-center space-x-3 p-0 bg-transparent border-none"
-                                    >
-                                        <FaRegUser className="text-teal-600 text-lg" />
-                                        <span>
-                                            {eventDetails.created_by.first_name}{" "}
-                                            {eventDetails.created_by.last_name}
-                                        </span>
-                                    </button>
+                                    <FaRegUser className="text-teal-600 text-lg" />
+                                    <span className="text-gray-800 font-medium">
+                                        {eventDetails.created_by.first_name} {eventDetails.created_by.last_name}
+                                    </span>
                                 </div>
+                            </div>
 
-                                <div className="flex items-start space-x-4">
-                                    <FaCalendarAlt className="text-teal-600 text-2xl mt-1" />
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-gray-800">Event Schedule</h3>
-                                        <p className="text-gray-600">
-                                            {formatDateTime(eventDetails.start_date, eventDetails.start_time)}
-                                            {" – "}
-                                            {formatDateTime(eventDetails.end_date, eventDetails.end_time)}
-                                        </p>
-                                    </div>
+                            {/* Date & Time */}
+                            <div>
+                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Date & Time</h3>
+                                <div className="flex items-start space-x-3">
+                                    <FaCalendarAlt className="text-teal-600 text-lg mt-1" />
+                                    <span className="text-gray-700">
+                                        {formatDateTime(eventDetails.start_date, eventDetails.start_time)}
+                                    </span>
                                 </div>
+                            </div>
 
-                                <div className="flex items-center space-x-3">
-                                    <FaMapMarkerAlt className="text-teal-600 text-lg" />
-                                    <span>
+                            {/* Location */}
+                            <div>
+                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
+                                <div className="flex items-start space-x-3">
+                                    <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
+                                    <span className="text-gray-700">
                                         {eventDetails.venue_name}, {eventDetails.venue_address}
                                     </span>
                                 </div>
+                            </div>
 
-                                {eventDetails.age_restriction && (
-                                    <div className="flex items-center justify-between">
-                                        <span className="font-semibold text-gray-800 text-lg">
-                                            Age: {formatAgeRestriction(eventDetails.age_restriction)}
-                                        </span>
-                                        <button
-                                            className="text-gray-600 hover:text-teal-600 transition-colors p-2 rounded-full hover:bg-gray-100"
-                                            onClick={() => console.log("Share clicked")}
-                                        >
-                                            <FaShareAlt className="text-xl" />
-                                        </button>
-                                    </div>
-                                )}
+                            {/* Age Restriction */}
+                            {eventDetails.age_restriction && (
+                                <div>
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Age Restriction</h3>
+                                    <p className="text-gray-800 font-medium">
+                                        {formatAgeRestriction(eventDetails.age_restriction)}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Event Type + Share */}
+                            <div className="flex justify-between items-center pt-4 border-t border-gray-200">
+                                <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg font-semibold text-sm">
+                                    In-person
+                                </span>
+                                <button
+                                    className="flex items-center space-x-2 text-gray-600 hover:text-teal-600 transition-colors"
+                                    onClick={() => console.log("Share clicked")}
+                                >
+                                    <FaShareAlt />
+                                    <span className="font-medium">Share</span>
+                                </button>
                             </div>
                         </div>
                     </div>
+
 
                     {/* Main Content */}
                     <div className="lg:w-2/3">

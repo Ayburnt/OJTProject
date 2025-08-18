@@ -10,20 +10,23 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
           alt={eventTitle}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
-        {/* Optional: Add a subtle overlay for text if desired */}
-        {/* <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div> */}
       </div>
 
       {/* Content Area */}
       <div className="p-4 bg-teal-600 text-white">
-        <h3 className="text-xl font-bold mb-1 group-hover:underline group-hover:text-orange-300 transition-colors">{eventTitle}</h3>
+        {/* Title */}
+        <h3 className="text-xl font-bold mb-1 group-hover:underline group-hover:text-orange-300 transition-colors line-clamp-2">
+          {eventTitle}
+        </h3>
+
+        {/* Date */}
         <p className="text-sm text-teal-100 mb-1">{eventDate}</p>
-        <p className="text-sm text-teal-100">{eventLocation}</p>
-        <p className="text-sm text-teal-100">{eventCreator}</p>
-        {/* Optional: Add a call-to-action button */}
-        {/* <button className="mt-4 bg-white text-teal-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-gray-100 transition-colors">
-          Details
-        </button> */}
+
+        {/* Location */}
+        <p className="text-sm text-teal-100 truncate">{eventLocation}</p>
+
+        {/* Creator */}
+        <p className="text-sm text-teal-100">By {eventCreator}</p>
       </div>
     </div>
   );
