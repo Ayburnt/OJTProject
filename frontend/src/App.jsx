@@ -114,8 +114,9 @@ function App() {
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           <Route path="/manage-account" element={<ManageAccount />} />
           <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
+          <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
 
-          <Route path='/create-event' element={<CreateEvent />} />
+          {/* <Route path='/create-event' element={<CreateEvent />} /> */}
           <Route path='/org/:userCode/verification-form' element={<PrivateRoute requiredRole={'organizer'}><VerificationForm /></PrivateRoute>} />
           {/* <Route path="/verification-form" element={<VerificationForm />} /> */}
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
