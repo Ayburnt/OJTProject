@@ -19,7 +19,7 @@ function FooterNav() {
 
   const navItems = [
     { key: "help", label: "Need Help", links: ["How to buy tickets?", "Where are my tickets?", "How to use e-ticket?", "Help Center"] },
-    { key: "CustomerSupport", label: "Customer Support" },
+    { key: "CustomerSupport", label: "Customer Support", links: ["Customer Support"] },
     { key: "Organizers", label: "Event organizer", links: ["Our Solutions", "Pricing", "Contact Us"] },
     { key: "Legal", label: "Legal", links: ["Term", "Policy", "Security"] },
   ];
@@ -37,92 +37,144 @@ function FooterNav() {
 
         {/* Desktop Nav */}
         <nav className="hidden lg:flex space-x-8 items-center relative font-outfit">
-          {navItems.map((item) => (
-            <div key={item.key} className="relative">
-              <button
-                className="flex items-center text-sm text-gray-700 font-medium gap-1 cursor-pointer"
-                onClick={() =>
-                  setOpenDropdown(openDropdown === item.key ? null : item.key)
-                }
+        {navItems.map((item) => (
+  <div key={item.key} className="relative">
+    {/* Desktop */}
+    {item.key === "CustomerSupport" ? (
+      <Link
+        to="/customer-support"
+        className="text-sm text-gray-700 font-medium cursor-pointer"
+      >
+        {item.label}
+      </Link>
+    ) : (
+      <button
+        className="flex items-center text-sm text-gray-700 font-medium gap-1 cursor-pointer"
+        onClick={() =>
+          setOpenDropdown(openDropdown === item.key ? null : item.key)
+        }
+      >
+        {item.label}
+        <FiChevronDown />
+      </button>
+    )}
+
+    {item.links && item.key !== "CustomerSupport" && openDropdown === item.key && (
+      <div className={dropdownClass}>
+        {item.links.map((link, i) => {
+          if (link === "How to buy tickets?") {
+            return (
+              <Link
+                key={i}
+                to="/q1"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
               >
-                {item.label}
-                {item.key !== "CustomerSupport" && <FiChevronDown />}
-              </button>
-
-            {item.links && openDropdown === item.key && (
-                <div className={dropdownClass}>
-                  {item.links.map((link, i) => {
-
-                      if (link === "Pricing") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/pricing"
-                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-                      if (link === "Contact Us") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/contact-us"
-                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-
-                    if (link === "Term") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/term"
-                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-                    if (link === "Policy") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/policy"
-                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-                    if (link === "Security") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/security"
-                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-                    return (
-                      <Link
-                        key={i}
-                        to="#"
-                        className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
-                      >
-                        {link}
-                      </Link>
-                    );
-                  })}
-                </div>
-              )}
-               </div>
-          ))}
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Where are my tickets?") {
+            return (
+              <Link
+                key={i}
+                to="/q2"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "How to use e-ticket?") {
+            return (
+              <Link
+                key={i}
+                to="/q3"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Help Center") {
+            return (
+              <Link
+                key={i}
+                to="/help-center"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Pricing") {
+            return (
+              <Link
+                key={i}
+                to="/pricing"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Contact Us") {
+            return (
+              <Link
+                key={i}
+                to="/contact-us"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Term") {
+            return (
+              <Link
+                key={i}
+                to="/term"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Policy") {
+            return (
+              <Link
+                key={i}
+                to="/policy"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          if (link === "Security") {
+            return (
+              <Link
+                key={i}
+                to="/security"
+                className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+              >
+                {link}
+              </Link>
+            );
+          }
+          return (
+            <Link
+              key={i}
+              to="#"
+              className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+            >
+              {link}
+            </Link>
+          );
+        })}
+      </div>
+    )}
+  </div>
+))}
         </nav>
 
         {/* Mobile Hamburger */}

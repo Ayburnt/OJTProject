@@ -25,6 +25,17 @@ import AdminAttendees from './pages/AdminAttendees.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 
+import Q1 from './footer/Q1.jsx';
+import Q2 from './footer/Q2.jsx';
+import Q3 from './footer/Q3.jsx';
+import HelpCenter from './footer/HelpCenter.jsx';
+import CustomerSupport from './footer/CustomerSupport.jsx';
+import Pricing from './footer/Pricing.jsx';
+import ContactUs from './footer/ContactUs.jsx';
+import Term from './footer/Term.jsx';
+import Policy from './footer/Policy.jsx';
+import Security from './footer/Security.jsx';
+
 // A component that wraps the main App logic
 function App() {
   const location = useLocation();
@@ -46,7 +57,19 @@ function App() {
     '/admin-eventcontrol',
     '/admin-review',
     '/change-password',
-    '/admin-attendees'
+    '/admin-attendees',
+
+    '/q1',
+    '/q2',
+    '/q3',
+    '/help-center',
+     '/customer-support',
+    '/pricing',
+    '/contact-us',
+    '/term',
+    '/policy',
+    '/security',  
+
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -90,10 +113,9 @@ function App() {
           {/* <Route path="/attendees" element={<Attendees />} />*/}
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           <Route path="/manage-account" element={<ManageAccount />} />
-          <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
           <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
 
-          {/* <Route path='/create-event' element={<CreateEvent />} /> */}
+          <Route path='/create-event' element={<CreateEvent />} />
           <Route path='/org/:userCode/verification-form' element={<PrivateRoute requiredRole={'organizer'}><VerificationForm /></PrivateRoute>} />
           {/* <Route path="/verification-form" element={<VerificationForm />} /> */}
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
@@ -101,6 +123,17 @@ function App() {
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
           <Route path='/admin-attendees' element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
+
+          <Route path="/q1" element={<Q1 />} />
+          <Route path="/q2" element={<Q2 />} />
+          <Route path="/q3" element={<Q3 />} />
+          <Route path="/help-center" element={<HelpCenter />} />
+          <Route path="/customer-support" element={<CustomerSupport />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/contact-us" element={<ContactUs />} />
+          <Route path="/term" element={<Term />} />
+          <Route path="/policy" element={<Policy />} />
+          <Route path="/security" element={<Security />} />
 
 
         </Routes>

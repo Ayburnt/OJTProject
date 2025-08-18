@@ -1,41 +1,47 @@
 import React from 'react';
+import FooterNav from "../components/FooterNav";
 
-// Component for the new FAQ section
-const TicketmelonFAQ = () => {
-  const steps = [
-    "Sign up or sign in to your Sari-sari account with either Facebook or email registration. Click on the poster or the 'Get Tickets' button of the event you would like to attend.",
-    "On the event page, select your ticket quantity and click on the 'Buy Tickets' button.",
-    "On the check-out page. Select your preferred payment method (card or cash) and fill in the required information. Choose the answer to protect your ticket (Click Here for more information about Refund Protect)",
-    "Review all the prices. Then, click on the checkbox next to “I agree to Ticketmelon's Terms of Service and Event Organizer's Agreement”, and click the ’Pay Now’ button."
-  ];
-
+const Q1 = () => {
   return (
-    <div className="bg-white rounded-3xl shadow-xl p-8 lg:p-12 mb-8 text-gray-800">
-      <h2 className="text-2xl lg:text-3xl font-bold font-outfit mb-6">How to buy tickets on Sari-sari?</h2>
-      <ol className="list-decimal list-inside space-y-4 text-lg text-gray-700">
-        {steps.map((step, index) => (
-          <li key={index}>{step}</li>
-        ))}
-      </ol>
-      <p className="mt-6 text-base italic text-gray-600">
-        If you wish to pay using cash, please print the payment slip to the selected payment channel as their system may not support scanning directly from the mobile phone screen.
-      </p>
-      <p className="mt-6 text-sm font-bold text-gray-700">
-        Important: To prevent theft, please do not reveal your ticket to anyone other than the gate agent (the person scanning your tickets at event entry) prior to validation. Ticketmelon will not be responsible for any damages arising from damaged tickets, ticket theft and/or losses.
-      </p>
+    <div className="min-h-screen bg-gray-100">
+      <FooterNav/>
+      {/* Main Content */}
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="bg-white rounded-lg shadow-sm p-8">
+          {/* Title */}
+          <h1 className="text-2xl font-bold font-outfit text-secondary mb-6">How to buy tickets on Sari-sari?</h1>
+          
+          {/* Subtitle */}
+          <p className="text-gray-600 mb-6">Follow these steps to purchase your tickets:</p>
+
+          {/* Steps */}
+          <div className="space-y-4 mb-8">
+            <div className="text-gray-800">
+              <span className="font-medium">1.</span> Sign up or sign in to your Sari-sari account with either Facebook or email registration. Click on the poster or the 'Get Tickets' button of the event you would like to attend.
+            </div>
+
+            <div className="text-gray-800">
+              <span className="font-medium">2.</span> On the event page, select your ticket quantity and click on the 'Buy Tickets' button.
+            </div>
+
+            <div className="text-gray-800">
+              <span className="font-medium">3.</span> On the check-out page, select your preferred payment method (card or cash) and fill in the required information. Choose the answer to protect your ticket.
+            </div>
+
+            <div className="text-gray-800">
+              <span className="font-medium">4.</span> Review all the prices. Then, click on the checkbox next to "I agree to Ticketmelon's Terms of Service and Event Organizer's Agreement", and click the 'Pay Now' button.
+            </div>
+          </div>
+
+          {/* Cash Payment Note */}
+          <div className="text-gray-700 mb-8">
+            If you wish to pay using cash, please print the payment slip to the selected payment channel as their system may not support scanning directly from the mobile phone screen.
+          </div>
+
+        </div>
+      </div>
     </div>
   );
 };
 
-// Main App Component
-const App = () => {
-  return (
-    <div className="min-h-screen bg-gray-100 antialiased text-gray-800 flex flex-col p-4">
-      <main className="w-full mx-auto">
-        <TicketmelonFAQ />
-      </main>
-    </div>
-  );
-};
-
-export default App;
+export default Q1;

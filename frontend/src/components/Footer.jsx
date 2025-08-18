@@ -38,10 +38,10 @@ function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Need help?</h3>
           <ul className="space-y-2">
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">How to buy tickets?</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Where are my tickets?</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">How to use e-ticket?</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Help Center</a></li> {/* Adjusted font size */}
+            <li><a href="/q1" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">How to buy tickets?</a></li> {/* Adjusted font size */}
+            <li><a href="/q2" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Where are my tickets?</a></li> {/* Adjusted font size */}
+            <li><a href="/q3" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">How to use e-ticket?</a></li> {/* Adjusted font size */}
+            <li><a href="/help-center" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Help Center</a></li> {/* Adjusted font size */}
           </ul>
         </div>
 
@@ -72,9 +72,9 @@ function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Legal</h3>
           <ul className="space-y-2">
-            <li><a href="term" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Terms</a></li> {/* Adjusted font size */}
-            <li><a href="policy" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Policy</a></li> {/* Adjusted font size */}
-            <li><a href="security" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Security</a></li> {/* Adjusted font size */}
+            <li><a href="/term" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Terms</a></li> {/* Adjusted font size */}
+            <li><a href="/policy" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Policy</a></li> {/* Adjusted font size */}
+            <li><a href="/security" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Security</a></li> {/* Adjusted font size */}
           </ul>
         </div>
 
