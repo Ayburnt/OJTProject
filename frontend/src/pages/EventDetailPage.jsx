@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaTicketAlt } from 'react-icons/fa';
+import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaTicketAlt, FaCar, FaUserLock } from 'react-icons/fa';
 import { FaRegUser } from "react-icons/fa";
 import api from '../events.js';
 
@@ -75,8 +75,10 @@ function EventDetailPage() {
         );
     }
 
-    function formatAgeRestriction(value) {
-        switch (value) {
+    function formatAgeRestriction(restriction, allowedAge) {
+        if (!restriction) return null;
+
+        switch (restriction) {
             case "all":
                 return "All Ages Allowed";
             case "18+":
@@ -85,11 +87,14 @@ function EventDetailPage() {
                 return "Kids Only";
             case "guardian_needed":
                 return "Minors Allowed with Guardian";
+            case "custom":
+                // Example: your DB provides age_allowed = 12 → show "12+ Only"
+                return allowedAge ? `${allowedAge}+ Only` : "Age Restricted";
             default:
-                return value;
+                // fallback (in case DB directly gives "12+", "13+" etc.)
+                return allowedAge ? `${allowedAge} Only` : restriction;
         }
     }
-
     function formatDateTime(dateStr, timeStr) {
         const dateObj = new Date(`${dateStr}T${timeStr}`);
         return dateObj.toLocaleString("en-US", {
@@ -171,12 +176,31 @@ function EventDetailPage() {
                             {/* Age Restriction */}
                             {eventDetails.age_restriction && (
                                 <div>
-                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Age Restriction</h3>
-                                    <p className="text-gray-800 font-medium">
-                                        {formatAgeRestriction(eventDetails.age_restriction)}
-                                    </p>
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">
+                                        Age Restriction
+                                    </h3>
+                                    <div className="flex items-center space-x-3">
+                                        <FaUserLock className="text-teal-600 text-lg" />
+                                        <span className="text-gray-800">
+                                            {formatAgeRestriction(eventDetails.age_restriction, eventDetails.age_allowed)}
+                                        </span>
+                                    </div>
                                 </div>
                             )}
+
+                            {/* Parking (only if NOT virtual) */}
+                            {eventDetails.parking && eventDetails.event_type?.toLowerCase() !== "virtual" && (
+                                <div>
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Parking</h3>
+                                    <div className="flex items-center space-x-3">
+                                        <FaCar className="text-teal-600 text-lg" />
+                                        <span className="text-gray-800">{eventDetails.parking}</span>
+                                    </div>
+                                </div>
+                            )}
+
+
+
 
                             {/* Event Type + Share */}
                             <div className="flex justify-between items-center pt-4 border-t border-gray-200">

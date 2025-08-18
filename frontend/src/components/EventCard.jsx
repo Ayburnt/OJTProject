@@ -1,6 +1,20 @@
 import React from 'react';
 
 function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCreator }) {
+  // ✅ Date formatter
+  function formatDate(dateStr) {
+    if (!dateStr) return "TBA";
+    const dateObj = new Date(dateStr);
+    return dateObj.toLocaleString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group">
       {/* Image */}
@@ -20,7 +34,7 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
         </h3>
 
         {/* Date */}
-        <p className="text-sm text-teal-100 mb-1">{eventDate}</p>
+        <p className="text-sm text-teal-100 mb-1">{formatDate(eventDate)}</p>
 
         {/* Location */}
         <p className="text-sm text-teal-100 truncate">{eventLocation}</p>
