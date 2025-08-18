@@ -1,174 +1,115 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
-import { Link } from "react-router-dom";
+import React from "react";
+import FooterNav from "../components/FooterNav";
 
-export default function FooterNav() {
-  const [open, setOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState({
-    help: false,
-    CustomerSupport: false,
-    Organizers: false,
-    Legal: false,
-  });
-
-  const navRef = useRef();
-
-  const toggleDropdown = (key) => {
-    setDropdownOpen((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  // Close dropdown if clicked outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (navRef.current && !navRef.current.contains(event.target)) {
-        setDropdownOpen({
-          help: false,
-          CustomerSupport: false,
-          Organizers: false,
-          Legal: false,
-        });
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  const navItems = [
-    {
-      key: "help",
-      label: "Need Help?",
-      links: ["How to buy tickets?", "Where are my tickets?", "How to use e-ticket?", "Help Center"]
-    },
-    { key: "CustomerSupport", label: "Customer Support", links: ["1", "2", "3"] },
-    { key: "Organizers", label: "Event organizer", links: ["Our Solutions", "Pricing", "Contact Us"] },
-    { key: "Legal", label: "Legal", links: ["Terms", "Policy", "Security"] },
-  ];
-
-  const dropdownClass =
-    "absolute top-full left-1/2 mt-2 w-43 bg-white border border-transparent rounded-md shadow z-10 -translate-x-1/2 text-center";
-
+function Term() {
   return (
-    <header className="w-full bg-white shadow-sm" ref={navRef}>
-      <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <div className="flex items-center space-x-2">
-          <img src="/sariLogo.png" alt="Logo" className="h-8 w-auto" />
+    <div className="min-h-screen bg-gray-100 pb-4">
+      <FooterNav />
+
+      {/* Main container */}
+      <div className="max-w-xl mt-8 md:mt-12 lg:mt-16 py-10 mx-5 md:mx-auto px-5 md:px-10 lg:px-15 bg-primary mb-10 rounded-lg md:max-w-2xl lg:max-w-6xl font-outfit">
+        <div className="max-w-5xl space-y-8">
+          <h1 className="text-4xl font-semibold text-secondary mb-10 lg:text-5xl md:text-5xl">
+            Terms & Conditions
+          </h1>
+
+          {/* Section Links */}
+          <div id="top" className="space-y-1">
+            <a href="#section1" className="block underline text-secondary">
+              1. Account Registration and Accuracy of Information
+            </a>
+            <a href="#section2" className="block underline text-secondary">
+              2. Event Organizer Duties and Compliance
+            </a>
+            <a href="#section3" className="block underline text-secondary">
+              3. Ticketing and Refund Policy
+            </a>
+            <a href="#section4" className="block underline text-secondary">
+              4. Prohibited Use
+            </a>
+            <a href="#section5" className="block underline text-secondary">
+              5. Intellectual Property
+            </a>
+            <a href="#section6" className="block underline text-secondary">
+              6. Acceptance of Terms
+            </a>
+          </div>
+
+          {/* Section Content */}
+          <section id="section1">
+            <h2 className="text-xl font-semibold mb-2">
+              1. Account Registration and Accuracy of Information
+            </h2>
+            <p className="text-gray-700 text-sm">
+              Users are required to create an account in order to access and utilize the event
+              management services. You agree that all information provided during registration and
+              throughout your use of the platform shall be true, accurate, current, and complete.
+              You further acknowledge that it is your responsibility to update such information
+              promptly in the event of any changes. The Company shall not be liable for any loss or
+              damage arising from inaccurate or incomplete information provided by you.
+            </p>
+          </section>
+
+          <section id="section2">
+            <h2 className="text-xl font-semibold mb-2">
+              2. Event Organizer Duties and Compliance
+            </h2>
+            <p className="text-gray-700 text-sm">
+              Event organizers are solely responsible for ensuring that their events comply with all
+              applicable laws, regulations, and licensing requirements. This includes, but is not limited
+              to, securing the necessary permits, providing accurate event descriptions, and taking all
+              reasonable measures to ensure participant safety. The Company acts only as a facilitator
+              of event listings and ticket sales and shall bear no responsibility for the conduct or
+              organization of any event.
+            </p>
+          </section>
+
+          <section id="section3">
+            <h2 className="text-xl font-semibold mb-2">
+              3. Ticketing and Refund Policy
+            </h2>
+            <p className="text-gray-700 text-sm">
+              All ticket sales completed through the platform are final unless otherwise stated by the
+              event organizer. In the event of cancellation or postponement of an event, the organizer
+              shall be solely responsible for issuing refunds in accordance with their stated policies
+              and applicable law. The Company may, at its sole discretion, provide reasonable assistance
+              regarding communications with attendees but shall bear no obligation to issue refunds itself.
+            </p>
+          </section>
+
+          <section id="section4">
+            <h2 className="text-xl font-semibold mb-2">4. Prohibited Use</h2>
+            <p className="text-gray-700 text-sm">
+              You agree not to use the platform for any unlawful, fraudulent, or abusive purpose, including
+              the distribution of false or misleading information or the transmission of malicious software.
+              You further agree not to interfere with or disrupt the operation of the platform or engage in
+              any activity that may compromise the security or integrity of the platform, its systems, or the
+              data of other users.
+            </p>
+          </section>
+
+          <section id="section5">
+            <h2 className="text-xl font-semibold mb-2">5. Intellectual Property</h2>
+            <p className="text-gray-700 text-sm">
+              All intellectual property rights in and to the platform and its content, other than user-submitted
+              material, are owned by or licensed to the Company. Users retain ownership of their own submitted
+              content, but grant the Company a non-exclusive, worldwide, royalty-free license to use, display,
+              and process such content solely for the purpose of providing the event management services.
+            </p>
+          </section>
+
+          <section id="section6">
+            <h2 className="text-xl font-semibold mb-2">6. Acceptance of Terms</h2>
+            <p className="text-gray-700 text-sm">
+              By accessing or using the platform, you acknowledge that you have read, understood, and agree to
+              be bound by these Terms and Conditions. If you do not agree to any part of these Terms, you must
+              discontinue your use of the platform immediately.
+            </p>
+          </section>
         </div>
-
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex space-x-8 items-center relative">
-          {navItems.map((item) => (
-            <div key={item.key} className="relative">
-              <button
-                className="flex items-center text-sm text-gray-700 font-medium gap-1"
-                onClick={() => toggleDropdown(item.key)}
-              >
-                {item.label} <FiChevronDown />
-              </button>
-
-              {dropdownOpen[item.key] && (
-                   <div className={dropdownClass}>
-                  {item.links.map((link, i) => {
-                if (link === "Terms") {
-                  return (
-                    <Link
-                      key={i}
-                      to="/terms"
-                      className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                    >
-                      {link}
-                    </Link>
-                  );
-                }
-                if (link === "Policy") {
-                  return (
-                    <Link
-                      key={i}
-                      to="/policy"
-                      className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                    >
-                      {link}
-                    </Link>
-                  );
-                }
-                  if (link === "Security") {
-                  return (
-                    <Link
-                      key={i}
-                      to="/security"
-                      className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                    >
-                      {link}
-                    </Link>
-                  );
-                }
-                return (
-                  <a
-                    key={i}
-                    href="#"
-                    className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                  >
-                    {link}
-                  </a>
-                );
-              })}
-
-                </div>
-              )}
-            </div>
-          ))}
-        </nav>
-
-        {/* Mobile Hamburger */}
-        <button
-          className="lg:hidden text-2xl text-gray-700"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? <FiX /> : <FiMenu />}
-        </button>
       </div>
-
-      {/* Mobile Dropdown */}
-      {open && (
-        <div className="lg:hidden px-4 pb-4 space-y-2">
-          {navItems.map((item) => (
-            <div key={item.key}>
-              <button
-                className="w-full flex justify-between items-center text-gray-700 text-sm"
-                onClick={() => toggleDropdown(item.key)}
-              >
-                {item.label} <FiChevronDown />
-              </button>
-              {dropdownOpen[item.key] && (
-                <div className="pl-4 mt-1 space-y-1 text-center w-43 bg-white border border-transparent rounded-md shadow z-10 -translate-x-1/2 relative left-1/2">
-                  {item.links.map((link, i) => {
-                    if (link === "Terms") {
-                      return (
-                        <Link
-                          key={i}
-                          to="/terms"
-                          className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                        >
-                          {link}
-                        </Link>
-                      );
-                    }
-                    return (
-                      <a
-                        key={i}
-                        href="#"
-                        className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                      >
-                        {link}
-                      </a>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </header>
+    </div>
   );
 }
+
+export default Term;

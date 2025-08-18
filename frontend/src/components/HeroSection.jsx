@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Install react-icons if you haven't: npm install react-icons
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'; // For navigation
 
 function HeroSection() {
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = "Sari-Sari Events";
-  },[])
+  }, [])
+
   const images = [
     {
       src: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/ladies-night-party-landscape-poster-flyer-design-template-cc9e9c66c4e308161db9c7dcaa27bffe_screen.jpg?ts=1601365829",
@@ -12,6 +16,7 @@ function HeroSection() {
       heading: "DISCOVER NEW EVENTS",
       subheading: "Find your next unforgettable experience",
       buttonText: "Explore Events",
+      action: "explore"
     },
     {
       src: "https://i.pinimg.com/736x/dc/72/63/dc7263d4dae4bb28fb5a71ff4ad9891e.jpg",
@@ -19,6 +24,7 @@ function HeroSection() {
       heading: "BECOME AN ORGANIZER WITH US",
       subheading: "Seamlessly manage and promote your events",
       buttonText: "Start Organizing Today",
+      action: "login"
     },
     {
       src: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/nightclub-dance-party-landscape-flyer-template-f69a412a8dd4e6f0bb393b01e1327395_screen.jpg?ts=1561377260",
@@ -26,17 +32,17 @@ function HeroSection() {
       heading: "LIVE MUSIC EXPERIENCE",
       subheading: "Grab your tickets now for the hottest shows!",
       buttonText: "See Concerts",
+      action: "concerts"
     },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Function to go to the next slide
+  // Navigation
   const goToNext = () => {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
   };
 
-  // Function to go to the previous slide
   const goToPrevious = () => {
     setCurrentIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
@@ -45,13 +51,26 @@ function HeroSection() {
   useEffect(() => {
     const interval = setInterval(() => {
       goToNext();
-    }, 5000); // Change slide every 5 seconds (5000ms)
+    }, 5000);
 
-    // Clear interval on component unmount to prevent memory leaks
     return () => clearInterval(interval);
-  }, [currentIndex]); // Re-run effect if currentIndex changes to reset timer
+  }, [currentIndex]);
 
   const currentImage = images[currentIndex];
+
+  // Button click handler
+  const handleButtonClick = (action) => {
+    if (action === "explore") {
+      const section = document.getElementById("recommended-events");
+      if (section) {
+        section.scrollIntoView({ behavior: "smooth" });
+      }
+    } else if (action === "login") {
+      navigate("/login"); // adjust your route if login page is different
+    } else if (action === "concerts") {
+      navigate("/concerts"); // you can change this path
+    }
+  };
 
   return (
     <div className='flex items-center justify-center pt-10'>
@@ -64,9 +83,8 @@ function HeroSection() {
           key={currentImage.src}
         />
 
-        {/* Dark overlay for readability */}
+        {/* Dark overlay */}
         <div className="absolute inset-0 bg-black/60 z-10"></div>
-
 
         {/* Content */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center text-white">
@@ -80,7 +98,10 @@ function HeroSection() {
           <p className="text-lg md:text-xl lg:text-2xl font-medium mb-10 drop-shadow animate-fade-in-up delay-200">
             {currentImage.subheading}
           </p>
-          <button className="cursor-pointer bg-orange-500 text-white px-10 py-4 rounded-full text-xl font-bold hover:bg-orange-600 transition-all duration-200 transform hover:scale-105 shadow-xl border-2 border-orange-500 hover:border-orange-700 animate-fade-in-up delay-400">
+          <button
+            onClick={() => handleButtonClick(currentImage.action)}
+            className="cursor-pointer bg-orange-500 text-white px-10 py-4 rounded-full text-xl font-bold hover:bg-orange-600 transition-all duration-200 transform hover:scale-105 shadow-xl border-2 border-orange-500 hover:border-orange-700 animate-fade-in-up delay-400"
+          >
             {currentImage.buttonText}
           </button>
         </div>
@@ -107,8 +128,7 @@ function HeroSection() {
             <button
               key={index}
               onClick={() => setCurrentIndex(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-white scale-125' : 'bg-gray-400 bg-opacity-75'
-                }`}
+              className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex ? 'bg-white scale-125' : 'bg-gray-400 bg-opacity-75'}`}
               aria-label={`Go to slide ${index + 1}`}
             ></button>
           ))}

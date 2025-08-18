@@ -2,31 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { FiMenu, FiX, FiChevronDown } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
-export default function FooterNav() {
+function FooterNav() {
   const [open, setOpen] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState({
-    help: false,
-    CustomerSupport: false,
-    Organizers: false,
-    Legal: false,
-  });
-
+  const [openDropdown, setOpenDropdown] = useState(null);
   const navRef = useRef();
 
-  const toggleDropdown = (key) => {
-    setDropdownOpen((prev) => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  // Close dropdown if clicked outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target)) {
-        setDropdownOpen({
-          help: false,
-          CustomerSupport: false,
-          Organizers: false,
-          Legal: false,
-        });
+        setOpenDropdown(null);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -34,87 +18,110 @@ export default function FooterNav() {
   }, []);
 
   const navItems = [
-    {
-      key: "help",
-      label: "Need Help?",
-      links: ["How to buy tickets?", "Where are my tickets?", "How to use e-ticket?", "Help Center"]
-    },
-    { key: "CustomerSupport", label: "Customer Support", links: ["1", "2", "3"] },
+    { key: "help", label: "Need Help", links: ["How to buy tickets?", "Where are my tickets?", "How to use e-ticket?", "Help Center"] },
+    { key: "CustomerSupport", label: "Customer Support" },
     { key: "Organizers", label: "Event organizer", links: ["Our Solutions", "Pricing", "Contact Us"] },
-    { key: "Legal", label: "Legal", links: ["Terms", "Policy", "Security"] },
+    { key: "Legal", label: "Legal", links: ["Term", "Policy", "Security"] },
   ];
 
-  const dropdownClass =
-    "absolute top-full left-1/2 mt-2 w-43 bg-white border border-transparent rounded-md shadow z-10 -translate-x-1/2 text-center";
+  const dropdownClass = "absolute top-full left-1/2 mt-2 w-43 bg-white border border-transparent rounded-md shadow z-10 -translate-x-1/2 text-center";
 
   return (
-    <header className="w-full bg-white shadow-sm" ref={navRef}>
+    <header className="w-full bg-white shadow-sm relative" ref={navRef}>
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
         <div className="flex items-center space-x-2">
-          <img src="/sariLogo.png" alt="Logo" className="h-8 w-auto" />
+          <Link to="/event" className="cursor-pointer">
+            <img src="/sariLogo.png" alt="Logo" className="h-8 w-auto" />
+          </Link>
         </div>
 
         {/* Desktop Nav */}
-        <nav className="hidden lg:flex space-x-8 items-center relative">
+        <nav className="hidden lg:flex space-x-8 items-center relative font-outfit">
           {navItems.map((item) => (
             <div key={item.key} className="relative">
               <button
-                className="flex items-center text-sm text-gray-700 font-medium gap-1"
-                onClick={() => toggleDropdown(item.key)}
+                className="flex items-center text-sm text-gray-700 font-medium gap-1 cursor-pointer"
+                onClick={() =>
+                  setOpenDropdown(openDropdown === item.key ? null : item.key)
+                }
               >
-                {item.label} <FiChevronDown />
+                {item.label}
+                {item.key !== "CustomerSupport" && <FiChevronDown />}
               </button>
 
-              {dropdownOpen[item.key] && (
+            {item.links && openDropdown === item.key && (
                 <div className={dropdownClass}>
-                 {item.links.map((link, i) => {
-                    if (link === "Term") {
-                        return (
+                  {item.links.map((link, i) => {
+
+                      if (link === "Pricing") {
+                      return (
                         <Link
-                            key={i}
-                            to="/term"
-                            className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
+                          key={i}
+                          to="/pricing"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
                         >
-                            {link}
+                          {link}
                         </Link>
-                        );
+                      );
+                    }
+                      if (link === "Contact Us") {
+                      return (
+                        <Link
+                          key={i}
+                          to="/contact-us"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+                        >
+                          {link}
+                        </Link>
+                      );
+                    }
+
+                    if (link === "Term") {
+                      return (
+                        <Link
+                          key={i}
+                          to="/term"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+                        >
+                          {link}
+                        </Link>
+                      );
                     }
                     if (link === "Policy") {
-                        return (
+                      return (
                         <Link
-                            key={i}
-                            to="/policy"
-                            className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
+                          key={i}
+                          to="/policy"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
                         >
-                            {link}
+                          {link}
                         </Link>
-                        );
+                      );
                     }
-                     if (link === "Security") {
-                        return (
+                    if (link === "Security") {
+                      return (
                         <Link
-                            key={i}
-                            to="/security"
-                            className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
+                          key={i}
+                          to="/security"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
                         >
-                            {link}
+                          {link}
                         </Link>
-                        );
+                      );
                     }
                     return (
-                        <a
+                      <Link
                         key={i}
-                        href="#"
-                        className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                        >
+                        to="#"
+                        className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm cursor-pointer"
+                      >
                         {link}
-                        </a>
+                      </Link>
                     );
                   })}
                 </div>
               )}
-            </div>
+               </div>
           ))}
         </nav>
 
@@ -129,45 +136,49 @@ export default function FooterNav() {
 
       {/* Mobile Dropdown */}
       {open && (
-        <div className="lg:hidden px-4 pb-4 space-y-2">
-          {navItems.map((item) => (
-            <div key={item.key}>
-              <button
-                className="w-full flex justify-between items-center text-gray-700 text-sm"
-                onClick={() => toggleDropdown(item.key)}
-              >
-                {item.label} <FiChevronDown />
-              </button>
-              {dropdownOpen[item.key] && (
-                <div className="pl-4 mt-1 space-y-1 text-center w-43 bg-white border border-transparent rounded-md shadow z-10 -translate-x-1/2 relative left-1/2">
-                  {item.links.map((link, i) => {
-                    if (link === "Terms") {
-                      return (
+        <>
+          <div
+            className="fixed inset-0 bg-black/20 z-10"
+            onClick={() => setOpen(false)}
+          ></div>
+
+          <div className="lg:hidden absolute left-1/2 -translate-x-1/2 top-full z-20 bg-white border border-gray-300 w-[95%] rounded-lg shadow-md">
+            <div className="max-w-md mx-auto px-4 pb-4 pt-4 space-y-2 font-outfit">
+              {navItems.map((item) => (
+                <div key={item.key}>
+                  <button
+                    className="w-full flex justify-between items-center text-gray-700 text-sm cursor-pointer"
+                    onClick={() =>
+                      setOpenDropdown(
+                        openDropdown === item.key ? null : item.key
+                      )
+                    }
+                  >
+                    {item.label}
+                    {item.key !== "CustomerSupport" && <FiChevronDown />}
+                  </button>
+
+                  {item.links && openDropdown === item.key && (
+                    <div className="pl-4 mt-1 space-y-1 w-full bg-white border border-transparent rounded-md shadow">
+                      {item.links.map((link, i) => (
                         <Link
                           key={i}
-                          to="/terms"
-                          className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
+                          to="#"
+                          className="block px-3 py-2 text-gray-700 hover:bg-gray-100 text-sm"
                         >
                           {link}
                         </Link>
-                      );
-                    }
-                    return (
-                      <a
-                        key={i}
-                        href="#"
-                        className="block px-3 py-1 text-gray-700 hover:bg-gray-100 text-sm"
-                      >
-                        {link}
-                      </a>
-                    );
-                  })}
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        </>
       )}
     </header>
   );
 }
+
+export default FooterNav;

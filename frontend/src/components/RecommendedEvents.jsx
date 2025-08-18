@@ -30,7 +30,7 @@ function RecommendedEvents() {
   // ];
 
   return (
-    <section className="py-16 md:py-20 bg-white shadow-inner-lg">
+    <section id="recommended-events" className="py-16 md:py-20 bg-white shadow-inner-lg">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-4xl md:text-5xl font-extrabold text-teal-800 mb-4 tracking-tight">

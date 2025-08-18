@@ -63,8 +63,8 @@ function Footer() {
           <h3 className="text-lg font-semibold text-gray-800 mb-4">For Event Organizers</h3>
           <ul className="space-y-2">
             <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Our Solutions</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Pricing</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Contact Us</a></li> {/* Adjusted font size */}
+            <li><a href="/pricing" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Pricing</a></li> {/* Adjusted font size */}
+            <li><a href="/contact-us" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Contact Us</a></li> {/* Adjusted font size */}
           </ul>
         </div>
 
@@ -72,9 +72,9 @@ function Footer() {
         <div>
           <h3 className="text-lg font-semibold text-gray-800 mb-4">Legal</h3>
           <ul className="space-y-2">
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Terms</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Policy</a></li> {/* Adjusted font size */}
-            <li><a href="#" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Security</a></li> {/* Adjusted font size */}
+            <li><a href="term" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Terms</a></li> {/* Adjusted font size */}
+            <li><a href="policy" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Policy</a></li> {/* Adjusted font size */}
+            <li><a href="security" className="text-sm text-gray-600 hover:text-teal-600 transition-colors">Security</a></li> {/* Adjusted font size */}
           </ul>
         </div>
 

@@ -1,11 +1,16 @@
-// src/components/SecurityPolicy.jsx
 import React from "react";
+import FooterNav from "../components/FooterNav";
 
-export default function Security() {
+
+function Security() {
   return (
-    <div className="max-w-6xl mt-10 py-10 mx-auto mb-10 px-8 bg-primary rounded-lg md:px-12 lg:px-15 font-outfit">
-      <div className="max-w-5xl space-y-8">
-        <h1 className="text-5xl font-semibold text-secondary mb-10">
+    <div className="min-h-screen bg-gray-100 pb-4">
+      <FooterNav />
+
+      {/* Main container */}
+      <div className="max-w-xl mt-8 md:mt-12 lg:mt-16 py-10 mx-5 md:mx-auto px-5 md:px-10 lg:px-15 bg-primary mb-10 rounded-lg md:max-w-2xl lg:max-w-6xl font-outfit">
+        <div className="max-w-5xl space-y-8">
+          <h1 className="text-4xl font-semibold text-secondary mb-10 lg:text-5xl md:text-5xl">
           Security Policy
         </h1>
 
@@ -57,5 +62,7 @@ export default function Security() {
         </section>
       </div>
     </div>
+    </div>
   );
 }
+export default Security;
