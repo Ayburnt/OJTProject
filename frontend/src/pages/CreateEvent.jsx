@@ -16,8 +16,8 @@ const createNewTicket = () => ({
   ticket_name: '',
   ticket_type: 'free',
   price: 0,
-  quantity_total: 0,
-  quantity_available: 0,
+  quantity_total: 100,
+  quantity_available: 100,
   is_selling: false,
 });
 
@@ -123,11 +123,6 @@ const CreateEventForm = () => {
             setPosterErr('Image must be landscape.');
             return;
           }
-          if (Math.abs(aspectRatio - ratio16by9) > 0.01) {
-            setIsPosterErr(true);
-            setPosterErr('Image must be 16:9 ratio.');
-            return;
-          }
 
           setFormData(prev => ({ ...prev, event_poster: file }));
         };
@@ -220,164 +215,169 @@ const CreateEventForm = () => {
   };
 
   const handleSubmit = async (e, forceDraft = false, redirectTo = null) => {
-  if (e) e.preventDefault();
-  
+    if (e) e.preventDefault();
 
-  const form = new FormData();
-  setIsLoading(true);
 
-  // === Append files only if valid ===
-  if (formData.event_poster instanceof File) {
-    form.append("event_poster", formData.event_poster);
-  }
-  if (formData.seating_map instanceof File) {
-    form.append("seating_map", formData.seating_map);
-  }
+    const form = new FormData();
+    setIsLoading(true);
 
-  // === Filter and append ticket types ===
-  const validTicketTypes = formData.ticket_types.filter(ticket =>
-    ticket.ticket_name?.trim() &&
-    ticket.quantity_total > 0 &&
-    (ticket.ticket_type === "free" || (ticket.ticket_type === "paid" && ticket.price > 0))
-  );
+    // === Append files only if valid ===
+    if (formData.event_poster instanceof File) {
+      form.append("event_poster", formData.event_poster);
+    }
+    if (formData.seating_map instanceof File) {
+      form.append("seating_map", formData.seating_map);
+    }
 
-  validTicketTypes.forEach((ticket, index) => {
-    Object.entries(ticket).forEach(([key, value]) => {
-      form.append(`ticket_types[${index}][${key}]`, value);
+    // === Filter and append ticket types ===
+    const validTicketTypes = formData.ticket_types.filter(ticket =>
+      ticket.ticket_name?.trim() &&
+      ticket.quantity_total > 0 &&
+      (ticket.ticket_type === "free" || (ticket.ticket_type === "paid" && ticket.price > 0))
+    );
+
+    validTicketTypes.forEach((ticket, index) => {
+      Object.entries(ticket).forEach(([key, value]) => {
+        form.append(`ticket_types[${index}][${key}]`, value);
+      });
     });
-  });
 
-  // === Determine ticket condition ===
-  const hasPaidTickets = validTicketTypes.some(ticket => {
-    const price = parseFloat(ticket.price);
-    return !isNaN(price) && price > 0;
-  });
+    // === Determine ticket condition ===
+    const hasPaidTickets = validTicketTypes.some(ticket => {
+      const price = parseFloat(ticket.price);
+      return !isNaN(price) && price > 0;
+    });
 
-  // === Status Logic (3 conditions) ===
-  // === Status Logic (3 conditions) ===
-// === Status Logic ===
-let verificationStatus = localStorage.getItem("verification_status");
+    // === Status Logic (3 conditions) ===
+    // === Status Logic (3 conditions) ===
+    // === Status Logic ===
+    let verificationStatus = localStorage.getItem("verification_status");
 
-// 🔄 Always confirm from API if paid tickets are present
-if (hasPaidTickets) {
-  try {
-    const { data } = await auth.get("/me/");
-    verificationStatus = data.verification_status;
-    localStorage.setItem("verification_status", verificationStatus); // keep it synced
-  } catch (err) {
-    console.error("Failed to fetch organizer status:", err);
-  }
-}
+    // 🔄 Always confirm from API if paid tickets are present
+    if (hasPaidTickets) {
+      try {
+        const { data } = await auth.get("/me/");
+        verificationStatus = data.verification_status;
+        localStorage.setItem("verification_status", verificationStatus); // keep it synced
+      } catch (err) {
+        console.error("Failed to fetch organizer status:", err);
+      }
+    }
 
-if (forceDraft) {
-  form.append("status", "draft");
-} else if (!hasPaidTickets) {
-  form.append("status", "published");
-} else if (hasPaidTickets) {
-  if (verificationStatus === "verified") {
-    form.append("status", "pending");
-  } else {
-    form.append("status", "draft");   
-    setIsLoading(false);
-    setIsVerifiedConfirm(true);
-    return;
-  }
-}
-
+    if (forceDraft) {
+      form.append("status", "draft");
+    } else if (!hasPaidTickets) {
+      form.append("status", "published");
+    } else if (hasPaidTickets) {
+      if (verificationStatus === "verified") {
+        form.append("status", "pending");
+      } else {
+        form.append("status", "draft");
+        setIsLoading(false);
+        setIsVerifiedConfirm(true);
+        return;
+      }
+    }
 
 
-  // === Append reg form templates ===
-  const validRegFormTemplates = formData.reg_form_templates.filter(template =>
-    template.questions.some(q => q.question_label?.trim())
-  );
 
-  validRegFormTemplates.forEach((template, index) => {
-    Object.entries(template).forEach(([key, value]) => {
-      if (key === "questions") {
-        value
-          .filter(q => q.question_label?.trim() && q.question_type?.trim())
-          .forEach((question, qIndex) => {
-            Object.entries(question).forEach(([questionKey, questionValue]) => {
-              if (questionKey === "options") {
-                questionValue.forEach((option, oIndex) => {
-                  if (option.option_value?.trim()) {
-                    form.append(
-                      `reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][option_value]`,
-                      option.option_value
-                    );
-                  }
-                });
-              } else if (questionValue !== null && questionValue !== "") {
-                form.append(
-                  `reg_form_templates[${index}][questions][${qIndex}][${questionKey}]`,
-                  questionValue
-                );
-              }
+    // === Append reg form templates ===
+    const validRegFormTemplates = formData.reg_form_templates.filter(template =>
+      template.questions.some(q => q.question_label?.trim())
+    );
+
+    validRegFormTemplates.forEach((template, index) => {
+      Object.entries(template).forEach(([key, value]) => {
+        if (key === "questions") {
+          value
+            .filter(q => q.question_label?.trim() && q.question_type?.trim())
+            .forEach((question, qIndex) => {
+              Object.entries(question).forEach(([questionKey, questionValue]) => {
+                if (questionKey === "options") {
+                  questionValue.forEach((option, oIndex) => {
+                    if (option.option_value?.trim()) {
+                      form.append(
+                        `reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][option_value]`,
+                        option.option_value
+                      );
+                    }
+                  });
+                } else if (questionValue !== null && questionValue !== "") {
+                  form.append(
+                    `reg_form_templates[${index}][questions][${qIndex}][${questionKey}]`,
+                    questionValue
+                  );
+                }
+              });
             });
-          });
-      } else if (value) {
-        form.append(`reg_form_templates[${index}][${key}]`, value);
+        } else if (value) {
+          form.append(`reg_form_templates[${index}][${key}]`, value);
+        }
+      });
+    });
+
+    // === Append other fields ===
+    const fieldsToAppend = { ...formData };
+    delete fieldsToAppend.event_poster;
+    delete fieldsToAppend.seating_map;
+    delete fieldsToAppend.ticket_types;
+    delete fieldsToAppend.reg_form_templates;
+
+    // Automatically set parking for virtual events
+    if (fieldsToAppend.event_type === "virtual") {
+      fieldsToAppend.parking = "No Parking";
+    }
+
+    if (fieldsToAppend.duration_type === "single") {
+      fieldsToAppend.end_date = fieldsToAppend.start_date;
+    }
+
+    if (fieldsToAppend.start_date) {
+      fieldsToAppend.start_date = new Date(fieldsToAppend.start_date).toISOString().slice(0, 10);
+    }
+    if (fieldsToAppend.end_date) {
+      fieldsToAppend.end_date = new Date(fieldsToAppend.end_date).toISOString().slice(0, 10);
+    }
+
+    Object.entries(fieldsToAppend).forEach(([key, value]) => {
+      if (value !== null && value !== undefined && (typeof value !== "string" || value.trim() !== "")) {
+        form.append(key, typeof value === "boolean" ? value.toString() : value);
       }
     });
-  });
 
-  // === Append other fields ===
-  const fieldsToAppend = { ...formData };
-  delete fieldsToAppend.event_poster;
-  delete fieldsToAppend.seating_map;
-  delete fieldsToAppend.ticket_types;
-  delete fieldsToAppend.reg_form_templates;
 
-  if (fieldsToAppend.duration_type === "single") {
-    fieldsToAppend.end_date = fieldsToAppend.start_date;
-  }
+    try {
+      await api.post("/list-create/", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setIsLoading(false);
+      if (redirectTo) {
+        navigate(redirectTo);
+      } else {
+        navigate(`/org/${userCode}/my-event`);
+      }
+    } catch (err) {
+      console.error("Error creating event:", err.response?.data || err.message);
+      setIsLoading(false);
 
-  if (fieldsToAppend.start_date) {
-    fieldsToAppend.start_date = new Date(fieldsToAppend.start_date).toISOString().slice(0, 10);
-  }
-  if (fieldsToAppend.end_date) {
-    fieldsToAppend.end_date = new Date(fieldsToAppend.end_date).toISOString().slice(0, 10);
-  }
+      if (err.response?.data) {
+        // If backend sends detailed validation error
+        const errorData = err.response.data;
+        let errorMsg = "Error creating event\n";
 
-  Object.entries(fieldsToAppend).forEach(([key, value]) => {
-    if (value !== null && value !== undefined && (typeof value !== "string" || value.trim() !== "")) {
-      form.append(key, typeof value === "boolean" ? value.toString() : value);
+        Object.entries(errorData).forEach(([field, messages]) => {
+          errorMsg += `${messages.join(", ")}\n`;
+        });
+
+        // palitan ng magandang design instead of alert
+        alert(errorMsg);
+      } else {
+        // palitan ng magandang design instead of alert
+        // Generic fallback
+        alert("An unexpected error occurred. Please try again.");
+      }
     }
-  });
-  
-
-  try {
-    await api.post("/list-create/", form, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    setIsLoading(false);
-    if(redirectTo){
-      navigate(redirectTo);
-    } else {
-      navigate(`/org/${userCode}/my-event`);
-  }
-  } catch (err) {
-    console.error("Error creating event:", err.response?.data || err.message);
-    setIsLoading(false);
-
-    if (err.response?.data) {
-    // If backend sends detailed validation error
-    const errorData = err.response.data;
-    let errorMsg = "Error creating event\n";
-
-    Object.entries(errorData).forEach(([field, messages]) => {
-      errorMsg += `${messages.join(", ")}\n`;
-    });
-
-    // palitan ng magandang design instead of alert
-    alert(errorMsg);
-  } else {
-    // palitan ng magandang design instead of alert
-    // Generic fallback
-    alert("An unexpected error occurred. Please try again.");
-  }
-  }
-};
+  };
 
 
 
@@ -434,57 +434,57 @@ if (forceDraft) {
   };
 
   const [isVerifiedConfirm, setIsVerifiedConfirm] = useState(false);
-  
+
 
   return (
     <>
       {isLoading && (
         <Backdrop
-        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-        open={open}
-        onClick={() => setIsLoading(false)}
-      >
-        <CircularProgress color="inherit" />
-      </Backdrop>
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+          open={open}
+          onClick={() => setIsLoading(false)}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       )}
 
       {isVerifiedConfirm && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-    <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
-      <button
-        onClick={() => setIsVerifiedConfirm(false)}
-        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
-      >
-        &times;
-      </button>
-      <h2 className="text-lg font-semibold mb-2 text-gray-800">
-        Verification Required
-      </h2>
-      <p className="mb-6 text-base text-gray-600">
-        To publish paid events, your account needs to be verified.  
-        Your event will be saved as a <span className="font-semibold">draft</span> while you complete the verification process.
-      </p>
-      <div className="flex justify-center gap-4">
-        <button
-          type="button"
-          onClick={() => setIsVerifiedConfirm(false)}
-          className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50"
-        >
-          Cancel
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-    handleSubmit(null, true, `/org/${userCode}/verification-form`);
-  }}
-          className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
-        >
-          Start Verification
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
+            <button
+              onClick={() => setIsVerifiedConfirm(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
+            >
+              &times;
+            </button>
+            <h2 className="text-lg font-semibold mb-2 text-gray-800">
+              Verification Required
+            </h2>
+            <p className="mb-6 text-base text-gray-600">
+              To publish paid events, your account needs to be verified.
+              Your event will be saved as a <span className="font-semibold">draft</span> while you complete the verification process.
+            </p>
+            <div className="flex justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setIsVerifiedConfirm(false)}
+                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  handleSubmit(null, true, `/org/${userCode}/verification-form`);
+                }}
+                className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
+              >
+                Start Verification
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
 
       {/* Cancellation Confirmation Modal
@@ -567,7 +567,7 @@ if (forceDraft) {
               <CEStep2 formData={formData} setFormData={setFormData} handleLocationChange={handleLocationChange} handleEventChange={handleEventChange} handleCheckboxChange={handleCheckboxChange} handleTimeChange={handleTimeChange} />
             )}
             {step === 3 && (
-              <CEStep3 formData={formData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />
+              <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />
             )}
             {step === 4 && (
               <CEStep4 formData={formData} setFormData={setFormData} />

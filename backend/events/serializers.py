@@ -26,6 +26,17 @@ class RegFormTemplateSerializer(serializers.ModelSerializer):
         model = Reg_Form_Template
         fields = ['is_active', 'questions']
 
+    def validate_questions(self, value):
+        """
+        Allow multiple questions with the same question_type.
+        Skip any duplicate validation.
+        """
+        # Optionally: you can still enforce that each question has a label
+        for q in value:
+            if not q.get('question_label'):
+                raise serializers.ValidationError("Each question must have a label.")
+        return value
+
 # Serializer for Ticket_Type
 class TicketTypeSerializer(serializers.ModelSerializer):
     class Meta:

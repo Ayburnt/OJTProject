@@ -10,10 +10,10 @@ const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const [events, setEvents] = useState([]);
   const { userCode, isLoggedIn, userRole } = useAuth();
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [ eventCode, setEventCode ] = useState('');
 
-  useEffect(() => {
-    const fetchEventDetails = async () => {
-
+  const fetchEventDetails = async () => {
       try {
         const res = await api.get(`/list-create/`);
         setEvents(res.data);
@@ -23,8 +23,9 @@ const OrganizerEvent = () => {
       }
     }
 
+  useEffect(() => {    
     fetchEventDetails();
-  }, [])
+  }, []);
 
 
 
@@ -103,22 +104,25 @@ const OrganizerEvent = () => {
         <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
           {Array.isArray(events) && events.length > 0 ? (
             events.map((event, i) => (
-            <EventCard
-              key={i}
-              eventPoster={event.event_poster}
-              eventStatus={event.status}
-              eventName={event.title}
-              eventDate={event.start_date === event.end_date
-                ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
-                : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
-              eventLocation={event.venue_name}
-              eventAttendees={event.attendees}
-              ticketTypes={event.ticket_types}
-            />
-          ))
-          ):(
+              <EventCard
+                key={i}
+                eventPoster={event.event_poster}
+                eventStatus={event.status}
+                eventName={event.title}
+                eventDate={event.start_date === event.end_date
+                  ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
+                  : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
+                eventLocation={event.venue_name}
+                eventAttendees={event.attendees}
+                ticketTypes={event.ticket_types}
+                eventCode={event.event_code}
+                setEventCode={event.event_code}
+                fetchEventDetails={fetchEventDetails}
+              />
+            ))
+          ) : (
             <p className="text-gray-500">No events available.</p>
-          )}          
+          )}
         </div>
       </div>
 

@@ -64,18 +64,18 @@ function CEStep2({
             id="start_date"
             name="start_date"
             value={formData.start_date}
-            onChange={handleEventChange}            
+            onChange={handleEventChange}
           />
 
           {formData.duration_type === 'multiple' && (
             <CustomDateInput
-            label="End Date"
-            id="end_date"
-            name="end_date"
-            value={formData.end_date}
-            onChange={handleEventChange}
-          />
-          )}            
+              label="End Date"
+              id="end_date"
+              name="end_date"
+              value={formData.end_date}
+              onChange={handleEventChange}
+            />
+          )}
 
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
@@ -84,20 +84,26 @@ function CEStep2({
             <label className="block text-sm font-medium text-gray-700">Start Time</label>
             <div className="mt-1 flex items-center space-x-2">
               <input
-                type="text"
+                type="number"
                 name="startHour"
                 value={formData.startHour}
                 onChange={(e) => handleTimeChange("start", "hour", e.target.value)}
                 placeholder="00"
+                maxLength={2}
+                min={1}
+                max={12}
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <span>:</span>
               <input
-                type="text"
+                type="number"
                 name="startMinute"
                 value={formData.startMinute}
                 onChange={(e) => handleTimeChange("start", "minute", e.target.value)}
                 placeholder="00"
+                maxLength={2}
+                min={0}
+                max={59}
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <button
@@ -115,20 +121,26 @@ function CEStep2({
             <label className="block text-sm font-medium text-gray-700">End Time</label>
             <div className="mt-1 flex items-center space-x-2">
               <input
-                type="text"
+                type="number"
                 name="endHour"
                 value={formData.endHour}
                 onChange={(e) => handleTimeChange("end", "hour", e.target.value)}
                 placeholder="00"
+                maxLength={2}
+                min={1}
+                max={12}
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <span>:</span>
               <input
-                type="text"
+                type="number"
                 name="endMinute"
                 value={formData.endMinute}
                 onChange={(e) => handleTimeChange("end", "minute", e.target.value)}
                 placeholder="00"
+                maxLength={2}
+                min={0}
+                max={59}
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <button
@@ -142,7 +154,7 @@ function CEStep2({
           </div>
 
         </div>
-        
+
         <div className="mt-4 py-2 rounded-xl">
 
           <LocationPicker
@@ -159,59 +171,59 @@ function CEStep2({
       <FormSection title="ADD HIGHLIGHTS ABOUT YOUR EVENT">
         <label className="block text-sm font-medium text-gray-700 mb-2">Is there an age restriction?</label>
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            {/* all */}
-            <input
-              type="radio"
-              id="age_restriction_all"
-              name="age_restriction"
-              value="all"
-              checked={formData.age_restriction === "all"}
-              onChange={handleEventChange}
-              className="hidden peer/all"
-            />
-            <label
-              htmlFor="age_restriction_all"
-              className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/all:bg-teal-500 peer-checked/all:border-teal-500 peer-checked/all:text-white"
-            >
-              <span className="text-sm font-medium">All ages allowed</span>
-            </label>
+          {/* all */}
+          <input
+            type="radio"
+            id="age_restriction_all"
+            name="age_restriction"
+            value="all"
+            checked={formData.age_restriction === "all"}
+            onChange={handleEventChange}
+            className="hidden peer/all"
+          />
+          <label
+            htmlFor="age_restriction_all"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/all:bg-teal-500 peer-checked/all:border-teal-500 peer-checked/all:text-white"
+          >
+            <span className="text-sm font-medium">All ages allowed</span>
+          </label>
 
-            {/* restricted */}
-            <input
-              type="radio"
-              id="age_restriction_restricted"
-              name="age_restriction"
-              value="restricted"
-              checked={formData.age_restriction === "restricted"}
-              onChange={handleEventChange}
-              className="hidden peer/restricted"
-            />
-            <label
-              htmlFor="age_restriction_restricted"
-              className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/restricted:bg-teal-500 peer-checked/restricted:border-teal-500 peer-checked/restricted:text-white"
-            >
-              <span className="text-sm font-medium">There's an age restriction</span>
-            </label>
+          {/* restricted */}
+          <input
+            type="radio"
+            id="age_restriction_restricted"
+            name="age_restriction"
+            value="restricted"
+            checked={formData.age_restriction === "restricted"}
+            onChange={handleEventChange}
+            className="hidden peer/restricted"
+          />
+          <label
+            htmlFor="age_restriction_restricted"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/restricted:bg-teal-500 peer-checked/restricted:border-teal-500 peer-checked/restricted:text-white"
+          >
+            <span className="text-sm font-medium">There's an age restriction</span>
+          </label>
 
-            
-            {/* guardian needed */}
-            <input
-              type="radio"
-              id="age_restriction_guardian_needed"
-              name="age_restriction"
-              value="guardian_needed"
-              checked={formData.age_restriction === "guardian_needed"}
-              onChange={handleEventChange}
-              className="hidden peer/guardian_needed"
-            />
-            <label
-              htmlFor="age_restriction_guardian_needed"
-              className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/guardian_needed:bg-teal-500 peer-checked/guardian_needed:border-teal-500 peer-checked/guardian_needed:text-white"
-            >
-              <span className="text-sm font-medium">Parent or guardian needed</span>
-            </label>
-          </div>
-                  
+
+          {/* guardian needed */}
+          <input
+            type="radio"
+            id="age_restriction_guardian_needed"
+            name="age_restriction"
+            value="guardian_needed"
+            checked={formData.age_restriction === "guardian_needed"}
+            onChange={handleEventChange}
+            className="hidden peer/guardian_needed"
+          />
+          <label
+            htmlFor="age_restriction_guardian_needed"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/guardian_needed:bg-teal-500 peer-checked/guardian_needed:border-teal-500 peer-checked/guardian_needed:text-white"
+          >
+            <span className="text-sm font-medium">Parent or guardian needed</span>
+          </label>
+        </div>
+
         {formData.age_restriction === "restricted" && (
           <>
             <label className="block text-sm font-medium text-gray-700 mb-2">What age is allowed</label>
@@ -222,40 +234,44 @@ function CEStep2({
             </div>
           </>
         )}
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-  Parking Options
-</label>
-<div className="flex flex-col sm:flex-row gap-4 mb-4">
-  {["Free Parking", "Paid Parking", "No Parking"].map((option) => (
-    <label key={option} className="inline-flex items-center space-x-2">
-      <input
-        type="checkbox"
-        name="parking"
-        value={option}
-        checked={formData.parking.split(", ").includes(option)}
-        onChange={(e) => {
-          const { value, checked } = e.target;
-          let selected = formData.parking
-            ? formData.parking.split(", ")
-            : [];
+        {formData.event_type !== 'virtual' && (
+          <>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+          Parking Options
+        </label>
+        <div className="flex flex-col sm:flex-row gap-4 mb-4">
+          {["Free Parking", "Paid Parking", "No Parking"].map((option) => (
+            <label key={option} className="inline-flex items-center space-x-2">
+              <input
+                type="checkbox"
+                name="parking"
+                value={option}
+                checked={formData.parking.split(", ").includes(option)}
+                onChange={(e) => {
+                  const { value, checked } = e.target;
+                  let selected = formData.parking
+                    ? formData.parking.split(", ")
+                    : [];
 
-          if (checked) {
-            selected.push(value);
-          } else {
-            selected = selected.filter((p) => p !== value);
-          }
+                  if (checked) {
+                    selected.push(value);
+                  } else {
+                    selected = selected.filter((p) => p !== value);
+                  }
 
-          setFormData((prev) => ({
-            ...prev,
-            parking: selected.join(", "), // store as "Free Parking, Paid Parking"
-          }));
-        }}
-        className="h-4 w-4 text-blue-600 border-gray-300 rounded"
-      />
-      <span>{option}</span>
-    </label>
-  ))}
-</div>
+                  setFormData((prev) => ({
+                    ...prev,
+                    parking: selected.join(", "), // store as "Free Parking, Paid Parking"
+                  }));
+                }}
+                className="h-4 w-4 text-blue-600 border-gray-300 rounded"
+              />
+              <span>{option}</span>
+            </label>
+          ))}
+        </div>
+          </>
+        )}        
 
 
       </FormSection>

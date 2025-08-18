@@ -6,7 +6,7 @@ export default function CreateEventRegForm({ formData, setFormData }) {
   // Create a new empty question object
   const createNewQuestion = () => ({
     question_label: "",
-    question_type: "Short answer",
+    question_type: "short",
     is_required: false,
     options: []
   });

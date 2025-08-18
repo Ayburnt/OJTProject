@@ -7,7 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import Event
+from .models import Event, Ticket_Type, Reg_Form_Template, Reg_Form_Question, Question_Option
 from .serializers import EventSerializer
 from .permissions import IsOwnerOrReadOnly # Assuming you've created this file
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -30,7 +30,7 @@ class EventListCreateAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        events = Event.objects.all()
+        events = Event.objects.filter(created_by=request.user)
         serializer = EventSerializer(events, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -89,7 +89,9 @@ class EventRetrieveUpdateDestroyAPIView(APIView):
         event = get_object_or_404(Event, event_code=event_code)
         self.check_object_permissions(request, event)
         
-        event.delete()
+        with transaction.atomic():
+            event.delete()
+        
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 class EventDetailView(APIView):

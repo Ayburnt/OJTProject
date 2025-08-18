@@ -1,35 +1,92 @@
+import { useState } from "react";
+
 function CEStep3({
-    formData,
-    handleTicketChange,
-    removeTicketType,
-    addTicketType,
-    isPosterErr,
-    handleEventChange,
-    isSeatingMapErr,
-    seatingMapErr,
-    handleAddTicket,
-    handleRemoveTicket
-}){
-    return(
-         <FormSection title="TICKETING FOR EVENT">
-      <p className="text-sm text-gray-500 mb-4">Seating Map Visual</p>
+  formData,
+  handleTicketChange,
+  removeTicketType,
+  addTicketType,
+  setFormData,
+  handleEventChange,
+  isSeatingMapErr,
+  seatingMapErr,
+  handleAddTicket,
+  handleRemoveTicket
+}) {
+  const [hasSeatingMap, setHasSeatingMap] = useState(false);
+
+  const handleSeatingMapChange = (e) => {
+  const isChecked = e.target.value === 'true';
+  setHasSeatingMap(isChecked);
+
+  // If "No" is selected, clear the seating map from formData
+  if (!isChecked) {
+    setFormData((prevData) => ({
+      ...prevData,
+      seating_map: null,
+    }));
+  }
+};
+
+  return (
+    <FormSection title="TICKETING FOR EVENT">
+      <div className="mb-5">
+        <label htmlFor="" className="font-outfit text-gray-700">Do you have a seating map?</label>
+        <div className="grid grid-cols-2 gap-3">
+          {/* Yes */}
+          <input
+            type="radio"
+            id="has_map_yes"
+            name="hasSeatingMap"
+            value={true}
+            checked={hasSeatingMap === true}
+            onChange={handleSeatingMapChange}
+            className="hidden peer/yes"
+          />
+          <label
+            htmlFor="has_map_yes"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/yes:bg-teal-500 peer-checked/yes:border-teal-500 peer-checked/yes:text-white"
+          >
+            <span className="text-sm font-medium">Yes</span>
+          </label>
+
+          {/* No */}
+          <input
+            type="radio"
+            id="has_map_no"
+            name="hasSeatingMap"
+            value={false}
+            checked={hasSeatingMap === false}
+            onChange={handleSeatingMapChange}
+            className="hidden peer/no"
+          />
+          <label
+            htmlFor="has_map_no"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/no:bg-teal-500 peer-checked/no:border-teal-500 peer-checked/no:text-white"
+          >
+            <span className="text-sm font-medium">No</span>
+          </label>
+        </div>
+      </div>
+
+      {hasSeatingMap && (
+        <>
+        <p className="text-sm text-gray-500 mb-4">Seating Map Visual</p>
       <div
-        className={`flex justify-center items-center aspect-16/9 border-2 ${
-          isSeatingMapErr ? 'border-red-500' : 'border-gray-300'
-        } border-dashed rounded-xl relative overflow-hidden`}
+        className={`flex justify-center items-center aspect-16/9 border-2 ${isSeatingMapErr ? 'border-red-500' : 'border-gray-300'
+          } border-dashed rounded-xl relative overflow-hidden`}
       >
         {formData.seating_map ? (
-  <img
-    src={typeof formData.seating_map === 'object' && formData.seating_map instanceof File
-      ? URL.createObjectURL(formData.seating_map)
-      : formData.seating_map
-    }
-    alt="Seating Map Preview"
-    className="object-cover w-full h-full"
-  />
-) : (
-  <span className="text-gray-500">Upload an image here</span>
-)}
+          <img
+            src={typeof formData.seating_map === 'object' && formData.seating_map instanceof File
+              ? URL.createObjectURL(formData.seating_map)
+              : formData.seating_map
+            }
+            alt="Seating Map Preview"
+            className="object-cover w-full h-full"
+          />
+        ) : (
+          <span className="text-gray-500">Upload an image here</span>
+        )}
 
 
         <input
@@ -48,6 +105,10 @@ function CEStep3({
           Upload
         </button>
       </div>
+      </>
+      )}
+
+      
 
       {formData.ticket_types.map((ticket, index) => (
         <div key={index} className="space-y-4 mb-6 p-4 border rounded-xl border-gray-200">
@@ -125,7 +186,7 @@ function CEStep3({
         </button>
       </div>
     </FormSection>
-    );
+  );
 }
 
 export default CEStep3;
