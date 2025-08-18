@@ -1,5 +1,5 @@
 // hooks/useAuth.js
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ACCESS_TOKEN } from '../api.js';
 
@@ -11,6 +11,7 @@ const USER_FIRST_NAME = 'userFirstName';
 const USER_LAST_NAME = 'userLastName';
 const USER_PROFILE = 'userProfile';
 const IS_LOGGED_IN = 'isLoggedIn';
+const IS_VERIFIED = 'verification_status';
 
 export const useAuth = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,6 +21,7 @@ export const useAuth = () => {
   const [userFirstName, setUserFirstName] = useState('');
   const [userLastName, setUserLastName] = useState('');
   const [userProfile, setUserProfile] = useState('');
+  const [verificationStatus, setVerificationStatus] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,6 +33,7 @@ export const useAuth = () => {
     const firstName = localStorage.getItem(USER_FIRST_NAME);
     const lastName = localStorage.getItem(USER_LAST_NAME);
     const profile = localStorage.getItem(USER_PROFILE);
+    const verificationStatus = localStorage.getItem(IS_VERIFIED);
 
     if (accessToken && refreshToken && role && email) {
       setIsLoggedIn(true);
@@ -40,6 +43,7 @@ export const useAuth = () => {
       setUserFirstName(firstName || '');
       setUserProfile(profile || '');
       setUserLastName(lastName || '');
+      setVerificationStatus(verificationStatus || '');
     } else {
       clearAuthData();
     }
@@ -55,6 +59,7 @@ export const useAuth = () => {
     localStorage.setItem(USER_LAST_NAME, user.last_name || '');
     localStorage.setItem(USER_PROFILE, user.profile_picture || '');
     localStorage.setItem(IS_LOGGED_IN, 'true');
+    localStorage.setItem(IS_VERIFIED, user.verification_status || '');
 
     setIsLoggedIn(true);
     setUserRole(user.role);
@@ -63,6 +68,7 @@ export const useAuth = () => {
     setUserFirstName(user.first_name || '');
     setUserLastName(user.last_name || '');
     setUserProfile(user.profile_picture || '');
+    setVerificationStatus(user.verification_status || '');
   };
 
   const clearAuthData = () => {
@@ -75,6 +81,7 @@ export const useAuth = () => {
     setUserFirstName('');
     setUserLastName('');
     setUserProfile('');
+    setVerificationStatus('');
   };
 
   const login = (tokens, user) => {
@@ -100,8 +107,9 @@ export const useAuth = () => {
     userEmail,
     userCode,
     userFirstName,
-    userLastName,
+    userLastName,    
     userProfile,
+    verificationStatus,
     login,
     logout
   };

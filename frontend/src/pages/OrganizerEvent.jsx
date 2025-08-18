@@ -16,7 +16,6 @@ const OrganizerEvent = () => {
 
       try {
         const res = await api.get(`/list-create/`);
-        console.log(res.data);
         setEvents(res.data);
       } catch (err) {
         console.error("Error fetching events:", err);

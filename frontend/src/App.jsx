@@ -96,7 +96,8 @@ function App() {
           <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
 
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}
-          <Route path="/verification-form" element={<VerificationForm />} />
+          <Route path='/org/:userCode/verification-form' element={<PrivateRoute requiredRole={'organizer'}><VerificationForm /></PrivateRoute>} />
+          {/* <Route path="/verification-form" element={<VerificationForm />} /> */}
           <Route path="/attendees-dashboard" element={<AttendeesDashboard />} /> 
           <Route path='/admin-dashboard' element={<PrivateRoute requiredRole={'admin'}><AdminDashboard /></PrivateRoute>} /> 
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 

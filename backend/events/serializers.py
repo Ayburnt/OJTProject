@@ -39,6 +39,7 @@ class userserializer(serializers.ModelSerializer):
         model= CustomUser
         fields = ["first_name", "last_name", "email"] 
 
+
 class EventSerializer(serializers.ModelSerializer):
     created_by = userserializer(read_only=True)
     ticket_types = TicketTypeSerializer(many=True)
@@ -75,7 +76,16 @@ class EventSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(obj.event_qr_image.url)
         return None
     
-    # ...existing code...
+    def validate(self, data):
+        if data.get("status") != "draft":
+            # enforce required fields only if not draft
+            required_fields = ["ticket_types", "event_code", "event_type"]
+            for field in required_fields:
+                if not data.get(field):
+                    raise serializers.ValidationError({field: "This field is required."})
+        return data
+
+    
     def create(self, validated_data):
         print("validated_data before file assignment:", validated_data)
         # Extract nested data
@@ -102,7 +112,7 @@ class EventSerializer(serializers.ModelSerializer):
             if request.FILES.get('event_poster'):
                 validated_data['event_poster'] = request.FILES['event_poster']
             if request.FILES.get('seating_map'):
-                validated_data['seating_map'] = request.FILES['seating_map']   
+                validated_data['seating_map'] = request.FILES['seating_map']
         print("validated_data after file assignment:", validated_data)
 
         # --- Status logic ---
@@ -110,9 +120,23 @@ class EventSerializer(serializers.ModelSerializer):
             (str(ticket.get('price', 0)) == '0' or str(ticket.get('price', 0)) == '0.00')
             for ticket in ticket_types_data
         )
+
+        # --- Status logic ---
+        all_free = all(
+            (str(ticket.get('price', 0)) == '0' or str(ticket.get('price', 0)) == '0.00')
+            for ticket in ticket_types_data
+        )
+
+        # If ALL tickets are free → publish immediately
         if all_free:
             validated_data['status'] = 'published'
-        # else: status remains default ('pending')
+        # If there are paid tickets → keep as draft until verification
+        elif ticket_types_data:  # has tickets and at least one is paid
+            validated_data['status'] = 'draft'
+        else:
+            # No tickets provided → fallback to draft
+            validated_data['status'] = 'draft'
+
 
         # Use a database transaction for atomicity
         with transaction.atomic():
@@ -127,7 +151,7 @@ class EventSerializer(serializers.ModelSerializer):
                 questions_data = template_data.pop('questions', [])
                 reg_form_template = Reg_Form_Template.objects.create(
                     event=event,
-                    created_by=request.user,  # <-- Add this line
+                    created_by=request.user,
                     **template_data
                 )
 
@@ -135,13 +159,12 @@ class EventSerializer(serializers.ModelSerializer):
                 for question_data in questions_data:
                     options_data = question_data.pop('options', [])
                     reg_form_question = Reg_Form_Question.objects.create(
-                        regForm_template=reg_form_template,  # <-- Make sure this matches your model field name
+                        regForm_template=reg_form_template,
                         **question_data
                     )
-
-                    # Create related Question_Option objects
                     for option_data in options_data:
                         Question_Option.objects.create(question=reg_form_question, **option_data)
 
         return event
+
     # ...existing code...

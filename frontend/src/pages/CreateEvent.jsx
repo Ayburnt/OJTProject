@@ -7,6 +7,8 @@ import CEStep4 from './CreateEventRegForm.jsx';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../hooks/useAuth.js';
 import { IoIosArrowBack } from "react-icons/io";
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // A helper function to create a new, empty ticket object
 const createNewTicket = () => ({
@@ -67,6 +69,7 @@ const CreateEventForm = () => {
 
   const [posterErr, setPosterErr] = useState('');
   const [isPosterErr, setIsPosterErr] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Separate state for seating map
   const [isSeatingMapErr, setIsSeatingMapErr] = useState(false);
@@ -215,147 +218,156 @@ const CreateEventForm = () => {
     setStep(prevStep => Math.max(prevStep - 1, 1));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e, forceDraft = false, redirectTo = null) => {
+  if (e) e.preventDefault();
+  
 
-    const form = new FormData();
+  const form = new FormData();
+  setIsLoading(true);
 
-    // Append files only if they are valid File objects
-    if (formData.event_poster instanceof File) {      
-      form.append("event_poster", formData.event_poster);
-    }
-    if (formData.seating_map instanceof File) {
-      form.append("seating_map", formData.seating_map);
-    }
+  // === Append files only if valid ===
+  if (formData.event_poster instanceof File) {
+    form.append("event_poster", formData.event_poster);
+  }
+  if (formData.seating_map instanceof File) {
+    form.append("seating_map", formData.seating_map);
+  }
 
-    // Filter out and append valid ticket types
-    const validTicketTypes = formData.ticket_types.filter(ticket =>
-      ticket.ticket_name && ticket.ticket_name.trim() !== '' &&
-      ticket.quantity_total > 0 &&
-      (ticket.ticket_type === 'free' || (ticket.ticket_type === 'paid' && ticket.price > 0))
-    );
+  // === Filter and append ticket types ===
+  const validTicketTypes = formData.ticket_types.filter(ticket =>
+    ticket.ticket_name?.trim() &&
+    ticket.quantity_total > 0 &&
+    (ticket.ticket_type === "free" || (ticket.ticket_type === "paid" && ticket.price > 0))
+  );
 
-    validTicketTypes.forEach((ticket, index) => {
-      Object.entries(ticket).forEach(([key, value]) => {
-        form.append(`ticket_types[${index}][${key}]`, value);
-      });
+  validTicketTypes.forEach((ticket, index) => {
+    Object.entries(ticket).forEach(([key, value]) => {
+      form.append(`ticket_types[${index}][${key}]`, value);
     });
+  });
 
-    // Add logic for status field before sending
-    const hasPaidTickets = validTicketTypes.some(ticket =>
-      ticket.price !== '0' || ticket.price > 0 || ticket.price !== '0.00'
-    );
-    if (!hasPaidTickets) {
-      form.append('status', 'published');
-    }
+  // === Determine ticket condition ===
+  const hasPaidTickets = validTicketTypes.some(ticket => {
+    const price = parseFloat(ticket.price);
+    return !isNaN(price) && price > 0;
+  });
 
-    // Filter out and append valid reg form templates
-    const validRegFormTemplates = formData.reg_form_templates.filter(template =>
-      template.questions.some(q => q.question_label && q.question_label.trim() !== '') // Keep templates with at least one question
-    );
+  // === Status Logic (3 conditions) ===
+  // === Status Logic (3 conditions) ===
+const verificationStatus = localStorage.getItem("verification_status");
 
-    validRegFormTemplates.forEach((template, index) => {
-      Object.entries(template).forEach(([key, value]) => {
-        if (key === 'questions') {
-          // Only include questions with a non-empty question_label and question_type
-          value
-            .filter(
-              q =>
-                q.question_label &&
-                q.question_label.trim() !== '' &&
-                q.question_type &&
-                q.question_type.trim() !== ''
-            )
-            .forEach((question, qIndex) => {
-              Object.entries(question).forEach(([questionKey, questionValue]) => {
-                if (questionKey === 'options') {
-                  questionValue.forEach((option, oIndex) => {
-                    if (
-                      option.option_value !== null &&
-                      option.option_value !== '' &&
-                      option.option_value.trim() !== ''
-                    ) {
-                      form.append(
-                        `reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][option_value]`,
-                        option.option_value
-                      );
-                    }
-                  });
-                } else {
-                  if (
-                    questionValue !== null &&
-                    questionValue !== '' &&
-                    questionValue !== undefined
-                  ) {
+if (forceDraft) {
+  // Case 1 → User clicked "Start Verification" inside modal    
+  form.append("status", "draft");
+} else if (!hasPaidTickets) {
+  // Case 2 → Free event
+  form.append("status", "published");
+} else if (hasPaidTickets) {
+  if (verificationStatus === "accepted") {
+    // Case 3 → Paid event & verified
+    form.append("status", "pending");
+  } else {
+    // Case 4 → Paid event & NOT verified
+    form.append("status", "draft");   // <-- ✅ ensure draft is saved
+    setIsLoading(false);
+    setIsVerifiedConfirm(true);       // show modal after draft save
+    return;
+  }
+}
+
+
+  // === Append reg form templates ===
+  const validRegFormTemplates = formData.reg_form_templates.filter(template =>
+    template.questions.some(q => q.question_label?.trim())
+  );
+
+  validRegFormTemplates.forEach((template, index) => {
+    Object.entries(template).forEach(([key, value]) => {
+      if (key === "questions") {
+        value
+          .filter(q => q.question_label?.trim() && q.question_type?.trim())
+          .forEach((question, qIndex) => {
+            Object.entries(question).forEach(([questionKey, questionValue]) => {
+              if (questionKey === "options") {
+                questionValue.forEach((option, oIndex) => {
+                  if (option.option_value?.trim()) {
                     form.append(
-                      `reg_form_templates[${index}][questions][${qIndex}][${questionKey}]`,
-                      questionValue
+                      `reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][option_value]`,
+                      option.option_value
                     );
                   }
-                }
-              });
+                });
+              } else if (questionValue !== null && questionValue !== "") {
+                form.append(
+                  `reg_form_templates[${index}][questions][${qIndex}][${questionKey}]`,
+                  questionValue
+                );
+              }
             });
-        } else {
-          if (value !== null && value !== '' && value !== undefined) {
-            form.append(`reg_form_templates[${index}][${key}]`, value);
-          }
-        }
-      });
-    });
-
-    // Append all remaining simple fields
-    const fieldsToAppend = { ...formData };
-    delete fieldsToAppend.event_poster;
-    delete fieldsToAppend.seating_map;
-    delete fieldsToAppend.ticket_types;
-    delete fieldsToAppend.reg_form_templates;
-
-    // Logic to set end_date equal to start_date for 'single' duration type
-    if (fieldsToAppend.duration_type === 'single') {
-      fieldsToAppend.end_date = fieldsToAppend.start_date;
-    }
-
-    // Correctly format dates before appending to FormData
-    if (fieldsToAppend.start_date) {
-      fieldsToAppend.start_date = new Date(fieldsToAppend.start_date).toISOString().slice(0, 10);
-    }
-    if (fieldsToAppend.end_date) {
-      fieldsToAppend.end_date = new Date(fieldsToAppend.end_date).toISOString().slice(0, 10);
-    }
-
-    Object.entries(fieldsToAppend).forEach(([key, value]) => {
-      if (value !== null && value !== undefined && (typeof value !== 'string' || value.trim() !== '')) {
-        form.append(key, typeof value === 'boolean' ? value.toString() : value);
+          });
+      } else if (value) {
+        form.append(`reg_form_templates[${index}][${key}]`, value);
       }
     });
+  });
 
-    // Debug: Log all FormData entries
-    console.log('=== Final FormData entries ===');
-    for (let [key, value] of form.entries()) {
-      if (value instanceof File) {
-        console.log(`${key}: File(${value.name}, ${value.size} bytes, ${value.type})`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
+  // === Append other fields ===
+  const fieldsToAppend = { ...formData };
+  delete fieldsToAppend.event_poster;
+  delete fieldsToAppend.seating_map;
+  delete fieldsToAppend.ticket_types;
+  delete fieldsToAppend.reg_form_templates;
+
+  if (fieldsToAppend.duration_type === "single") {
+    fieldsToAppend.end_date = fieldsToAppend.start_date;
+  }
+
+  if (fieldsToAppend.start_date) {
+    fieldsToAppend.start_date = new Date(fieldsToAppend.start_date).toISOString().slice(0, 10);
+  }
+  if (fieldsToAppend.end_date) {
+    fieldsToAppend.end_date = new Date(fieldsToAppend.end_date).toISOString().slice(0, 10);
+  }
+
+  Object.entries(fieldsToAppend).forEach(([key, value]) => {
+    if (value !== null && value !== undefined && (typeof value !== "string" || value.trim() !== "")) {
+      form.append(key, typeof value === "boolean" ? value.toString() : value);
     }
+  });
+  
 
-    try {
-      const response = await api.post('/list-create/', form, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+  try {
+    await api.post("/list-create/", form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setIsLoading(false);
+    if(redirectTo){
+      navigate(redirectTo);
+    } else {
       navigate(`/org/${userCode}/my-event`);
-      console.log('Event created:');
-    } catch (err) {
-      console.error('Error creating event:', err.response?.data || err.message);
-      console.log('Full error response:', err.response);
-    }
-  };
+  }
+  } catch (err) {
+    console.error("Error creating event:", err.response?.data || err.message);
+    setIsLoading(false);
 
+    if (err.response?.data) {
+    // If backend sends detailed validation error
+    const errorData = err.response.data;
+    let errorMsg = "Error creating event\n";
 
+    Object.entries(errorData).forEach(([field, messages]) => {
+      errorMsg += `${messages.join(", ")}\n`;
+    });
 
-
+    // palitan ng magandang design instead of alert
+    alert(errorMsg);
+  } else {
+    // palitan ng magandang design instead of alert
+    // Generic fallback
+    alert("An unexpected error occurred. Please try again.");
+  }
+  }
+};
 
 
 
@@ -411,10 +423,61 @@ const CreateEventForm = () => {
     });
   };
 
+  const [isVerifiedConfirm, setIsVerifiedConfirm] = useState(false);
+  
 
   return (
     <>
-      {/* Cancellation Confirmation Modal */}
+      {isLoading && (
+        <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={open}
+        onClick={() => setIsLoading(false)}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      )}
+
+      {isVerifiedConfirm && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+    <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
+      <button
+        onClick={() => setIsVerifiedConfirm(false)}
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
+      >
+        &times;
+      </button>
+      <h2 className="text-lg font-semibold mb-2 text-gray-800">
+        Verification Required
+      </h2>
+      <p className="mb-6 text-base text-gray-600">
+        To publish paid events, your account needs to be verified.  
+        Your event will be saved as a <span className="font-semibold">draft</span> while you complete the verification process.
+      </p>
+      <div className="flex justify-center gap-4">
+        <button
+          type="button"
+          onClick={() => setIsVerifiedConfirm(false)}
+          className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+    handleSubmit(null, true, `/org/${userCode}/verification-form`);
+  }}
+          className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
+        >
+          Start Verification
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+      {/* Cancellation Confirmation Modal
       {isCancelConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
@@ -441,7 +504,7 @@ const CreateEventForm = () => {
               </button>
               <button
                 type="button"
-                // Add a save draft functionality here
+                onClick={handleSaveDraft}
                 className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
               >
                 Save Draft
@@ -449,7 +512,7 @@ const CreateEventForm = () => {
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* Main Container */}
       <div className="bg-alice-blue min-h-screen flex items-center justify-center font-outfit p-4 sm:p-8 text-gray-900 antialiased">

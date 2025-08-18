@@ -188,6 +188,7 @@ class UserLoginView(APIView):
                     'company_website': user.company_website,
                     'needs_profile_completion': needs_profile_completion, # Flag for frontend
                     'user_code': user.user_code,
+                    'verification_status': user.verification_status,
                 },
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
@@ -286,7 +287,8 @@ class GoogleAuthRegisterView(APIView):
                     'company_name': user.company_name,
                     'company_website': user.company_website,
                     'needs_profile_completion': needs_profile_completion, # Flag for frontend
-                    'user_code': user.user_code
+                    'user_code': user.user_code,
+                    'verification_status': user.verification_status,
                 },
                 'tokens': tokens,
             }, status=status_code)
@@ -351,7 +353,8 @@ class GoogleAuthLoginView(APIView):
                     'company_name': user.company_name,
                     'company_website': user.company_website,
                     'user_code': user.user_code,
-                    'needs_profile_completion': needs_profile_completion, # Flag for frontend                    
+                    'needs_profile_completion': needs_profile_completion, # Flag for frontend  
+                    'verification_status': user.verification_status,                  
                 },
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
@@ -407,6 +410,7 @@ class ProfileCompletionView(APIView):
                     'company_website': user.company_website,
                     'needs_profile_completion': False, # Profile is now complete
                     'user_code': user.user_code,
+                    'verification_status': user.verification_status,
                 }
             }, status=status.HTTP_200_OK)
 

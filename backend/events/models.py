@@ -54,11 +54,11 @@ class Event(models.Model):
     )
     title = models.CharField(max_length=50)
     description = models.TextField(blank=True, null=True)
-    event_code= models.CharField(unique=True)
+    event_code= models.CharField(unique=True, blank=True, null=True)
     audience = models.CharField(max_length=20, choices=AUDIENCE_CHOICES, default='public')
     private_code = models.CharField(max_length=20, null=True, blank=True)
-    category = models.CharField(max_length=100)
-    event_type = models.CharField(max_length=50)
+    category = models.CharField(max_length=100, null=True, blank=True)
+    event_type = models.CharField(max_length=50, blank=True, null=True)
     meeting_platform = models.CharField(max_length=100, blank=True, null=True)
     meeting_link = models.URLField(max_length=500, blank=True, null=True)
     event_poster = models.ImageField(upload_to=unique_event_poster_path, blank=True, null=True)
@@ -138,13 +138,13 @@ class Ticket_Type(models.Model):
         to_field='event_code',
     )
 
-    ticket_name = models.CharField(max_length=100)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    quantity_total = models.IntegerField()
-    quantity_available = models.IntegerField()
-    is_selling = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    ticket_name = models.CharField(max_length=100, null=True, blank=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
+    quantity_total = models.IntegerField(null=True, blank=True)
+    quantity_available = models.IntegerField(null=True, blank=True)
+    is_selling = models.BooleanField(default=False, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
 
     class Meta:
@@ -171,9 +171,9 @@ class Reg_Form_Template(models.Model):
         related_name='event_template',
         to_field='user_code'
     )
-    is_active = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=False, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Reg Form Template'
@@ -197,11 +197,11 @@ class Reg_Form_Question(models.Model):
         on_delete=models.CASCADE,
         related_name='questions',
     )
-    question_label = models.CharField(max_length=200)
-    question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='short')
-    is_required = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    question_label = models.CharField(max_length=200, null=True, blank=True)
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default='short', null=True, blank=True)
+    is_required = models.BooleanField(default=False, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         verbose_name = 'Reg Form Question'

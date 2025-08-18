@@ -18,7 +18,7 @@ class EventPublicView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        events = Event.objects.all()
+        events = Event.objects.filter(status='published')
         serializer = EventSerializer(events, many=True, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 

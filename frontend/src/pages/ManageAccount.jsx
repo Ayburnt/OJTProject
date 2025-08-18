@@ -3,6 +3,7 @@ import { FiUpload } from "react-icons/fi";
 import OrganizerNav from '../components/OrganizerNav';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import useAuth from '../hooks/useAuth';
 
 // Assuming MessageModal is a component you've defined elsewhere
 const MessageModal = ({ message, onClose }) => {
@@ -26,6 +27,7 @@ const ManageAccount = () => {
   const [userData, setUserData] = useState(null); // Initialize as null for loading state
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { userCode } = useAuth();
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -41,10 +43,8 @@ const ManageAccount = () => {
       setLoading(true);
       // Make sure the API call is authenticated
       const res = await api.get(`/me/`);
-      console.log(res.data);
       setUserData(res.data);
       setError(null);
-      console.log(res.data);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
       setError('Failed to load profile. Please try again.');
@@ -158,7 +158,7 @@ const ManageAccount = () => {
                   Verified
                 </button>
               ) : (
-                <Link to="/verification-form">
+                <Link to={`/org/${userCode}/verification-form`}>
                   <button
                     className="w-full sm:w-auto px-9 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                   >
