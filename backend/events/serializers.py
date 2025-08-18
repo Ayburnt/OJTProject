@@ -94,8 +94,12 @@ class EventSerializer(serializers.ModelSerializer):
 
         # Assign the authenticated user as the creator
         request = self.context.get('request')
+        user = None
         if request and request.user.is_authenticated:
-            validated_data['created_by'] = request.user
+            user = request.user
+            validated_data['created_by'] = user
+
+        # Handle file uploads
         if request and request.FILES.get('event_poster'):
             validated_data['event_poster'] = request.FILES['event_poster']
         if request and request.FILES.get('seating_map'):
@@ -108,11 +112,7 @@ class EventSerializer(serializers.ModelSerializer):
                 validated_data['event_poster'] = files['event_poster']
             if files.get('seating_map'):
                 validated_data['seating_map'] = files['seating_map']
-        elif request:
-            if request.FILES.get('event_poster'):
-                validated_data['event_poster'] = request.FILES['event_poster']
-            if request.FILES.get('seating_map'):
-                validated_data['seating_map'] = request.FILES['seating_map']
+
         print("validated_data after file assignment:", validated_data)
 
         # --- Status logic ---
@@ -121,22 +121,14 @@ class EventSerializer(serializers.ModelSerializer):
             for ticket in ticket_types_data
         )
 
-        # --- Status logic ---
-        all_free = all(
-            (str(ticket.get('price', 0)) == '0' or str(ticket.get('price', 0)) == '0.00')
-            for ticket in ticket_types_data
-        )
+        is_verified = getattr(user, "verification_status", "unverified") == "verified"
 
-        # If ALL tickets are free → publish immediately
         if all_free:
             validated_data['status'] = 'published'
-        # If there are paid tickets → keep as draft until verification
-        elif ticket_types_data:  # has tickets and at least one is paid
-            validated_data['status'] = 'draft'
+        elif not all_free and not is_verified:
+            validated_data['status'] = 'draft'      # paid tickets but organizer not verified
         else:
-            # No tickets provided → fallback to draft
-            validated_data['status'] = 'draft'
-
+            validated_data['status'] = 'pending'    # paid tickets + verified organizer
 
         # Use a database transaction for atomicity
         with transaction.atomic():
@@ -151,7 +143,7 @@ class EventSerializer(serializers.ModelSerializer):
                 questions_data = template_data.pop('questions', [])
                 reg_form_template = Reg_Form_Template.objects.create(
                     event=event,
-                    created_by=request.user,
+                    created_by=user,
                     **template_data
                 )
 
@@ -166,5 +158,6 @@ class EventSerializer(serializers.ModelSerializer):
                         Question_Option.objects.create(question=reg_form_question, **option_data)
 
         return event
+
 
     # ...existing code...

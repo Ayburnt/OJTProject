@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import api from '../events';
+import auth from '../api.js';
 import CEStep1 from '../components/CEStep1.jsx';
 import CEStep2 from '../components/CEStep2.jsx';
 import CEStep3 from '../components/CEStep3.jsx';
@@ -254,26 +255,35 @@ const CreateEventForm = () => {
 
   // === Status Logic (3 conditions) ===
   // === Status Logic (3 conditions) ===
-const verificationStatus = localStorage.getItem("verification_status");
+// === Status Logic ===
+let verificationStatus = localStorage.getItem("verification_status");
+
+// 🔄 Always confirm from API if paid tickets are present
+if (hasPaidTickets) {
+  try {
+    const { data } = await auth.get("/me/");
+    verificationStatus = data.verification_status;
+    localStorage.setItem("verification_status", verificationStatus); // keep it synced
+  } catch (err) {
+    console.error("Failed to fetch organizer status:", err);
+  }
+}
 
 if (forceDraft) {
-  // Case 1 → User clicked "Start Verification" inside modal    
   form.append("status", "draft");
 } else if (!hasPaidTickets) {
-  // Case 2 → Free event
   form.append("status", "published");
 } else if (hasPaidTickets) {
-  if (verificationStatus === "accepted") {
-    // Case 3 → Paid event & verified
+  if (verificationStatus === "verified") {
     form.append("status", "pending");
   } else {
-    // Case 4 → Paid event & NOT verified
-    form.append("status", "draft");   // <-- ✅ ensure draft is saved
+    form.append("status", "draft");   
     setIsLoading(false);
-    setIsVerifiedConfirm(true);       // show modal after draft save
+    setIsVerifiedConfirm(true);
     return;
   }
 }
+
 
 
   // === Append reg form templates ===
@@ -568,7 +578,7 @@ if (forceDraft) {
               <div className="flex justify-end ml-auto space-x-4">
                 <button
                   type="button"
-                  onClick={handleCancel}
+                  onClick={() => navigate(`/org/${userCode}/my-event`)}
                   className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
                 >
                   Cancel
