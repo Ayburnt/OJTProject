@@ -14,6 +14,7 @@ import ForgotPass from './pages/ForgotPass.jsx';
 import OrganizerEvent from './pages/OrganizerEvent.jsx';
 import FindMyTicket from './pages/FindmyTicket.jsx';
 import Attendees from './pages/Attendees.jsx';
+import TimeLine from './pages/TimeLine.jsx';
 import ManageAccount from './pages/ManageAccount.jsx';
 import CreateEvent from './pages/CreateEvent.jsx';
 import VerificationForm from './pages/VerificationForm.jsx';
@@ -110,6 +111,7 @@ function App() {
           <Route path='/org/:userCode/my-event' element={<PrivateRoute requiredRole={'organizer'}><OrganizerEvent /></PrivateRoute>} />
           <Route path='/org/:userCode/attendees' element={<PrivateRoute requiredRole={'organizer'}><Attendees /></PrivateRoute>} />
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
+          <Route path="/timeline" element={<TimeLine />} />
           {/* <Route path="/attendees" element={<Attendees />} />*/}
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           <Route path="/manage-account" element={<ManageAccount />} />

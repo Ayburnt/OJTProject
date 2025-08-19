@@ -1,491 +1,214 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  FaCalendarAlt,
-  FaMapMarkerAlt,
-  FaShareAlt,
-  FaTicketAlt,
-  FaCar,
-  FaUserLock,
-  FaFacebook,
-  FaFacebookMessenger,
-  FaTwitter,
-  FaLinkedin,
-} from 'react-icons/fa';
-import { FaRegUser } from "react-icons/fa";
+import { CgProfile } from "react-icons/cg";
+import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
+import { AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
 import api from '../events.js';
 
-/* ---------- Share Modal ---------- */
-function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
-  const [copied, setCopied] = useState(false);
+/* ---------- Back Button ---------- */
+const BackButton = () => {
+  return (
+    <button
+      onClick={() => window.history.back()}
+      className="flex items-center font-outfit text-teal-600 hover:text-teal-800 mb-4 font-medium"
+    >
+      <span className="mr-1">&lt;</span> Back
+    </button>
+  );
+};
 
-  if (!isOpen) return null;
+/* ---------- Organizer Profile ---------- */
+const ProfileCard = ({ organizer }) => (
+  <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
+    <div className="rounded-full bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
+      <CgProfile className="text-gray-400 w-16 h-16" />
+    </div>
+    <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
+      <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
+        {organizer?.name || "Organizer Name"}
+        <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
+      </h1>
+      <p className="text-gray-500 font-outfit text-sm">{organizer?.company || "Company Name"}</p>
+    </div>
+    <div className="flex justify-around w-full md:w-auto md:space-x-8 mt-4 md:mt-0">
+      <div className="text-center">
+        <span className="text-xl font-bold font-outfit text-gray-900">{organizer?.eventsCount || 0}</span>
+        <span className="text-gray-500 text-sm font-outfit block">Events</span>
+      </div>
+      <div className="text-center">
+        <span className="text-xl font-bold font-outfit text-gray-900">{organizer?.attendeesCount || 0}</span>
+        <span className="text-gray-500 font-outfit text-sm block">Attendees</span>
+      </div>
+    </div>
+  </div>
+);
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch (e) {
-      console.error('Copy failed:', e);
+/* ---------- Tabs ---------- */
+const EventTabs = ({ activeTab, onTabClick }) => {
+  const tabs = [
+    { id: 'all', label: 'All Events' },
+    { id: 'upcoming', label: 'Upcoming' },
+    { id: 'ongoing', label: 'Ongoing' },
+    { id: 'past', label: 'Past Events' },
+  ];
+
+  return (
+    <div className="bg-white rounded-xl shadow-md p-4 mb-6 flex space-x-2 md:space-x-6 justify-center items-end">
+      {tabs.map((tab) => (
+        <button
+          key={tab.id}
+          onClick={() => onTabClick(tab.id)}
+          className={`pb-1 text-sm font-semibold transition-colors duration-200 ease-in-out
+            ${activeTab === tab.id
+              ? 'border-b-2 border-teal-500 text-teal-500'
+              : 'border-b-2 border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
+};
+
+/* ---------- Event Card ---------- */
+const EventCard = ({ event, onCardClick }) => {
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'ongoing':
+        return 'bg-green-500';
+      case 'upcoming':
+        return 'bg-blue-500';
+      case 'past':
+        return 'bg-gray-400';
+      default:
+        return 'bg-gray-400';
     }
   };
 
-  const encodedUrl = encodeURIComponent(shareUrl);
+  return (
+    <div
+      className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:scale-[1.01] duration-200 ease-in-out text-left cursor-pointer"
+      onClick={() => onCardClick(event)}
+    >
+      <img
+        src={event.event_poster || `https://placehold.co/600x400/FFFFFF/000000?text=${event.title?.replace(' ', '+')}`}
+        alt={`${event.title} Event`}
+        className="w-full h-40 object-cover"
+      />
+      <div className="p-4 sm:p-6 bg-teal-500 text-white">
+        <div className="flex items-start justify-between mb-2">
+          <h2 className="text-xl font-bold">{event.title}</h2>
+          <span className={`px-3 py-1 rounded-full text-xs font-semibold font-outfit text-white ${getStatusColor(event.status)}`}>
+            {event.status}
+          </span>
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-2">
+          <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0">
+            <FiCalendar className="w-4 h-4" />
+            <p>{event.start_date}</p>
+          </div>
+          <div className="flex items-center font-outfit space-x-2 text-sm">
+            <FiMapPin className="w-4 h-4" />
+            <p>{event.venue_name}</p>
+          </div>
+        </div>
+        <div className="flex items-center font-outfit space-x-2 text-sm">
+          <FiUsers className="w-4 h-4" />
+          <p>{event.attendees || 0} attendees</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ---------- Event Modal ---------- */
+const EventModal = ({ event, onClose }) => {
+  if (!event) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-[95%] max-w-lg p-6">
-        {/* Close */}
+    <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-3xl shadow-2xl overflow-hidden max-w-md w-full relative">
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
-          aria-label="Close share modal"
+          className="absolute top-4 right-4 text-gray-700 hover:text-gray-900 z-10"
         >
-          ×
+          <AiOutlineClose className="w-8 h-8" />
         </button>
-
-        <h3 className="text-xl font-semibold text-center mb-5">
-          Let your friends know!
-        </h3>
-
-        {/* Social buttons */}
-        <div className="flex items-center justify-center gap-6 mb-4">
-          <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Share on Facebook"
-          >
-            <FaFacebook size={34} className="text-[#1877F2]" />
-          </a>
-          <a
-            href={`fb-messenger://share/?link=${shareUrl}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Share on Messenger"
-          >
-            <FaFacebookMessenger size={34} className="text-[#00B2FF]" />
-          </a>
-          <a
-            href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent(title || '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Share on X/Twitter"
-          >
-            <FaTwitter size={34} className="text-[#1DA1F2]" />
-          </a>
-        <a
-            href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodeURIComponent(title || '')}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Share on LinkedIn"
-          >
-            <FaLinkedin size={34} className="text-[#0A66C2]" />
-          </a>
-        </div>
-
-        <p className="text-center text-gray-500 mb-3">or share link</p>
-
-        {/* Copyable link */}
-        <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
-          <input
-            type="text"
-            readOnly
-            value={shareUrl}
-            className="flex-1 px-3 py-3 text-sm md:text-base outline-none"
+        <div className="bg-teal-500 relative overflow-hidden">
+          <img
+            src={event.event_poster || "https://placehold.co/600x400/FFFFFF/000000?text=Event"}
+            alt={event.title}
+            className="w-full h-40 object-cover"
           />
-          <button
-            onClick={handleCopy}
-            className="px-4 py-3 text-orange-600 font-semibold hover:bg-orange-50 transition-colors"
-          >
-            {copied ? 'Copied!' : 'Copy'}
+        </div>
+        <div className="p-6">
+          <h2 className="text-2xl font-bold font-outfit text-gray-900 mb-2">{event.title}</h2>
+          <div className="flex flex-col gap-2 mb-4 text-gray-600 text-sm">
+            <p>{event.start_date}</p>
+            <p>{event.venue_name}</p>
+            <p>{event.attendees || 0} attendees</p>
+          </div>
+          <button className="w-full bg-teal-500 text-white font-semibold py-3 rounded-xl shadow-lg hover:bg-teal-600 transition-colors duration-200">
+            View Event
           </button>
         </div>
-
-        {/* QR below link */}
-        {qrUrl && (
-          <div className="mt-5 flex flex-col items-center">
-            <a
-              href={qrUrl}
-              download={`event-qr.png`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block"
-              title="Open / download QR"
-            >
-              <img
-                src={qrUrl}
-                alt="Event QR code"
-                className="w-44 h-44 object-contain rounded-lg border"
-              />
-            </a>
-            <p className="text-xs text-gray-500 mt-2">QR code (click to open/download)</p>
-          </div>
-        )}
       </div>
     </div>
   );
-}
+};
 
-/* ---------- Main Page ---------- */
-function EventDetailPage() {
-  const [eventDetails, setEventDetails] = useState(null);
-  const [openCategories, setOpenCategories] = useState({});
-  const [discountCode, setDiscountCode] = useState('');
-  const [discountStatus, setDiscountStatus] = useState({ applied: false, message: '' });
-  const [selectedTickets, setSelectedTickets] = useState({});
-  const [agreeToTerms, setAgreeToTerms] = useState(false);
-  const [isShareOpen, setIsShareOpen] = useState(false);
-
-  const navigate = useNavigate();
-  const { eventcode } = useParams();
+/* ---------- Main TimeLine ---------- */
+const TimeLine = () => {
+  const [activeTab, setActiveTab] = useState('all');
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
-  useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchEvents = async () => {
       try {
-        const res = await api.get(`/events/${eventcode}/`);
-        setEventDetails(res.data);
-        console.log("Fetched Event:", res.data);
+        const res = await api.get(`/event-public/`);
+        setEvents(res.data);
       } catch (err) {
-        console.error("Error fetching event:", err);
+        console.error("Error fetching events:", err);
+      } finally {
+        setLoading(false);
       }
     };
+    fetchEvents();
+  }, []);
 
-    fetchEvent();
-  }, [eventcode]);
-
-  const toggleCategory = (categoryName) => {
-    setOpenCategories((prev) => ({
-      ...prev,
-      [categoryName]: !prev[categoryName],
-    }));
-  };
-
-  const handleApplyDiscount = () => {
-    if (discountCode.toUpperCase() === 'SKECHERS25') {
-      setDiscountStatus({ applied: true, message: 'Discount applied!' });
-    } else {
-      setDiscountStatus({ applied: false, message: 'Invalid code.' });
-    }
-  };
-
-  const handleQuantityChange = (ticketId, quantity) => {
-    setSelectedTickets((prev) => ({
-      ...prev,
-      [ticketId]: parseInt(quantity, 10),
-    }));
-  };
-
-  const totalTicketsSelected = Object.values(selectedTickets).reduce(
-    (sum, current) => sum + current,
-    0
-  );
-
-  if (!eventDetails) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center">
-        <h2 className="text-3xl font-bold text-gray-600 mb-4">Loading event...</h2>
-      </div>
-    );
-  }
-
-  function formatAgeRestriction(restriction, allowedAge) {
-    if (!restriction) return null;
-
-    switch (restriction) {
-      case "all":
-        return "All Ages Allowed";
-      case "18+":
-        return "18 and Above Only";
-      case "kids":
-        return "Kids Only";
-      case "guardian_needed":
-        return "Minors Allowed with Guardian";
-      case "custom":
-        return allowedAge ? `${allowedAge}+ Only` : "Age Restricted";
-      default:
-        return allowedAge ? `${allowedAge} Only` : restriction;
-    }
-  }
-
-  function formatDateTime(dateStr, timeStr) {
-    const dateObj = new Date(`${dateStr}T${timeStr}`);
-    return dateObj.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  }
-
-  // Construct a shareable URL (uses current page URL by default)
-  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const qrUrl = eventDetails.event_qr_image; // from backend
+  const filteredEvents = events.filter(event => {
+    if (activeTab === 'all') return true;
+    return event.status?.toLowerCase() === activeTab;
+  });
 
   return (
-    <div className="bg-gray-100 min-h-screen">
-      {/* Banner */}
-      <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden">
-        <img
-          src={eventDetails.event_poster}
-          alt={eventDetails.title}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      </section>
+    <div className="min-h-screen bg-gray-100 antialiased text-gray-800 flex flex-col items-center">
+      <main className="w-full max-w-screen-lg mx-auto p-4 sm:p-6 md:p-8">
+        <BackButton />
+        <ProfileCard organizer={{ name: "Organizer Name", company: "Jesselle Corp.", eventsCount: events.length, attendeesCount: 2500 }} />
+        <EventTabs activeTab={activeTab} onTabClick={setActiveTab} />
 
-      <div className="relative z-10 -mt-40 md:-mt-56 lg:-mt-80 container mx-auto px-4">
-        <div className="flex flex-col lg:flex-row lg:gap-8">
-          {/* Sidebar */}
-          <div className="lg:w-1/3 order-first lg:order-last mb-8 lg:mb-0">
-            <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28 space-y-6">
-              {/* Title */}
-              <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight text-center mb-5">
-                {eventDetails.title}
-              </h1>
-
-              {/* Organizer */}
-              <div>
-                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Organized by</h3>
-                <div className="flex items-center space-x-3">
-                  <FaRegUser className="text-teal-600 text-lg" />
-                  <span className="text-gray-800 font-medium">
-                    {eventDetails.created_by.first_name} {eventDetails.created_by.last_name}
-                  </span>
-                </div>
+        {loading ? (
+          <div className="text-center py-20 text-gray-500">Loading events...</div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredEvents.length > 0 ? (
+              filteredEvents.map((event) => (
+                <EventCard key={event.id} event={event} onCardClick={setSelectedEvent} />
+              ))
+            ) : (
+              <div className="col-span-full text-center text-gray-500 py-10">
+                No events found for this category.
               </div>
-
-              {/* Date & Time */}
-              <div>
-                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Date & Time</h3>
-                <div className="flex items-start space-x-3">
-                  <FaCalendarAlt className="text-teal-600 text-lg mt-1" />
-                  <span className="text-gray-700">
-                    {formatDateTime(eventDetails.start_date, eventDetails.start_time)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Location */}
-              <div>
-                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
-                <div className="flex items-start space-x-3">
-                  <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
-                  <span className="text-gray-700">
-                    {eventDetails.venue_name}, {eventDetails.venue_address}
-                  </span>
-                </div>
-              </div>
-
-              {/* Age Restriction */}
-              {eventDetails.age_restriction && (
-                <div>
-                  <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">
-                    Age Restriction
-                  </h3>
-                  <div className="flex items-center space-x-3">
-                    <FaUserLock className="text-teal-600 text-lg" />
-                    <span className="text-gray-800">
-                      {formatAgeRestriction(eventDetails.age_restriction, eventDetails.age_allowed)}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* Parking (only if NOT virtual) */}
-              {eventDetails.parking && eventDetails.event_type?.toLowerCase() !== "virtual" && (
-                <div>
-                  <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Parking</h3>
-                  <div className="flex items-center space-x-3">
-                    <FaCar className="text-teal-600 text-lg" />
-                    <span className="text-gray-800">{eventDetails.parking}</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Event Type + Share */}
-              <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-                <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-lg font-semibold text-sm">
-                  {eventDetails.event_type ? eventDetails.event_type : 'In-person'}
-                </span>
-                <button
-                  className="flex items-center space-x-2 text-gray-600 hover:text-teal-600 transition-colors"
-                  onClick={() => setIsShareOpen(true)}
-                >
-                  <FaShareAlt />
-                  <span className="font-medium">Share</span>
-                </button>
-              </div>
-            </div>
+            )}
           </div>
-
-          {/* Main Content */}
-          <div className="lg:w-2/3">
-            {/* Nav */}
-            <div className="sticky top-20 bg-white shadow-md rounded-lg mb-8 z-20 overflow-hidden">
-              <nav className="flex justify-around items-center border-b border-gray-200 py-3 px-4">
-                <a
-                  href="#description-section"
-                  className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  Description
-                </a>
-                <a
-                  href="#tickets-section"
-                  className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
-                >
-                  Tickets
-                </a>
-              </nav>
-            </div>
-
-            {/* Description */}
-            <div
-              id="description-section"
-              className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8"
-            >
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
-                Description
-              </h2>
-              <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                {eventDetails.description}
-              </p>
-            </div>
-
-            {/* Tickets */}
-            <div
-              id="tickets-section"
-              className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8"
-            >
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
-                Tickets
-              </h2>
-              {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 ? (
-                <div className="space-y-4">
-                  {eventDetails.ticket_types.map((ticket, index) => (
-                    <div
-                      key={index}
-                      className="flex justify-between items-center py-2 border-b border-dashed border-gray-100 last:border-b-0"
-                    >
-                      <span className="text-gray-700">{ticket.ticket_name}</span>
-                      <div className="flex items-center space-x-4">
-                        <span className="text-lg font-bold text-orange-600">
-                          {ticket.price}
-                        </span>
-                        <div className="flex items-center space-x-2">
-                          <select
-                            className="p-2 border border-gray-300 rounded-md"
-                            value={selectedTickets[ticket.id] || 0}
-                            onChange={(e) =>
-                              handleQuantityChange(ticket.id, e.target.value)
-                            }
-                          >
-                            {[...Array(11).keys()].map((num) => (
-                              <option key={num} value={num}>
-                                {num}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-center text-gray-600">
-                  No tickets available at this time.
-                </p>
-              )}
-
-              {/* Discount */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4">
-                  <FaTicketAlt className="inline-block mr-2 text-teal-600" />
-                  Have a discount code?
-                </h3>
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <input
-                    type="text"
-                    placeholder="Enter code"
-                    className="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    value={discountCode}
-                    onChange={(e) => setDiscountCode(e.target.value)}
-                  />
-                  <button
-                    className="bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors"
-                    onClick={handleApplyDiscount}
-                  >
-                    Apply
-                  </button>
-                </div>
-                {discountStatus.message && (
-                  <p
-                    className={`mt-2 text-sm ${discountStatus.applied ? "text-green-600" : "text-red-600"}`}
-                  >
-                    {discountStatus.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Terms */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <label className="flex items-start cursor-pointer">
-                  <input
-                    type="checkbox"
-                    className="form-checkbox h-5 w-5 text-teal-600 rounded focus:ring-teal-500 mt-1"
-                    checked={agreeToTerms}
-                    onChange={(e) => setAgreeToTerms(e.target.checked)}
-                  />
-                  <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                    By checking this box, I hereby agree that my information
-                    will be shared to our Event Organizer.
-                  </span>
-                </label>
-              </div>
-
-              {/* Buy Button */}
-              <div className="mt-6">
-                <button
-                  className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${
-                    agreeToTerms && totalTicketsSelected > 0
-                      ? "bg-orange-500 hover:bg-orange-600 text-white"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-                  disabled={!agreeToTerms || totalTicketsSelected === 0}
-                >
-                  Buy Tickets ({totalTicketsSelected})
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Share Modal */}
-      <ShareModal
-        isOpen={isShareOpen}
-        onClose={() => setIsShareOpen(false)}
-        shareUrl={shareUrl}
-        qrUrl={qrUrl}
-        title={eventDetails.title}
-      />
-
-      <div className="mb-20"></div>
+        )}
+      </main>
+      <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
     </div>
   );
-}
+};
 
-export default EventDetailPage;
+export default TimeLine;

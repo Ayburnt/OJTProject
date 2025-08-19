@@ -179,8 +179,8 @@ const EventModal = ({ event, onClose }) => {
   );
 };
 
-// Main App Component
-const App = () => {
+// Main TimeLine Component
+const TimeLine = () => {
   const [activeTab, setActiveTab] = useState('all');
   const [selectedEvent, setSelectedEvent] = useState(null);
 
@@ -236,4 +236,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default TimeLine;
