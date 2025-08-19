@@ -23,7 +23,7 @@ function Header() {
   // ✅ Search states
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [allEvents, setAllEvents] = useState([]); // store all events
+  const [allEvents, setAllEvents] = useState([]); 
   const [showResults, setShowResults] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -51,7 +51,7 @@ function Header() {
     fetchEvents();
   }, []);
 
-  // ✅ Filter events as user types
+  // ✅ Filter events
   useEffect(() => {
     if (searchTerm.trim() === "") {
       setSearchResults([]);
@@ -60,24 +60,18 @@ function Header() {
 
     const filtered = allEvents.filter(
       (event) =>
-        event.title
-          ?.toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
+        event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (event.venue_place &&
-          event.venue_place
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase()))
+          event.venue_place.toLowerCase().includes(searchTerm.toLowerCase()))
     );
 
     setSearchResults(filtered);
     setShowResults(true);
   }, [searchTerm, allEvents]);
 
-  // ✅ Helper: Truncate text
-  const truncate = (text, length = 40) => {
-    if (!text) return "";
-    return text.length > length ? text.slice(0, length) + "..." : text;
-  };
+  // ✅ Truncate helper
+  const truncate = (text, length = 40) =>
+    !text ? "" : text.length > length ? text.slice(0, length) + "..." : text;
 
   return (
     <header className="bg-white shadow-md py-4 sticky top-0 z-50">
@@ -96,7 +90,7 @@ function Header() {
 
         {/* Search Bar */}
         <div className="relative flex items-center bg-gray-100 rounded-full px-4 py-2 w-full max-w-md mx-4 md:mx-8">
-          <CiSearch className="text-gray-500 text-secondary text-xl mr-2" />
+          <CiSearch className="text-gray-500 text-xl mr-2" />
           <input
             type="text"
             placeholder="Search for events..."
@@ -119,14 +113,11 @@ function Header() {
                     setShowResults(false);
                   }}
                 >
-                  {/* Event Image */}
                   <img
                     src={event.event_poster || "/placeholder.png"}
                     alt={event.title}
                     className="w-12 h-12 rounded-md object-cover"
                   />
-
-                  {/* Event Info */}
                   <div className="flex flex-col">
                     <span className="font-medium text-gray-900 truncate max-w-[180px]">
                       {truncate(event.title, 40)}
@@ -137,8 +128,7 @@ function Header() {
                         : `${event.start_date} - ${event.end_date}`}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {truncate(event.venue_place, 50) ||
-                        "Online Event"}
+                      {truncate(event.venue_place, 50) || "Online Event"}
                     </span>
                   </div>
                 </Link>
@@ -159,9 +149,7 @@ function Header() {
           <Link
             to="/find-my-ticket"
             className={`${
-              isLoggedIn && userRole === "client"
-                ? "hidden"
-                : "block"
+              isLoggedIn && userRole === "client" ? "hidden" : "block"
             } text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
           >
             Find my Tickets
@@ -181,13 +169,9 @@ function Header() {
                   src={userProfile}
                   alt="User Profile"
                   className="h-8 w-8 rounded-full object-cover cursor-pointer"
-                  onClick={() => {
-                    setIsAccDD(!isAccDD);
-                  }}
+                  onClick={() => setIsAccDD(!isAccDD)}
                 />
               )}
-
-              {/* Dropdown */}
               <div
                 className={`${
                   isAccDD ? "grid" : "hidden"
@@ -197,9 +181,7 @@ function Header() {
                   {userFirstName} {userLastName}
                 </p>
                 <button
-                  onClick={() =>
-                    navigate(`/org/${userCode}/dashboard`)
-                  }
+                  onClick={() => navigate(`/org/${userCode}/dashboard`)}
                   className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
                 >
                   Dashboard
@@ -221,7 +203,95 @@ function Header() {
             </Link>
           )}
         </nav>
+
+        {/* Mobile Menu Icon */}
+        <div className="lg:hidden">
+          <button
+            onClick={toggleMobileMenu}
+            className="text-gray-700 focus:outline-none p-2"
+          >
+            <svg
+              className="w-7 h-7"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
+            </svg>
+          </button>
+        </div>
       </div>
+
+      {/* ✅ Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden bg-white py-2 shadow-md">
+          <nav className="flex flex-col items-center space-y-3">
+            <Link
+              to="/find-my-ticket"
+              className={`${
+                isLoggedIn && userRole === "client" ? "hidden" : "block"
+              } font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}
+            >
+              Find my Tickets
+            </Link>
+            <button
+              onClick={handleCreateEvent}
+              className={`${
+                isLoggedIn && userRole === "guest" ? "hidden" : "block"
+              } font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}
+            >
+              Create Event
+            </button>
+
+            {isLoggedIn ? (
+              <>
+                {userProfile && (
+                  <img
+                    src={userProfile}
+                    alt="User Profile"
+                    className="h-8 w-8 rounded-full object-cover"
+                    onClick={() => setIsAccDD(!isAccDD)}
+                  />
+                )}
+                <div
+                  className={`${
+                    isAccDD ? "grid" : "hidden"
+                  } grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-xl w-full max-w-sm`}
+                >
+                  <p className="font-outfit block border-b border-gray-300 w-full text-center bg-secondary text-white text-gray-700 text-base py-2">
+                    {userFirstName} {userLastName}
+                  </p>
+                  <button
+                    onClick={() => navigate(`/org/${userCode}/dashboard`)}
+                    className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                    onClick={logout}
+                  >
+                    Log out
+                  </button>
+                </div>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1"
+              >
+                Login
+              </Link>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
