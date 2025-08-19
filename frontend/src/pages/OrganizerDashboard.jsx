@@ -4,7 +4,7 @@ import { CgProfile } from 'react-icons/cg';
 import { Link } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
-import api from '../events.js'
+import api from '../api.js'
 
 function OrganizerDashboard() {
   const { isLoggedIn, userCode, userFirstName, userProfile } = useAuth();

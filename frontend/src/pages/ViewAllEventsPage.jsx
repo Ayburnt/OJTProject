@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import EventCard from "../components/EventCard";
-import api from '../events.js';
+import api from '../api.js';
 
 function ViewAllEventsPage() {
   useEffect(() => {

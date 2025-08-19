@@ -3,6 +3,9 @@ from django.db import models
 from django.conf import settings
 import os
 from datetime import datetime
+from django.core.files import File
+from io import BytesIO
+import qrcode
 
 def unique_event_poster_path(instance, filename):
     ext = filename.split('.')[-1]
@@ -99,10 +102,6 @@ class Event(models.Model):
         if self.event_code and not self.event_qr_image:
             self.event_qr_link = f"https://event.sari-sari.com/events/{self.event_code}"
 
-            import qrcode
-            from io import BytesIO
-            from django.core.files import File
-
             qr = qrcode.QRCode(
                 version=1,
                 box_size=10,
@@ -115,13 +114,15 @@ class Event(models.Model):
 
             buffer = BytesIO()
             img.save(buffer, format="PNG")
-            file_name = f"qr_{self.event_code}.png"
 
-            # Correct way to save the QR code
-            # The file is attached to the ImageField, then super().save() handles the rest.
+            # Use event_code in filename to make it unique per event
+            safe_event_code = self.event_code.replace(" ", "_")  # avoid spaces
+            file_name = f"qr_event_{safe_event_code}.png"
+
             self.event_qr_image.save(file_name, File(buffer), save=False)
 
         super().save(*args, **kwargs)
+
 
     
 class Ticket_Type(models.Model):

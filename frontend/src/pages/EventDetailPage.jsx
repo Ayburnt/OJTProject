@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaTicketAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, } from 'react-icons/fa';
 import { FaRegUser } from "react-icons/fa";
-import api from '../events.js';
+import api from '../api.js';
 
 /* ---------- Share Modal ---------- */
 function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {

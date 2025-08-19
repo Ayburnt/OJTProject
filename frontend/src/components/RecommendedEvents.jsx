@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import EventCard from './EventCard'; 
-import api from '../events.js';
+import api from '../api.js';
 
 function RecommendedEvents() {
   const [events, setEvents] = useState([]);

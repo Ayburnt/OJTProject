@@ -4,7 +4,7 @@ import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
 import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 import useAuth from '../hooks/useAuth';
-import api from '../events.js';
+import api from '../api.js';
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');

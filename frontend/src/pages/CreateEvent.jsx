@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import api from '../events';
-import auth from '../api.js';
+import api from '../api.js';
 import CEStep1 from '../components/CEStep1.jsx';
 import CEStep2 from '../components/CEStep2.jsx';
 import CEStep3 from '../components/CEStep3.jsx';
@@ -256,7 +255,7 @@ const CreateEventForm = () => {
     // 🔄 Always confirm from API if paid tickets are present
     if (hasPaidTickets) {
       try {
-        const { data } = await auth.get("/me/");
+        const { data } = await api.get("/me/");
         verificationStatus = data.verification_status;
         localStorage.setItem("verification_status", verificationStatus); // keep it synced
       } catch (err) {

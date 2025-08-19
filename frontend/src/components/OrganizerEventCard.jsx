@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { GoCalendar, GoLocation, GoPeople } from "react-icons/go";
-import api from '../events.js';
+import api from '../api.js';
 
 function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode }) {
   const [confirmDelete, setConfirmDelete] = useState(false);

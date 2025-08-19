@@ -37,9 +37,18 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
-MEDIA_URL = '/media/'
+
+if DEBUG:
+    # Local development
+    MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
+else:
+    # Production on EB – persistent folder
+    MEDIA_ROOT = "/var/app/current/media"
+
+MEDIA_URL = "/media/"
 
 
 REST_FRAMEWORK = {
@@ -127,7 +136,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 DATABASES = {
     'default': {
