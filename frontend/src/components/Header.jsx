@@ -3,7 +3,7 @@ import { CiSearch } from "react-icons/ci";
 const SariSariLogo = "/sariLogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import api from "../events.js";
+import api from '../api.js';
 
 function Header() {
   const navigate = useNavigate();
@@ -23,7 +23,7 @@ function Header() {
   // ✅ Search states
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [allEvents, setAllEvents] = useState([]); 
+  const [allEvents, setAllEvents] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -43,9 +43,21 @@ function Header() {
     const fetchEvents = async () => {
       try {
         const res = await api.get(`/event-public-view/`);
-        setAllEvents(res.data || []);
+        console.log("Fetched Events:", res.data);
+
+        let events = [];
+        if (Array.isArray(res.data)) {
+          events = res.data;
+        } else if (res.data?.results && Array.isArray(res.data.results)) {
+          events = res.data.results;
+        } else {
+          console.warn("Unexpected API response format:", res.data);
+        }
+
+        setAllEvents(events);
       } catch (err) {
-        console.error(err);
+        console.error("API Fetch Error:", err);
+        setAllEvents([]); // fallback
       }
     };
     fetchEvents();
@@ -58,11 +70,10 @@ function Header() {
       return;
     }
 
-    const filtered = allEvents.filter(
+    const filtered = (allEvents || []).filter(
       (event) =>
         event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (event.venue_place &&
-          event.venue_place.toLowerCase().includes(searchTerm.toLowerCase()))
+        event.venue_place?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     setSearchResults(filtered);
