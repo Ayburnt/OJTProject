@@ -48,7 +48,7 @@ function ViewAllEventsPage() {
   const displayedEvents = filteredEvents.slice(0, eventsToShow);
   const hasMore = eventsToShow < filteredEvents.length;
 
-  const categories = ['All', 'Entertainment', 'Business', 'Sports', 'Lifestyle'];
+  const categories = ['All', 'Corporate', 'Social', 'Cultural', 'Sports & Recreational', 'Political & Government', 'Educational', 'Fundraising'];
 
   return (
     <div className="bg-gray-100 min-h-screen py-10">
@@ -57,23 +57,44 @@ function ViewAllEventsPage() {
           All Events
         </h1>
 
-        {/* Category Filter Buttons */}
-        <div className="flex flex-wrap justify-center gap-4 mb-10">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-6 py-2 rounded-full text-lg font-semibold transition-colors duration-200
-                ${
-                  activeCategory === category
-                    ? 'bg-teal-600 text-white shadow-md'
-                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
-                }`}
-            >
-              {category}
-            </button>
-          ))}
+
+
+   {/* Category Filter Buttons */}
+        {/* Mobile Dropdown */} 
+        <div className="mb-10 lg:hidden flex justify-center w-full cursor-pointer">
+          <select
+            value={activeCategory}
+            onChange={(e) => setActiveCategory(e.target.value)}
+            className="px-2 py-2 rounded-lg bg-white text-gray-700 min-w-[170px] max-w-fit md:min-w-[350px] md:w-full"
+          >
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </div>
+
+{/* desktop */}
+<div className="hidden lg:flex flex-wrap justify-center gap-4 mb-10 ">
+  {categories.map((category) => (
+    <button
+      key={category}
+      onClick={() => setActiveCategory(category)}
+      className={`px-4 py-2 rounded-full text-lg font-semibold transition-colors duration-200 cursor-pointer 
+        ${
+          activeCategory === category
+            ? 'bg-teal-600 text-white shadow-md'
+            : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+        }`}
+    >
+      {category}
+    </button>
+  ))}
+</div>
+
+
+
 
         {/* Event Grid */}
         {filteredEvents.length > 0 ? (
