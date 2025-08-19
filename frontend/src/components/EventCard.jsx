@@ -16,7 +16,7 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group">
       {/* Image */}
       <div className="relative w-full h-48 sm:h-52 overflow-hidden">
         <img
@@ -29,18 +29,22 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
       {/* Content Area */}
       <div className="p-4 bg-teal-600 text-white">
         {/* Title */}
-        <h3 className="text-xl font-bold mb-1 group-hover:underline group-hover:text-orange-300 transition-colors line-clamp-2">
+        <h3
+          title={eventTitle} // Tooltip for full text
+          className="text-lg sm:text-xl font-bold mb-2 group-hover:underline group-hover:text-orange-300 transition-colors truncate block max-w-full"
+        >
           {eventTitle}
         </h3>
 
         {/* Date */}
-        <p className="text-sm text-teal-100 mb-1">{formatDate(eventDate)}</p>
-
-        {/* Location */}
-        <p className="text-sm text-teal-100 truncate">{eventLocation}</p>
+        <div className="flex items-center text-sm text-teal-100 mb-1">
+          <span className="truncate">{formatDate(eventDate)}</span>
+        </div>
 
         {/* Creator */}
-        <p className="text-sm text-teal-100">By {eventCreator}</p>
+        <div className="text-sm text-teal-100 italic">
+          By {eventCreator || "Unknown Organizer"}
+        </div>
       </div>
     </div>
   );
