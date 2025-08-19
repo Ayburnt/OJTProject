@@ -12,6 +12,6 @@ urlpatterns = [
     path('event-public-view/', EventPublicView.as_view(), name='event-public-view'),
 
     # URL for retrieving, updating, and deleting a specific event by its event_code
-    path("events/<str:event_code>/", EventDetailView.as_view(), name="event-detail"),
+    path("<str:event_code>/", EventDetailView.as_view(), name="event-detail"),
     path('update/<str:event_code>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-retrieve-update-destroy'),
 ]
