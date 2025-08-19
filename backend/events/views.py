@@ -13,6 +13,26 @@ from .permissions import IsOwnerOrReadOnly # Assuming you've created this file
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import ParseError
 from .parsers import NestedMultiPartParser
+from django.db.models import Q
+
+class OrganizerProfilePublicView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, user_code):
+        profile = Event.objects.filter(
+            created_by=user_code
+        ).filter(
+            Q(status='published') | Q(status='completed')
+        )
+
+        if not profile.exists():
+            return Response(
+                {"error": "Organizer not found or no published/completed events"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = EventSerializer(profile, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class EventPublicView(APIView):
     permission_classes = [AllowAny]

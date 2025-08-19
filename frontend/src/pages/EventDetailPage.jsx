@@ -237,7 +237,7 @@ function EventDetailPage() {
               {/* Organizer */}
               <div>
                 <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Organized by</h3>
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate(`/org/${eventDetails.created_by.user_code}`)}>
                   <FaRegUser className="text-teal-600 text-lg" />
                   <span className="text-gray-800 font-medium">
                     {eventDetails.created_by.first_name} {eventDetails.created_by.last_name}

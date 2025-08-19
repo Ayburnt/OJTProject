@@ -48,7 +48,7 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 class userserializer(serializers.ModelSerializer):
     class Meta:
         model= CustomUser
-        fields = ["first_name", "last_name", "email"] 
+        fields = ["first_name", "last_name", "email", "profile_picture", "company_name", "company_website", "user_code", "qr_code_image", "verification_status"] 
 
 
 class EventSerializer(serializers.ModelSerializer):

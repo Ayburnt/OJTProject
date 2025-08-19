@@ -10,6 +10,7 @@ import { IoIosArrowBack } from "react-icons/io";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 
+
 // A helper function to create a new, empty ticket object
 const createNewTicket = () => ({
   ticket_name: '',
@@ -449,7 +450,7 @@ const CreateEventForm = () => {
 
       {isVerifiedConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
+          <div className="bg-secondary rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
             <button
               onClick={() => setIsVerifiedConfirm(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
@@ -540,23 +541,30 @@ const CreateEventForm = () => {
             <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
           </div>
 
-          {/* Step Indicator */}
-          <div className="flex justify-center items-center mb-12 space-x-6">
-            {[1, 2, 3, 4].map(s => (
-              <div key={s} className="flex flex-col items-center">
-                <div className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
-                ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700'}`}>
-                  {s}
-                </div>
-                <span className="mt-2 text-sm text-gray-600">
-                  {s === 1 && "Details"}
-                  {s === 2 && "Date & Location"}
-                  {s === 3 && "Ticketing"}
-                  {s === 4 && "Registration Form"}
-                </span>
-              </div>
-            ))}
-          </div>
+{/* Step Indicator */}
+<div className="flex justify-center items-start mb-12 w-full">
+  {[1, 2, 3, 4].map(s => (
+    <button
+      key={s}
+      type="button"
+      onClick={() => setStep(s)}
+      className="flex-1 flex flex-col items-center focus:outline-none"
+    >
+      <div
+        className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
+        ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
+      >
+        {s}
+      </div>
+      <span className="mt-2 text-xs sm:text-sm md:text-base text-gray-600 text-center leading-tight min-h-[32px] flex items-center justify-center">
+        {s === 1 && "Details"}
+        {s === 2 && "Date & Location"}
+        {s === 3 && "Ticketing"}
+        {s === 4 && "Registration Form"}
+      </span>
+    </button>
+  ))}
+</div>
 
           <form encType="multipart/form-data" className="space-y-6">
             {step === 1 && (
@@ -572,33 +580,40 @@ const CreateEventForm = () => {
               <CEStep4 formData={formData} setFormData={setFormData} />
             )}
 
-            {/* Buttons Section */}
-            <div className="flex justify-between items-center mt-8">
-              <div className="flex justify-end ml-auto space-x-4">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/org/${userCode}/my-event`)}
-                  className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
-                >
-                  Cancel
-                </button>
-                {step < totalSteps ? (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
-                  >
-                    Next
-                  </button>
-                ) : (
-                  <button
-                    type="button" onClick={handleSubmit}
-                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
-                  >
-                    Submit
-                  </button>
-                )}
-              </div>
+{/* Buttons Section */}
+<div className="flex justify-between items-center mt-8">
+  <div className="flex justify-end ml-auto space-x-4">
+    <button
+      type="button"
+      onClick={() => navigate(`/org/${userCode}/my-event`)}
+      className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
+    >
+      Cancel
+    </button>
+    {step < totalSteps ? (
+      <button
+        type="button"
+        onClick={() => {
+          handleNext();
+          window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 force scroll top
+        }}
+        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+      >
+        Next
+      </button>
+    ) : (
+      <button
+        type="button"
+        onClick={() => {
+          handleSubmit();
+          window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 also scrolls up on submit
+        }}
+        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+      >
+        Submit
+      </button>
+    )}
+  </div>
             </div>
           </form>
         </div>

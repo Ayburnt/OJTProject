@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { CgProfile } from "react-icons/cg";
 import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
+import api from '../api.js';
+import { useParams } from 'react-router-dom';
 
 // Back Button Component
 const BackButton = () => {
@@ -16,35 +18,50 @@ const BackButton = () => {
 };
 
 // Component for the Organizer Profile Card
-const ProfileCard = () => (
-  <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
-    {/* Profile picture/icon */}
-    <div className="rounded-full bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
-      <CgProfile className="text-gray-400 w-16 h-16" />
-    </div>
-    
-    {/* Name and company info */}
-    <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
-      <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
-        Organizer Name
-        <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
-      </h1>
-      <p className="text-gray-500 font-outfit text-sm">Jesselle Corp.</p>
-    </div>
-    
-    {/* Event and Attendees Stats */}
-    <div className="flex justify-around w-full md:w-auto md:space-x-8 mt-4 md:mt-0">
-      <div className="text-center">
-        <span className="text-xl font-bold font-outfit text-gray-900">15</span>
-        <span className="text-gray-500 text-sm font-outfit block">Events</span>
+// Component for the Organizer Profile Card
+const ProfileCard = ({ profileData }) => {
+  if (!profileData || profileData.length === 0) {
+    return (
+      <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex items-center justify-center">
+        Loading profile...
       </div>
-      <div className="text-center">
-        <span className="text-xl font-bold font-outfit text-gray-900">2500+</span>
-        <span className="text-gray-500 font-outfit text-sm block">Attendees</span>
+    );
+  }
+
+  const user = profileData[0];
+
+  // Use optional chaining to safely access fields
+  const firstName = user.created_by?.first_name || user.first_name || "Organizer";
+  const lastName = user.created_by?.last_name || user.last_name || "";
+  const pfp = user.created_by?.profile_picture || user.profile_picture || "";
+  const company_name = user.created_by?.company_name || user.company_name || "";
+
+  return (
+    <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
+      <div className="rounded-full overflow-hidden bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
+        <img src={pfp} alt="" className='w-full object-contain' />
+      </div>
+      <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
+        <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
+          {firstName} {lastName}
+          <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
+        </h1>
+        <p className="text-gray-500 font-outfit text-sm">{company_name}</p>
+      </div>
+      <div className="flex justify-around w-full md:w-auto md:space-x-8 mt-4 md:mt-0">
+        <div className="text-center">
+          <span className="text-xl font-bold font-outfit text-gray-900">{profileData.length}</span>
+          <span className="text-gray-500 text-sm font-outfit block">Events</span>
+        </div>
+        <div className="text-center">
+          <span className="text-xl font-bold font-outfit text-gray-900">2500+</span>
+          <span className="text-gray-500 font-outfit text-sm block">Attendees</span>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
+
 
 // Component for the Navigation Tabs
 const EventTabs = ({ activeTab, onTabClick }) => {
@@ -181,8 +198,29 @@ const EventModal = ({ event, onClose }) => {
 
 // Main TimeLine Component
 const TimeLine = () => {
+  const { userCode } = useParams();
   const [activeTab, setActiveTab] = useState('all');
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const [profileData, setProfileData] = useState([]);
+
+  const fetchProfile = async () => {
+  try {
+    const res = await api.get(`/profile/${userCode}/`);
+    if (res.data && res.data.length > 0) {
+      setProfileData(res.data);
+      console.log(res.data);
+    } else {
+      console.log("No events found");
+    }
+  } catch (err) {
+    console.error("Error fetching event:", err);
+  }
+};
+
+useEffect(() => {
+  fetchProfile();
+}, []);
+
 
   const events = [
     { id: 1, title: 'Event 2025', date: '20th June, 20XX', place: 'SPK Place, Manila', attendees: 150, status: 'Ongoing' },
@@ -211,7 +249,7 @@ const TimeLine = () => {
         <BackButton />
 
         {/* Organizer Profile Card */}
-        <ProfileCard />
+        <ProfileCard profileData={profileData} />
 
         {/* Event Navigation Tabs */}
         <EventTabs activeTab={activeTab} onTabClick={setActiveTab} />
