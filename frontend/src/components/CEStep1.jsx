@@ -115,7 +115,7 @@ function CEStep1({
               />
               <label
                 htmlFor="audience_public"
-                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/public:bg-teal-500 peer-checked/public:border-teal-500 peer-checked/public:text-white"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/public:bg-teal-500 peer-checked/public:border-teal-500 peer-checked/public:text-white hover:text-secondary"
               >
                 <span className="text-sm font-medium">Public</span>
               </label>
@@ -132,7 +132,7 @@ function CEStep1({
               />
               <label
                 htmlFor="audience_private"
-                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/private:bg-teal-500 peer-checked/private:border-teal-500 peer-checked/private:text-white"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/private:bg-teal-500 peer-checked/private:border-teal-500 peer-checked/private:text-white hover:text-secondary"
               >
                 <span className="text-sm font-medium">Private</span>
               </label>
@@ -148,7 +148,7 @@ function CEStep1({
       </FormSection>
 
       <FormSection title="EVENT IMAGE / POSTER">
-        <p className="text-sm text-gray-500 mb-4">Main Event Image / Poster</p>
+        <p className="text-sm text-gray-500 mb-4">Recommended size: 16:9 ratio (JPG or PNG)</p>
         <div className={`flex justify-center items-center aspect-16/9 border-2 ${isPosterErr ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-xl relative overflow-hidden`}>
           {formData.event_poster ? (
             formData.event_poster instanceof File ? (

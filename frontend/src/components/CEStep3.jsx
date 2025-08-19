@@ -44,7 +44,7 @@ function CEStep3({
           />
           <label
             htmlFor="has_map_yes"
-            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/yes:bg-teal-500 peer-checked/yes:border-teal-500 peer-checked/yes:text-white"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/yes:bg-teal-500 peer-checked/yes:border-teal-500 peer-checked/yes:text-white hover:text-secondary"
           >
             <span className="text-sm font-medium">Yes</span>
           </label>
@@ -61,7 +61,7 @@ function CEStep3({
           />
           <label
             htmlFor="has_map_no"
-            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/no:bg-teal-500 peer-checked/no:border-teal-500 peer-checked/no:text-white"
+            className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/no:bg-teal-500 peer-checked/no:border-teal-500 peer-checked/no:text-white hover:text-secondary"
           >
             <span className="text-sm font-medium">No</span>
           </label>
