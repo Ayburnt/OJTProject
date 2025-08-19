@@ -23,7 +23,7 @@ function EventDetailPage() {
     useEffect(() => {
         const fetchEvent = async () => {
             try {
-                const res = await api.get(`/${eventcode}/`);
+                const res = await api.get(`/events/${eventcode}/`);
                 setEventDetails(res.data);
 
                 // If backend also provides qr_code field

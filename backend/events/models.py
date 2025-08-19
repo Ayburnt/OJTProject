@@ -95,8 +95,8 @@ class Event(models.Model):
         return f"{self.title} event, created by {self.created_by.user_code}."
     
     def save(self, *args, **kwargs):
-        # Only generate QR if user_code exists
-        if self.event_code:
+        # Only generate QR if event_code exists and QR image doesn't exist yet
+        if self.event_code and not self.event_qr_image:
             self.event_qr_link = f"https://event.sari-sari.com/events/{self.event_code}"
 
             import qrcode
@@ -117,9 +117,9 @@ class Event(models.Model):
             img.save(buffer, format="PNG")
             file_name = f"qr_{self.event_code}.png"
 
-            # Only save the QR code once
-            if not self.event_qr_image:
-                self.event_qr_image.save(file_name, File(buffer), save=False)
+            # Correct way to save the QR code
+            # The file is attached to the ImageField, then super().save() handles the rest.
+            self.event_qr_image.save(file_name, File(buffer), save=False)
 
         super().save(*args, **kwargs)
 
