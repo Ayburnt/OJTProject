@@ -19,6 +19,8 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import ListAPIView
+
 
 
 # Import all necessary serializers
@@ -31,6 +33,8 @@ from .serializers import (
     OTPSendSerializer,
     OTPVerifySerializer,
     ProfileUpdateSerializer, # Import the new serializer
+    UserSerializer,
+    
 )
 from .models import CustomUser
 
@@ -705,3 +709,21 @@ def change_password(request):
 
     return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
+from rest_framework.permissions import AllowAny
+
+class OrganizerListView(ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = CustomUser.objects.filter(role="organizer")
+        search = self.request.query_params.get("search", None)
+        if search:
+            queryset = queryset.filter(
+                first_name__icontains=search
+            ) | queryset.filter(
+                last_name__icontains=search
+            ) | queryset.filter(
+                email__icontains=search
+            )
+        return queryset

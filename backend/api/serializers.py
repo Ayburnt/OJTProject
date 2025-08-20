@@ -210,3 +210,28 @@ class OTPVerifySerializer(serializers.Serializer):
     """
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6, min_length=6) # Ensure 6 digits
+
+
+# api/serializers.py
+from rest_framework import serializers
+from .models import CustomUser
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'id',
+            'email',
+            'first_name',
+            'last_name',
+            'profile_picture',
+            'role',
+            'phone_number',
+            'birthday',
+            'gender',
+            'company_name',
+            'company_website',
+            'user_code',
+            'verification_status',
+        ]

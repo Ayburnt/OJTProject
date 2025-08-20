@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
+import { FaCheckCircle } from "react-icons/fa";
 const SariSariLogo = "/sariLogo.png";
 import { Link, useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
-import api from '../api.js';
+import api from "../api.js";
 
 function Header() {
   const navigate = useNavigate();
@@ -22,7 +23,8 @@ function Header() {
 
   // ✅ Search states
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [eventResults, setEventResults] = useState([]);
+  const [organizerResults, setOrganizerResults] = useState([]);
   const [allEvents, setAllEvents] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
@@ -43,30 +45,46 @@ function Header() {
     const fetchEvents = async () => {
       try {
         const res = await api.get(`/event-public-view/`);
-        console.log("Fetched Events:", res.data);
-
         let events = [];
         if (Array.isArray(res.data)) {
           events = res.data;
         } else if (res.data?.results && Array.isArray(res.data.results)) {
           events = res.data.results;
-        } else {
-          console.warn("Unexpected API response format:", res.data);
         }
-
         setAllEvents(events);
       } catch (err) {
-        console.error("API Fetch Error:", err);
-        setAllEvents([]); // fallback
+        console.error("API Fetch Error (events):", err);
+        setAllEvents([]);
       }
     };
     fetchEvents();
   }, []);
 
-  // ✅ Filter events
+  // ✅ Fetch organizers when searching
+  useEffect(() => {
+    const fetchOrganizers = async () => {
+      if (!searchTerm.trim()) {
+        setOrganizerResults([]);
+        return;
+      }
+      try {
+        const res = await api.get(`/organizers/`, {
+          params: { search: searchTerm },
+        });
+        setOrganizerResults(res.data || []);
+      } catch (err) {
+        console.error("API Fetch Error (organizers):", err);
+        setOrganizerResults([]);
+      }
+    };
+
+    fetchOrganizers();
+  }, [searchTerm]);
+
+  // ✅ Filter events locally
   useEffect(() => {
     if (searchTerm.trim() === "") {
-      setSearchResults([]);
+      setEventResults([]);
       return;
     }
 
@@ -76,7 +94,7 @@ function Header() {
         event.venue_place?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    setSearchResults(filtered);
+    setEventResults(filtered);
     setShowResults(true);
   }, [searchTerm, allEvents]);
 
@@ -104,7 +122,7 @@ function Header() {
           <CiSearch className="text-gray-500 text-xl mr-2" />
           <input
             type="text"
-            placeholder="Search for events..."
+            placeholder="Search events or organizers..."
             className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500 text-base"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -112,47 +130,101 @@ function Header() {
           />
 
           {/* Results Dropdown */}
-          {showResults && searchResults.length > 0 && (
-            <div className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg max-h-96 overflow-y-auto z-50">
-              {searchResults.map((event, i) => (
-                <Link
-                  key={i}
-                  to={`/events/${event.event_code}`}
-                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
-                  onClick={() => {
-                    setSearchTerm("");
-                    setShowResults(false);
-                  }}
-                >
-                  <img
-                    src={event.event_poster || "/placeholder.png"}
-                    alt={event.title}
-                    className="w-12 h-12 rounded-md object-cover"
-                  />
-                  <div className="flex flex-col">
-                    <span className="font-medium text-gray-900 truncate max-w-[180px]">
-                      {truncate(event.title, 40)}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {event.start_date === event.end_date
-                        ? event.start_date
-                        : `${event.start_date} - ${event.end_date}`}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {truncate(event.venue_place, 50) || "Online Event"}
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+          {showResults &&
+            (eventResults.length > 0 || organizerResults.length > 0) && (
+              <div className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg max-h-96 overflow-y-auto z-50">
+                {/* Events */}
+                {eventResults.length > 0 && (
+                  <>
+                    <p className="px-4 pt-2 text-xs font-semibold text-gray-500">
+                      Events
+                    </p>
+                    {eventResults.map((event, i) => (
+                      <Link
+                        key={`event-${i}`}
+                        to={`/events/${event.event_code}`}
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
+                        onClick={() => {
+                          setSearchTerm("");
+                          setShowResults(false);
+                        }}
+                      >
+                        <img
+                          src={event.event_poster || "/placeholder.png"}
+                          alt={event.title}
+                          className="w-12 h-12 rounded-md object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900 truncate max-w-[180px]">
+                            {truncate(event.title, 40)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {event.start_date === event.end_date
+                              ? event.start_date
+                              : `${event.start_date} - ${event.end_date}`}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {truncate(event.venue_place, 50) || "Online Event"}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </>
+                )}
+
+                {/* Organizers */}
+                {organizerResults.length > 0 && (
+                  <>
+                    <p className="px-4 pt-2 text-xs font-semibold text-gray-500">
+                      Organizers
+                    </p>
+                    {organizerResults.map((org, i) => (
+                      <Link
+                        key={`org-${i}`}
+                        to={`/org/${org.user_code}`} // ✅ FIXED to match your TimeLine route
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
+                        onClick={() => {
+                          setSearchTerm("");
+                          setShowResults(false);
+                        }}
+                      >
+                        <img
+                          src={org.profile_picture || "/placeholder.png"}
+                          alt={org.first_name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium text-gray-900 flex items-center gap-1">
+                            {org.first_name} {org.last_name}
+                            {org.verification_status === "verified" && (
+                              <FaCheckCircle className="text-green-500 text-sm" />
+                            )}
+                          </span>
+                          {org.company_name && (
+                            <span className="text-xs text-gray-500">
+                              {org.company_name}
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-500">
+                            {org.email}
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
 
           {/* No results */}
-          {showResults && searchTerm && searchResults.length === 0 && (
-            <div className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg p-4 text-gray-500">
-              No events found
-            </div>
-          )}
+          {showResults &&
+            searchTerm &&
+            eventResults.length === 0 &&
+            organizerResults.length === 0 && (
+              <div className="absolute top-12 left-0 w-full bg-white shadow-lg rounded-lg p-4 text-gray-500">
+                No results found
+              </div>
+            )}
         </div>
 
         {/* Desktop Navigation */}
@@ -188,8 +260,11 @@ function Header() {
                   isAccDD ? "grid" : "hidden"
                 } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
               >
-                <p className="font-outfit block border-b border-gray-300 w-full text-center bg-secondary text-white text-gray-700 transition-colors text-base py-2">
+                <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
                   {userFirstName} {userLastName}
+                  {userProfile?.verification_status === "verified" && (
+                    <FaCheckCircle className="text-green-400" />
+                  )}
                 </p>
                 <button
                   onClick={() => navigate(`/org/${userCode}/dashboard`)}
@@ -238,71 +313,6 @@ function Header() {
           </button>
         </div>
       </div>
-
-      {/* ✅ Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden bg-white py-2 shadow-md">
-          <nav className="flex flex-col items-center space-y-3">
-            <Link
-              to="/find-my-ticket"
-              className={`${
-                isLoggedIn && userRole === "client" ? "hidden" : "block"
-              } font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}
-            >
-              Find my Tickets
-            </Link>
-            <button
-              onClick={handleCreateEvent}
-              className={`${
-                isLoggedIn && userRole === "guest" ? "hidden" : "block"
-              } font-outfit text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1`}
-            >
-              Create Event
-            </button>
-
-            {isLoggedIn ? (
-              <>
-                {userProfile && (
-                  <img
-                    src={userProfile}
-                    alt="User Profile"
-                    className="h-8 w-8 rounded-full object-cover"
-                    onClick={() => setIsAccDD(!isAccDD)}
-                  />
-                )}
-                <div
-                  className={`${
-                    isAccDD ? "grid" : "hidden"
-                  } grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-xl w-full max-w-sm`}
-                >
-                  <p className="font-outfit block border-b border-gray-300 w-full text-center bg-secondary text-white text-gray-700 text-base py-2">
-                    {userFirstName} {userLastName}
-                  </p>
-                  <button
-                    onClick={() => navigate(`/org/${userCode}/dashboard`)}
-                    className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
-                  >
-                    Dashboard
-                  </button>
-                  <button
-                    className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
-                    onClick={logout}
-                  >
-                    Log out
-                  </button>
-                </div>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="block text-gray-700 hover:text-teal-600 transition-colors text-base font-medium py-1"
-              >
-                Login
-              </Link>
-            )}
-          </nav>
-        </div>
-      )}
     </header>
   );
 }

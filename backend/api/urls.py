@@ -12,7 +12,8 @@ from .views import (
     ResetPasswordView,
     ResetOTPView,
     CurrentUserView,
-    change_password
+    change_password,
+    OrganizerListView,
 )
 
 urlpatterns = [
@@ -28,4 +29,6 @@ urlpatterns = [
     path('auth/change-password/', change_password, name='change-password'),
     path('auth/resetotp-password/', ResetOTPView.as_view(), name='reset-password'), # <--- Use the imported class directly and call .as_view()
     path("me/", CurrentUserView.as_view(), name="current-user"),
+    path('organizers/', OrganizerListView.as_view(), name='organizer-list'),
+
 ]
