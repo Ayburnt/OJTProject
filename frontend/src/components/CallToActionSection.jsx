@@ -1,6 +1,19 @@
 import React from 'react';
+import useAuth from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 function CallToActionSection() {
+  const { isLoggedIn, userRole, userCode } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCreateEvent = () => {
+    if (isLoggedIn && userRole === "organizer") {
+      navigate(`/org/${userCode}/create-event`);
+    } else if (!isLoggedIn) {
+      navigate("/login");
+    }
+  };
+
   return (
     <section className="bg-gradient-to-r from-orange-500 to-orange-600 py-16 md:py-20 rounded-lg shadow-xl text-white text-center mb-12">
       <div className="container mx-auto px-4">
@@ -10,7 +23,7 @@ function CallToActionSection() {
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8 drop-shadow">
           Join our growing community and seamlessly manage your events with our powerful tools.
         </p>
-        <button className="bg-white text-orange-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition-transform transform hover:scale-105 shadow-2xl">
+        <button onClick={handleCreateEvent} className="bg-white text-orange-600 px-8 py-4 rounded-full text-xl font-bold hover:bg-gray-100 transition-transform transform hover:scale-105 shadow-2xl">
           Start Organizing Today
         </button>
       </div>
