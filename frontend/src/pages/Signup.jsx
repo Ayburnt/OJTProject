@@ -579,7 +579,7 @@ function Signup({ onAuthSuccess }) {
                             }} />
                         </div>
 
-                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Create Your Attendee Account</h2>
+                        <h2 className="text-2xl font-bold mt-3 mb-4 text-center font-outfit">Create Account</h2>
 
                         <div className="w-[80%] md:w-[70%] flex flex-col items-center">
                             <div className="mb-4 w-full">
