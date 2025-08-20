@@ -71,10 +71,15 @@ const CreateEventForm = () => {
   const [posterErr, setPosterErr] = useState('');
   const [isPosterErr, setIsPosterErr] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [alert, setAlert] = useState({ show: false, message: '' });
 
   // Separate state for seating map
   const [isSeatingMapErr, setIsSeatingMapErr] = useState(false);
   const [seatingMapErr, setSeatingMapErr] = useState('');
+
+  const handleCloseAlert = () => {
+    setAlert({ show: false, message: '' });
+  };
 
   const handleEventChange = (e) => {
     const { name, value, files, type } = e.target;
@@ -363,18 +368,18 @@ const CreateEventForm = () => {
       if (err.response?.data) {
         // If backend sends detailed validation error
         const errorData = err.response.data;
-        let errorMsg = "Error creating event\n";
+        let errorMsg = "Error creating event:\n";
 
         Object.entries(errorData).forEach(([field, messages]) => {
           errorMsg += `${messages.join(", ")}\n`;
         });
 
-        // palitan ng magandang design instead of alert
-        alert(errorMsg);
+        // REPLACED: alert(errorMsg);
+        setAlert({ show: true, message: errorMsg });
       } else {
-        // palitan ng magandang design instead of alert
+        // REPLACED: alert("An unexpected error occurred. Please try again.");
         // Generic fallback
-        alert("An unexpected error occurred. Please try again.");
+        setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
       }
     }
   };
@@ -441,7 +446,7 @@ const CreateEventForm = () => {
       {isLoading && (
         <Backdrop
           sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-          open={open}
+          open={isLoading}
           onClick={() => setIsLoading(false)}
         >
           <CircularProgress color="inherit" />
@@ -487,42 +492,35 @@ const CreateEventForm = () => {
       )}
 
 
-      {/* Cancellation Confirmation Modal
-      {isCancelConfirm && (
+      {/* Custom Alert Modal */}
+      {alert.show && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
             <button
-              onClick={() => setIsCancelConfirm(false)}
+              onClick={handleCloseAlert}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
-              aria-label="Close"
             >
               &times;
             </button>
-            <h2 className="text-lg font-semibold mb-2 text-gray-800">
-              You have unsaved changes
+            <h2 className="text-lg font-semibold mb-2 text-red-600">
+              Error
             </h2>
-            <p className="mb-6 text-base text-gray-600">
-              What would you like to do before exiting?
+            <p className="mb-6 text-base text-gray-600 whitespace-pre-line">
+              {alert.message}
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex justify-center">
               <button
                 type="button"
-                onClick={() => navigate(`/org/${userCode}/my-event`)}
-                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
+                onClick={handleCloseAlert}
+                className="px-6 py-3 bg-red-600 text-white font-semibold rounded-xl hover:bg-red-700"
               >
-                Discard Changes
-              </button>
-              <button
-                type="button"
-                onClick={handleSaveDraft}
-                className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
-              >
-                Save Draft
+                OK
               </button>
             </div>
           </div>
         </div>
-      )} */}
+      )}
+
 
       {/* Main Container */}
       <div className="bg-alice-blue min-h-screen flex items-center justify-center font-outfit p-4 sm:p-8 text-gray-900 antialiased">
@@ -541,30 +539,30 @@ const CreateEventForm = () => {
             <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
           </div>
 
-{/* Step Indicator */}
-<div className="flex justify-center items-start mb-12 w-full">
-  {[1, 2, 3, 4].map(s => (
-    <button
-      key={s}
-      type="button"
-      onClick={() => setStep(s)}
-      className="flex-1 flex flex-col items-center focus:outline-none"
-    >
-      <div
-        className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
-        ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
-      >
-        {s}
-      </div>
-      <span className="mt-2 text-xs sm:text-sm md:text-base text-gray-600 text-center leading-tight min-h-[32px] flex items-center justify-center">
-        {s === 1 && "Details"}
-        {s === 2 && "Date & Location"}
-        {s === 3 && "Ticketing"}
-        {s === 4 && "Registration Form"}
-      </span>
-    </button>
-  ))}
-</div>
+          {/* Step Indicator */}
+          <div className="flex justify-center items-start mb-12 w-full">
+            {[1, 2, 3, 4].map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStep(s)}
+                className="flex-1 flex flex-col items-center focus:outline-none"
+              >
+                <div
+                  className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
+                  ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
+                >
+                  {s}
+                </div>
+                <span className="mt-2 text-xs sm:text-sm md:text-base text-gray-600 text-center leading-tight min-h-[32px] flex items-center justify-center">
+                  {s === 1 && "Details"}
+                  {s === 2 && "Date & Location"}
+                  {s === 3 && "Ticketing"}
+                  {s === 4 && "Registration Form"}
+                </span>
+              </button>
+            ))}
+          </div>
 
           <form encType="multipart/form-data" className="space-y-6">
             {step === 1 && (
@@ -580,40 +578,40 @@ const CreateEventForm = () => {
               <CEStep4 formData={formData} setFormData={setFormData} />
             )}
 
-{/* Buttons Section */}
-<div className="flex justify-between items-center mt-8">
-  <div className="flex justify-end ml-auto space-x-4">
-    <button
-      type="button"
-      onClick={() => navigate(`/org/${userCode}/my-event`)}
-      className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
-    >
-      Cancel
-    </button>
-    {step < totalSteps ? (
-      <button
-        type="button"
-        onClick={() => {
-          handleNext();
-          window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 force scroll top
-        }}
-        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
-      >
-        Next
-      </button>
-    ) : (
-      <button
-        type="button"
-        onClick={() => {
-          handleSubmit();
-          window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 also scrolls up on submit
-        }}
-        className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
-      >
-        Submit
-      </button>
-    )}
-  </div>
+            {/* Buttons Section */}
+            <div className="flex justify-between items-center mt-8">
+              <div className="flex justify-end ml-auto space-x-4">
+                <button
+                  type="button"
+                  onClick={() => navigate(`/org/${userCode}/my-event`)}
+                  className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                {step < totalSteps ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleNext();
+                      window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 force scroll top
+                    }}
+                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSubmit();
+                      window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 also scrolls up on submit
+                    }}
+                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    Submit
+                  </button>
+                )}
+              </div>
             </div>
           </form>
         </div>
