@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate
 from .models import CustomUser
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings # To access GOOGLE_CLIENT_ID from settings
+from events.models import Event
 
 # For Google ID token verification
 from google.oauth2 import id_token
@@ -234,4 +235,22 @@ class UserSerializer(serializers.ModelSerializer):
             'company_website',
             'user_code',
             'verification_status',
+        ]
+
+
+class EventSerializer(serializers.ModelSerializer):
+    created_by = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Event
+        fields = [
+            'id',
+            'title',
+            'description',
+            'start_time',
+            'end_time',
+            'location',
+            'organizer',
+            'created_at',
+            'updated_at',
         ]

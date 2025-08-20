@@ -136,7 +136,6 @@ function EventDetailPage() {
       try {
         const res = await api.get(`/events/${eventcode}/`);
         setEventDetails(res.data);
-        console.log("Fetched Event:", res.data);
       } catch (err) {
         console.error("Error fetching event:", err);
       }
@@ -191,9 +190,9 @@ function EventDetailPage() {
       case "guardian_needed":
         return "Minors Allowed with Guardian";
       case "custom":
-        return allowedAge ? `${allowedAge}+ Only` : "Age Restricted";
+        return allowedAge ? `${allowedAge} Only` : "Age Restricted";
       default:
-        return allowedAge ? `${allowedAge}+ Only` : restriction;
+        return allowedAge ? `${allowedAge} Only` : restriction;
     }
   }
 

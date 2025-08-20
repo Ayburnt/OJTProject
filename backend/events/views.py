@@ -8,31 +8,47 @@ from django.db import transaction
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import Event, Ticket_Type, Reg_Form_Template, Reg_Form_Question, Question_Option
-from .serializers import EventSerializer
+from .serializers import EventSerializer, userserializer
 from .permissions import IsOwnerOrReadOnly # Assuming you've created this file
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.exceptions import ParseError
 from .parsers import NestedMultiPartParser
 from django.db.models import Q
+from api.models import CustomUser
 
+# events.py
 class OrganizerProfilePublicView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request, user_code):
-        profile = Event.objects.filter(
-            created_by=user_code
+        # Step 1: Get the user
+        try:
+            user = CustomUser.objects.get(user_code=user_code)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"error": "Organizer not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Step 2: Get published/completed events (if any)
+        events = Event.objects.filter(
+            created_by=user
         ).filter(
             Q(status='published') | Q(status='completed')
         )
 
-        if not profile.exists():
-            return Response(
-                {"error": "Organizer not found or no published/completed events"},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Step 3: Serialize user + events
+        user_data = userserializer(user).data
+        event_data = EventSerializer(events, many=True, context={"request": request}).data
 
-        serializer = EventSerializer(profile, many=True, context={"request": request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "organizer": user_data,
+                "events": event_data
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 class EventPublicView(APIView):
     permission_classes = [AllowAny]

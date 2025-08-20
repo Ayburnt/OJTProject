@@ -665,13 +665,13 @@ function Signup({ onAuthSuccess }) {
                         </div>
 
 
-                        <div className="flex items-center w-70">
+                        <div className="flex items-center w-[70%] flex-row">
                             <input
                                 type="checkbox" id="agree" className="mr-2"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
                             <p className="font-outfit text-sm mb-4">
-                                I agree and I have read and accepted Eventchuchu.
-                                <span className="text-blue-500">Terms and Conditions</span> </p>
+                                I agree and I have read and accepted <Link to='/term' target="_blank" className="text-blue-500">Terms of services</Link> and <Link to='/policy' target="_blank" className="text-blue-500">Privacy Policy</Link>.
+                            </p>
                         </div>
                         <button
                             type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
