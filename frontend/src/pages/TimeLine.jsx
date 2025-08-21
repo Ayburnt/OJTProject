@@ -3,7 +3,7 @@ import { CgProfile } from "react-icons/cg";
 import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
 import api from '../api.js';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // Back Button Component
 const BackButton = () => {
@@ -120,6 +120,7 @@ const EventCard = ({ event, onCardClick }) => {
   };
 
   const statusColorClass = getStatusColor(category);
+  const navigate = useNavigate();
 
   function formatDateTime(dateStr, timeStr) {
     const dt = new Date(`${dateStr}T${timeStr}`);
@@ -136,7 +137,8 @@ const EventCard = ({ event, onCardClick }) => {
   return (
     <div
       className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:scale-[1.01] duration-200 ease-in-out text-left cursor-pointer"
-      onClick={() => onCardClick(event)}
+      // onClick={() => onCardClick(event)}
+      onClick={()=> navigate(`/events/${event.event_code}`)}
     >
       <img
         src={event.event_poster}
@@ -177,7 +179,8 @@ const EventCard = ({ event, onCardClick }) => {
 };
 
 // Event Modal
-const EventModal = ({ event, onClose }) => {
+const EventModal = ({ event, onClose }) => {  
+
   if (!event) return null;
 
   function formatDateTime(dateStr, timeStr) {

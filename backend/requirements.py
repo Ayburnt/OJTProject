@@ -40,10 +40,12 @@ pyasn1_modules==0.4.2
 pycparser==2.22
 PyJWT==2.10.1
 PyNaCl==1.5.0
+pypiwin32==223
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
 pythonnet==3.0.5
 pytz==2025.2
+pywin32==311
 PyYAML==6.0.2
 qrcode==8.2
 requests==2.32.4

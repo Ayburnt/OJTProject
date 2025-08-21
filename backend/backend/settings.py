@@ -41,14 +41,37 @@ DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-if DEBUG:
-    # Local development
-    MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
-else:
-    # Production on EB – persistent folder
-    MEDIA_ROOT = "/var/app/current/media"
+# if DEBUG:
+#     # Local development
+#     MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
+# else:
+#     # Production on EB – persistent folder
+#     MEDIA_ROOT = "/var/app/media"
 
-MEDIA_URL = "/media/"
+if DEBUG:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
+else:    
+    # AWS S3 bucket settings
+    AWS_STORAGE_BUCKET_NAME = "sari-sari-events-media"   # e.g. events-media
+    AWS_S3_REGION_NAME = "ap-southeast-1"          # your region
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SES_SECRET_ACCESS_KEY")
+
+    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
+        # Fall back to IAM role credentials automatically
+        AWS_ACCESS_KEY_ID = None
+        AWS_SECRET_ACCESS_KEY = None
+        
+    AWS_QUERYSTRING_AUTH = False                   # no query params in URLs
+    AWS_DEFAULT_ACL = None                         # important for public-read
+
+    # Custom domain for media files (use bucket name + region)
+    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
+
+    # Tell Django to use S3 for media
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 
 REST_FRAMEWORK = {
@@ -114,7 +137,8 @@ INSTALLED_APPS = [
     'events',
     'rest_framework',
     'corsheaders',
-    'verification'
+    'verification',
+    'storages'
 ]
 
 MIDDLEWARE = [
