@@ -114,7 +114,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def save(self, *args, **kwargs):
         # Only generate QR if user_code exists
         if self.user_code and not self.qr_code_image:
-            self.qr_profile_link = f"https://event.sari-sari.com/org/{self.user_code}/dashboard"
+            self.qr_profile_link = f"https://event.sari-sari.com/org/{self.user_code}"
 
             qr = qrcode.QRCode(
                 version=1,

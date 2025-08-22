@@ -30,7 +30,7 @@ PROJECT_ROOT = BASE_DIR.parent
 SECRET_KEY = os.getenv("AUTH_SECRET") or "fallback-if-missing"
 DJANGO_SECRET_KEY = os.getenv("DJANGO_SECRET_KEY") or SECRET_KEY
 
-ALLOWED_HOSTS = ['.elasticbeanstalk.com', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['.elasticbeanstalk.com', 'localhost', '127.0.0.1', '*', 'event.sari-sari.com']
 
 
 STATICFILES_DIRS = [
@@ -51,27 +51,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 if DEBUG:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
-else:    
-    # AWS S3 bucket settings
-    AWS_STORAGE_BUCKET_NAME = "sari-sari-events-media"   # e.g. events-media
-    AWS_S3_REGION_NAME = "ap-southeast-1"          # your region
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_SES_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SES_SECRET_ACCESS_KEY")
+else:
+    # EFS Production settings
+    # The MEDIA_ROOT must match the EFS mount point from your .ebextensions config
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = "/efs/media/"
+    # Use Django's built-in file system storage
+    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
 
-    if not AWS_ACCESS_KEY_ID or not AWS_SECRET_ACCESS_KEY:
-        # Fall back to IAM role credentials automatically
-        AWS_ACCESS_KEY_ID = None
-        AWS_SECRET_ACCESS_KEY = None
-        
-    AWS_QUERYSTRING_AUTH = False                   # no query params in URLs
-    AWS_DEFAULT_ACL = None                         # important for public-read
-
-    # Custom domain for media files (use bucket name + region)
-    AWS_S3_CUSTOM_DOMAIN = f"{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com"
-
-    # Tell Django to use S3 for media
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 
 
 REST_FRAMEWORK = {

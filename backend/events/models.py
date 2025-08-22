@@ -85,7 +85,6 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-
     class Meta:
         verbose_name = 'Event'
         verbose_name_plural = 'Events'
@@ -122,6 +121,16 @@ class Event(models.Model):
             self.event_qr_image.save(file_name, File(buffer), save=False)
 
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Delete related image files before deleting the model instance
+        if self.event_poster:
+            self.event_poster.delete(save=False)
+        if self.seating_map:
+            self.seating_map.delete(save=False)
+        if self.event_qr_image:
+            self.event_qr_image.delete(save=False)
+        super().delete(*args, **kwargs)
 
 
     
