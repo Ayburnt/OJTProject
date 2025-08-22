@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { BsArrowLeftCircleFill } from "react-icons/bs";
 import RegisterSuccess from "../components/RegisterSucess.jsx";
 
 function BuyTicket() {
@@ -55,18 +54,14 @@ function BuyTicket() {
             <RegisterSuccess setIsModalOpen={setIsModalOpen} />
         )}
       {/* Header */}
-      <div className="flex items-left p-4 mt-2">
-        <button
-          className="text-teal-600 text-xl cursor-pointer"
-          onClick={() => navigate("/")}
-        >
-          <BsArrowLeftCircleFill />
-        </button>
-      </div>
+
+    <div className="flex items-center justify-center mt-6 mb-6">
+  <img src="/sariLogo.png" alt="Sari-Sari Events Logo" className="h-auto max-h-16" />
+            </div>
 
       {/* Event Banner */}
       <div className="w-full h-40 bg-gray-100 flex items-center justify-center overflow-hidden">
-        <img src="" alt="Event Banner" className="w-full h-full object-cover" />
+        <img src="/.png" alt="Event Banner" className="w-full h-full object-cover" />
       </div>
 
       {/* Event Details */}
