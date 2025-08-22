@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { GoCalendar, GoLocation, GoPeople } from "react-icons/go";
 import api from '../api.js';
+import { useNavigate } from 'react-router-dom';
 
 function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
+  const navigate = useNavigate();
 
   // Delete API call
   const handleDelete = async () => {
@@ -96,7 +98,7 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
         <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
 
         <div className='flex flex-row gap-3 mt-3'>
-          <button className='font-outfit px-4 py-2 bg-secondary text-white font-semibold cursor-pointer'>Edit</button>
+          <button className='font-outfit px-4 py-2 bg-secondary text-white font-semibold cursor-pointer' onClick={() => navigate(`/org/edit/${eventCode}`)}>Edit</button>
           <button
             className='font-outfit text-secondary px-4 py-2 border-1 border-secondary font-semibold cursor-pointer'
             onClick={() => setConfirmDelete(true)}

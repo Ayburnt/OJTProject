@@ -96,6 +96,51 @@ class EventSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({field: "This field is required."})
         return data
 
+    #FOR UPDATING EVENT
+    def update(self, instance, validated_data):
+        # Extract nested data
+        ticket_types_data = validated_data.pop('ticket_types', None)
+        reg_form_templates_data = validated_data.pop('reg_form_templates', None)
+        
+        # 1. Update the main Event instance fields
+        # This handles fields like event_name, location, dates, etc.
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+
+        # 2. Handle nested Ticket_Type updates
+        if ticket_types_data is not None:
+            # Delete existing tickets and create new ones
+            # This is a simple, but effective way to handle updates
+            # For more complex logic, you could compare and update
+            # based on unique IDs if they exist.
+            instance.ticket_types.all().delete()
+            for ticket_data in ticket_types_data:
+                Ticket_Type.objects.create(event=instance, **ticket_data)
+
+        # 3. Handle nested Reg_Form_Template and its questions
+        if reg_form_templates_data is not None:
+            # Clear existing templates and recreate
+            # Again, this is a destructive but straightforward update approach.
+            instance.reg_form_templates.all().delete()
+            for template_data in reg_form_templates_data:
+                questions_data = template_data.pop('questions', [])
+                reg_form_template = Reg_Form_Template.objects.create(
+                    event=instance,
+                    created_by=instance.created_by,
+                    **template_data
+                )
+                for question_data in questions_data:
+                    options_data = question_data.pop('options', [])
+                    reg_form_question = Reg_Form_Question.objects.create(
+                        regForm_template=reg_form_template,
+                        **question_data
+                    )
+                    for option_data in options_data:
+                        Question_Option.objects.create(question=reg_form_question, **option_data)
+
+        return instance
+
     
     def create(self, validated_data):
         print("validated_data before file assignment:", validated_data)
