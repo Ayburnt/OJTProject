@@ -38,6 +38,10 @@ function OrganizerDashboard() {
     }).format(dt);
   }
 
+  
+     useEffect(() => {
+            document.title = "Organizer Dashboard | Sari-Sari Events";
+          }, []);
 
 
   return (

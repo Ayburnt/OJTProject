@@ -24,6 +24,8 @@ function DocTile({ label, file }) {
 
   const isImg = isImage(file);
 
+  
+
   return (
     <div className="rounded-xl border p-4 bg-white shadow-sm">
       <p className="text-sm font-semibold mb-2">{label}</p>
@@ -63,6 +65,10 @@ export default function AdminReviewPage() {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+   useEffect(() => {
+      document.title = "Admin Review Page | Sari-Sari Events";
+    }, []);
 
   const fetchPendingRequests = async () => {
     try {

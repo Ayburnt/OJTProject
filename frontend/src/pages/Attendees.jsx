@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import { FaChevronDown } from 'react-icons/fa';
 import { CiSearch } from 'react-icons/ci';
@@ -7,6 +7,10 @@ import { CgProfile } from 'react-icons/cg';
 const Attendees = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedEvent, setSelectedEvent] = useState('All Events');
+
+   useEffect(() => {
+        document.title = "Organizer Attendees | Sari-Sari Events";
+      }, []);
 
   // These will later come from the backend (currently empty)
   const events = [

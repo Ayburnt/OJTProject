@@ -27,6 +27,11 @@ const OrganizerEvent = () => {
     fetchEventDetails();
   }, []);
 
+  
+     useEffect(() => {
+            document.title = "Organizer Event | Sari-Sari Events";
+          }, []);
+
 
 
   function formatDateTime(dateStr, timeStr) {

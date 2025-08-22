@@ -17,6 +17,7 @@ const BackButton = () => {
   );
 };
 
+
 // Organizer Profile Card
 const ProfileCard = ({ profileData, eventData }) => {
   if (!profileData || profileData.length === 0) {
@@ -26,6 +27,8 @@ const ProfileCard = ({ profileData, eventData }) => {
       </div>
     );
   }  
+
+
 
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
@@ -242,6 +245,10 @@ const TimeLine = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [profileData, setProfileData] = useState([]);
   const [eventData, setEventData] = useState([]);
+
+  useEffect(() => {
+          document.title = "Time Line | Sari-Sari Events";
+        }, []);
 
   const fetchProfile = async () => {
     try {

@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BsShieldLockFill } from 'react-icons/bs';
 import { IoArrowBackCircle } from "react-icons/io5";
@@ -11,6 +11,10 @@ import api, { ACCESS_TOKEN } from '../api.js';
 
 const ForgotPass = () => {
   const navigate = useNavigate();
+
+   useEffect(() => {
+          document.title = "Forgot PAssword | Sari-Sari Events";
+        }, []);
 
   const [step, setStep] = useState('email');
   const [email, setEmail] = useState('');

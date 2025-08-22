@@ -1,4 +1,4 @@
-    import { useState } from 'react';
+    import { useEffect, useState } from 'react';
 import { IoArrowBackCircle } from "react-icons/io5";
 import { BsShieldLockFill } from 'react-icons/bs';
 import api from '../api';
@@ -6,6 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 const ChangePassword = () => {
   const navigate = useNavigate();
+
+   useEffect(() => {
+        document.title = "Change Password | Sari-Sari Events";
+      }, []);
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');

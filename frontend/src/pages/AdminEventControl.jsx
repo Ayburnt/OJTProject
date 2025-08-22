@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IoIosArrowBack } from "react-icons/io";
 import { IoIosEye } from "react-icons/io";
 import { MdOutlineWarehouse } from "react-icons/md";
@@ -13,6 +13,11 @@ import AdminNav from "../components/AdminNav";
 import { useNavigate } from "react-router-dom";
 
 function AdminEventControl() {
+
+   useEffect(() => {
+    document.title = "Admin Event Control | Sari-Sari Events";
+  }, []);
+
   const navigate = useNavigate();
   return (
     <div className="h-screen bg-aliceblue font-outfit grid grid-cols-1 md:grid-cols-6 xl:grid-cols-9 md:[80%] lg:[75%]">

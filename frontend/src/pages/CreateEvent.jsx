@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import api from '../api.js';
 import CEStep1 from '../components/CEStep1.jsx';
 import CEStep2 from '../components/CEStep2.jsx';
@@ -20,6 +20,7 @@ const createNewTicket = () => ({
   quantity_available: 100,
   is_selling: false,
 });
+
 
 // A helper function to create a new, empty question object
 const createNewQuestion = () => ({
@@ -439,6 +440,10 @@ const CreateEventForm = () => {
   };
 
   const [isVerifiedConfirm, setIsVerifiedConfirm] = useState(false);
+
+   useEffect(() => {
+      document.title = "Create Event | Sari-Sari Events";
+    }, []);
 
 
   return (

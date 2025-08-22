@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FaCalendarAlt } from "react-icons/fa";
 import AdminNav from "../components/AdminNav";
 import { CgProfile } from 'react-icons/cg';
@@ -9,6 +9,11 @@ import { IoEyeSharp, IoLocationOutline } from "react-icons/io5";
 import useAuth from '../hooks/useAuth';
 
 function AdminDashboard() {
+
+     useEffect(() => {
+      document.title = "Admin Dashboard | Sari-Sari Events";
+    }, []);
+
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const { isLoggedIn, userEmail } = useAuth();
   const displayName = userEmail ? userEmail.split('@')[0] : "Organizer";

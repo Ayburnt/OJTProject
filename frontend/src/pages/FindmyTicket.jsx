@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoIosArrowBack } from "react-icons/io";
 
 const FindMyTicket = () => {
@@ -8,6 +8,10 @@ const FindMyTicket = () => {
   const handleEmailChange = (event) => {
     setEmail(event.target.value);
   };
+
+   useEffect(() => {
+          document.title = "Find My Ticket | Sari-Sari Events";
+        }, []);
 
   const handleNextClick = async () => {
     if (!email) {

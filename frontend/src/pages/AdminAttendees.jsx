@@ -1,5 +1,5 @@
 // src/pages/AdminAttendeesManagement.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AdminNav from "../components/AdminNav";
 import { FiSearch } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
@@ -7,6 +7,11 @@ import { FaRegCalendarAlt } from "react-icons/fa";
 import { IoIosArrowBack } from "react-icons/io";
 
 function AdminAttendees() {
+
+     useEffect(() => {
+      document.title = "Admin Attendees | Sari-Sari Events";
+    }, []);
+
   const [step, setStep] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("All Events");
 

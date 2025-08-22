@@ -32,6 +32,10 @@ const DocumentUploadSection = ({ title, fileTypes, fileSizeLimit, onFileChange, 
     // Use a unique ID for the input to connect with the label
     const inputId = `upload-${title.replace(/\s+/g, '-')}`;
 
+    useEffect(() => {
+              document.title = "Verification Form | Sari-Sari Events";
+            }, []);
+
     return (
         <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">

@@ -80,6 +80,10 @@ const ManageAccount = () => {
       handleShowModal('Failed to save changes. Please try again.');
     }
   };
+  
+   useEffect(() => {
+          document.title = "Manage Account | Sari-Sari Events";
+        }, []);
 
   const handleShowModal = (message) => {
     setModalMessage(message);
