@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
-import Chatbot from '../pages/Chatbot'; 
+import Chatbot from '../pages/Chatbot';
 import useAuth from '../hooks/useAuth';
 import api from '../api.js';
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const [events, setEvents] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [searchTerm, setSearchTerm] = useState("");
   const { userCode } = useAuth();
 
   const fetchEventDetails = async () => {
@@ -30,17 +30,25 @@ const OrganizerEvent = () => {
   }, []);
 
   // Format date + time
-  function formatDateTime(dateStr, timeStr) {
-    const dt = new Date(`${dateStr}T${timeStr}`);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(dt);
+  // Add this helper function inside OrganizerEvent
+  function formatEventDateTime(startDate, startTime, endDate, endTime) {
+    if (!startDate || !startTime) return "TBA";
+
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+
+    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+
+    if (!end || start.toDateString() === end.toDateString()) {
+      // Single-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${endTime ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+    } else {
+      // Multi-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+    }
   }
+
 
   // Determine event status based on current date/time
   function getEventStatus(event) {
@@ -123,11 +131,10 @@ const OrganizerEvent = () => {
             {["All Events", "Upcoming", "Ongoing", "Done"].map((cat) => (
               <button
                 key={cat}
-                className={`${
-                  selectedCategory === cat
-                    ? `bg-secondary text-white`
-                    : `border-1 border-secondary text-secondary`
-                } whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}
+                className={`${selectedCategory === cat
+                  ? `bg-secondary text-white`
+                  : `border-1 border-secondary text-secondary`
+                  } whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}
                 onClick={() => setSelectedCategory(cat)}
               >
                 {cat}
@@ -153,11 +160,9 @@ const OrganizerEvent = () => {
                 eventStatus={getEventStatus(event)}
                 eventStatusColor={getStatusColor(getEventStatus(event))}
                 eventName={event.title}
-                eventDate={
-                  event.start_date === event.end_date
-                    ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
-                    : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`
-                }
+                eventDate={formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
+
+
                 eventLocation={event.venue_name}
                 eventAttendees={event.attendees}
                 ticketTypes={event.ticket_types}
