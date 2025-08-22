@@ -2,55 +2,87 @@ import React, { useEffect, useState } from 'react';
 import OrganizerNav from '../components/OrganizerNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link } from "react-router-dom";
-import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
+import Chatbot from '../pages/Chatbot'; 
 import useAuth from '../hooks/useAuth';
 import api from '../api.js';
 
 const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const [events, setEvents] = useState([]);
-  const { userCode, isLoggedIn, userRole } = useAuth();
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [ eventCode, setEventCode ] = useState('');
+  const [searchTerm, setSearchTerm] = useState(""); 
+  const { userCode } = useAuth();
 
   const fetchEventDetails = async () => {
-      try {
-        const res = await api.get(`/list-create/`);
-        setEvents(res.data);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-
-      }
+    try {
+      const res = await api.get(`/list-create/`);
+      setEvents(res.data);
+    } catch (err) {
+      console.error("Error fetching events:", err);
     }
+  };
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchEventDetails();
   }, []);
 
-  
-     useEffect(() => {
-            document.title = "Organizer Event | Sari-Sari Events";
-          }, []);
+  useEffect(() => {
+    document.title = "Organizer Event | Sari-Sari Events";
+  }, []);
 
-
-
+  // Format date + time
   function formatDateTime(dateStr, timeStr) {
-    const dt = new Date(`${dateStr}T${timeStr}`); // combine date + time
+    const dt = new Date(`${dateStr}T${timeStr}`);
     return new Intl.DateTimeFormat("en-US", {
       year: "numeric",
-      month: "long",   // full month name
+      month: "long",
       day: "numeric",
       hour: "numeric",
       minute: "numeric",
-      hour12: true,    // 12-hour format with AM/PM
+      hour12: true,
     }).format(dt);
   }
+
+  // Determine event status based on current date/time
+  function getEventStatus(event) {
+    const now = new Date();
+    const start = new Date(`${event.start_date}T${event.start_time}`);
+    const end = new Date(`${event.end_date}T${event.end_time}`);
+
+    if (now < start) return "Upcoming";
+    if (now >= start && now <= end) return "Ongoing";
+    if (now > end) return "Done";
+    return "All Events";
+  }
+
+  // Get status color for badge
+  function getStatusColor(status) {
+    switch (status) {
+      case "Upcoming":
+        return "bg-blue-500 text-white";
+      case "Ongoing":
+        return "bg-green-500 text-white";
+      case "Done":
+        return "bg-gray-400 text-white";
+      default:
+        return "bg-gray-200 text-black";
+    }
+  }
+
+  // Filter events based on search + category
+  const filteredEvents = events.filter(event => {
+    const title = event.title ? event.title.toLowerCase() : "";
+    const venue = event.venue_name ? event.venue_name.toLowerCase() : "";
+    const matchesSearch = title.includes(searchTerm.toLowerCase()) || venue.includes(searchTerm.toLowerCase());
+
+    if (!matchesSearch) return false;
+    if (selectedCategory === "All Events") return true;
+    return getEventStatus(event) === selectedCategory;
+  });
 
   return (
     <div className="bg-gray-50 min-h-screen font-sans">
       <OrganizerNav />
 
-      {/* Content Container */}
       <div className="pt-23 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
         {/* Header */}
         <div className="justify-center mb-5 hidden md:flex">
@@ -65,7 +97,9 @@ const OrganizerEvent = () => {
           <div className="relative w-full">
             <input
               type="text"
-              placeholder="Search..."
+              placeholder="Search events by name or venue..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border-b-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
             />
             <svg
@@ -86,37 +120,44 @@ const OrganizerEvent = () => {
 
           {/* Action buttons */}
           <div className="flex flex-row w-full gap-3 items-center lg:w-[80%] xl:w-[70%] lg:justify-between overflow-x-auto hide-scrollbar text-sm">
-            <button className={`${selectedCategory === 'All Events' ? `bg-secondary text-white` : `border-1 border-secondary text-secondary`} whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}>
-              All Events
-            </button>
-            <button className={`${selectedCategory === 'Upcoming' ? `bg-secondary text-white` : `border-1 border-secondary text-secondary`} whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}>
-              Upcoming
-            </button>
-            <button className={`${selectedCategory === 'Ongoing' ? `bg-secondary text-white` : `border-1 border-secondary text-secondary`} whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}>
-              Ongoing
-            </button>
-            <button className={`${selectedCategory === 'Recent' ? `bg-secondary text-white` : `border-1 border-secondary text-secondary`} whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}>
-              Recent
-            </button>
+            {["All Events", "Upcoming", "Ongoing", "Done"].map((cat) => (
+              <button
+                key={cat}
+                className={`${
+                  selectedCategory === cat
+                    ? `bg-secondary text-white`
+                    : `border-1 border-secondary text-secondary`
+                } whitespace-nowrap px-4 lg:px-7 xl:px-10 py-2 rounded-full hover:bg-secondary/80 hover:text-white font-outfit shadow cursor-pointer`}
+                onClick={() => setSelectedCategory(cat)}
+              >
+                {cat}
+              </button>
+            ))}
           </div>
 
-          <Link to={`/org/${userCode}/create-event`} className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'>
+          <Link
+            to={`/org/${userCode}/create-event`}
+            className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
+          >
             Create New Event
           </Link>
         </div>
 
-
+        {/* Event Cards */}
         <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
-          {Array.isArray(events) && events.length > 0 ? (
-            events.map((event, i) => (
+          {filteredEvents.length > 0 ? (
+            filteredEvents.map((event, i) => (
               <EventCard
                 key={i}
                 eventPoster={event.event_poster}
-                eventStatus={event.status}
+                eventStatus={getEventStatus(event)}
+                eventStatusColor={getStatusColor(getEventStatus(event))}
                 eventName={event.title}
-                eventDate={event.start_date === event.end_date
-                  ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
-                  : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
+                eventDate={
+                  event.start_date === event.end_date
+                    ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
+                    : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`
+                }
                 eventLocation={event.venue_name}
                 eventAttendees={event.attendees}
                 ticketTypes={event.ticket_types}
@@ -126,12 +167,11 @@ const OrganizerEvent = () => {
               />
             ))
           ) : (
-            <p className="text-gray-500">No events available.</p>
+            <p className="text-gray-500">No events match your search or category.</p>
           )}
         </div>
       </div>
 
-      {/* Include the Chatbot component here */}
       <Chatbot />
     </div>
   );
