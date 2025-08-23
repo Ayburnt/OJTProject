@@ -671,7 +671,12 @@ class CurrentUserView(APIView):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'profile_picture': user.profile_picture,
+            # Handle both ImageField and CharField cases
+            'profile_picture': (
+                request.build_absolute_uri(user.profile_picture.url)
+                if hasattr(user.profile_picture, "url") else
+                (request.build_absolute_uri(user.profile_picture) if user.profile_picture else None)
+            ),
             'role': user.role,
             'phone_number': user.phone_number,
             'birthday': user.birthday.isoformat() if user.birthday else None,
@@ -679,11 +684,34 @@ class CurrentUserView(APIView):
             'company_name': user.company_name,
             'company_website': user.company_website,
             'user_code': user.user_code,
-            'qr_code_image': request.build_absolute_uri(user.qr_code_image.url) if user.qr_code_image else None,
+            'qr_code_image': (
+                request.build_absolute_uri(user.qr_code_image.url)
+                if user.qr_code_image else None
+            ),
             'qr_profile_link': user.qr_profile_link,
-            "verification_status": user.verification_status,
-
+            'verification_status': user.verification_status,
         })
+
+    def patch(self, request):
+        user = request.user
+        data = request.data
+
+        # Only update editable fields
+        editable_fields = ["first_name", "last_name", "phone_number", "company_name", "company_website"]
+        for field in editable_fields:
+            if field in data:
+                setattr(user, field, data[field])
+
+        user.save()
+
+        return Response({
+            "message": "Profile updated successfully",
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone_number": user.phone_number,
+            "company_name": user.company_name,
+            "company_website": user.company_website,
+        }, status=status.HTTP_200_OK)
         
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])

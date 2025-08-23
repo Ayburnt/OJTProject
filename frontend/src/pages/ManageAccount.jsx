@@ -270,32 +270,6 @@ const ManageAccount = () => {
                       } focus:outline-none`}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company Address</label>
-                  <input
-                    type="text"
-                    value={userData.company_address || ''}
-                    onChange={(e) => setUserData({...userData, company_address: e.target.value})}
-                    disabled={!isEditing}
-                    className={`w-full px-3 py-2 border rounded-lg text-base ${
-                      isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
-                      } focus:outline-none`}
-                  />
-                </div>
-              </div>
-
-              {/* Bio */}
-              <div className="mt-4">
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Bio</label>
-                <textarea
-                  value={userData.bio || ''}
-                  onChange={(e) => setUserData({...userData, bio: e.target.value})}
-                  disabled={!isEditing}
-                  rows={3}
-                  className={`w-full px-3 py-2 border rounded-lg resize-none text-base ${
-                    isEditing ? 'border-gray-300 focus:ring-2 focus:ring-teal-500' : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
               </div>
             </div>
 
