@@ -120,6 +120,14 @@ class EventRetrieveUpdateDestroyAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def delete(self, request, event_code, *args, **kwargs):
+        event = get_object_or_404(Event, event_code=event_code)
+        self.check_object_permissions(request, event)
+        
+        with transaction.atomic():
+            event.delete()
+        return Response({"detail": "Event deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
 
     
 class EventDetailView(APIView):
