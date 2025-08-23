@@ -133,3 +133,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.qr_code_image.save(file_name, File(buffer), save=False)
 
         super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Delete related image files before deleting the model instance
+        if self.qr_code_image:
+            self.qr_code_image.delete(save=False)
+        super().delete(*args, **kwargs)

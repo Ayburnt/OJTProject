@@ -17,11 +17,11 @@ const InputField = ({ label, inputType, inputName, inputValue, inputOnChange, in
   </div>
 )
 
-const EventCodeInput = ({ label, inputType, inputName, inputValue, inputOnChange, inputPlaceholder, maxLength }) => (
+const EventCodeInput = ({ label, inputType, inputName, inputValue, inputOnChange, inputPlaceholder, maxLength, disabled }) => (
   <div className='flex flex-col w-full gap-2'>
     <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
-    <input className="w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3"
-      type={inputType} maxLength={maxLength} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} />
+    <input className={`${disabled ? 'cursor-not-allowed bg-gray-100' : 'bg-white'} w-full border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3`}
+      type={inputType} maxLength={maxLength} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} disabled={disabled} />
   </div>
 )
 
@@ -50,7 +50,7 @@ function CEStep1({
         />
         <EventCodeInput label='Event Code' inputType='text' inputName='event_code'
           inputValue={formData.event_code} inputOnChange={handleEventChange}
-          inputPlaceholder='e.g., TS-2000' maxLength={50}
+          inputPlaceholder='e.g., TS-2000' maxLength={50} disabled={!!formData.id}
         />
         <EventDescInput label='Event Description' inputName='description'
           inputValue={formData.description} inputOnChange={handleEventChange}
