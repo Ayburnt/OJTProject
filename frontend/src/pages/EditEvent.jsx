@@ -62,17 +62,84 @@ const EditEventForm = () => {
     // --- Add all the helper functions here ---
     const handleEventChange = (e) => {
         const { name, value, files, type } = e.target;
-    
-        if (type === 'file' && files?.length > 0) {
-            const file = files[0];
-            setFormData(prev => ({ ...prev, [name]: file }));
+
+    // Reset errors for the specific field
+    if (name === 'seating_map') {
+      setIsSeatingMapErr(false);
+      setSeatingMapErr('');
+    }
+    if (name === 'event_poster') {
+      setIsPosterErr(false);
+      setPosterErr('');
+    }
+
+    if (type === 'file' && files?.length > 0) {
+      const file = files[0];
+      const validTypes = ["image/png", "image/jpeg"];
+
+      // File type check
+      if (!validTypes.includes(file.type)) {
+        if (name === 'seating_map') {
+          setIsSeatingMapErr(true);
+          setSeatingMapErr('Image must be PNG or JPG format.');
         } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: value,
-                // Add any specific logic from your CreateEvent.jsx here
-            }));
+          setIsPosterErr(true);
+          setPosterErr('Image must be PNG or JPG format.');
         }
+        return;
+      }
+
+      // Seating map: no aspect ratio validation
+      if (name === 'seating_map') {
+        setFormData(prev => ({ ...prev, seating_map: file }));
+        return;
+      }
+
+      // Poster: validate aspect ratio
+      if (name === 'event_poster') {
+        const img = new Image();
+        img.onload = () => {
+          const aspectRatio = img.width / img.height;
+          const ratio16by9 = 16 / 9;
+
+          if (img.width <= img.height) {
+            setIsPosterErr(true);
+            setPosterErr('Image must be landscape.');
+            return;
+          }
+
+          setFormData(prev => ({ ...prev, event_poster: file }));
+        };
+        img.src = URL.createObjectURL(file);
+        return;
+      }
+    } else {
+      // Handle text fields or radio buttons
+      setFormData(prev => {
+        const updated = { ...prev, [name]: value };
+
+        // Clear private_code if audience is set to public
+        if (name === 'audience' && value === 'public') {
+          updated.private_code = '';
+        }
+
+        if (name === 'event_type' && value === 'in-person') {
+          updated.meeting_link = '';
+          updated.meeting_platform = '';
+        }
+
+        // If duration_type is single, set end_date same as start_date
+        if (name === 'duration_type' && value === 'single') {
+          updated.end_date = updated.start_date || ''; // use current start_date or empty string
+        }
+
+        if (name === 'event_code') {
+          updated.event_code = value.replace(/\s+/g, "");
+        }
+
+        return updated;
+      });
+    }
     };
 
     const handleCheckboxChange = (e) => {
