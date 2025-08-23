@@ -290,7 +290,7 @@ function Header() {
           )}
         </nav>
 
-        {/* Mobile Menu Icon */}
+                {/* Mobile Menu Icon */}
         <div className="lg:hidden">
           <button
             onClick={toggleMobileMenu}
@@ -313,7 +313,51 @@ function Header() {
           </button>
         </div>
       </div>
+
+      {/* ✅ Missing Mobile Menu */}
+{isMobileMenuOpen && (
+<div className="lg:hidden absolute left-1/2 -translate-x-1/2 top-full z-20 bg-white border border-gray-300 w-full rounded-md flex shadow-md">
+  <nav className="flex flex-col items-center text-center space-y-2 p-4 w-full">
+      <Link
+        to="/find-my-ticket"
+        className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+      >
+        Find my Tickets
+      </Link>
+      <button
+        onClick={handleCreateEvent}
+        className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+      >
+        Create Event
+      </button>
+      {isLoggedIn ? (
+        <>
+          <button
+            onClick={() => navigate(`/org/${userCode}/dashboard`)}
+            className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+          >
+            Dashboard
+          </button>
+          <button
+            onClick={logout}
+            className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+          >
+            Log out
+          </button>
+        </>
+      ) : (
+        <Link
+          to="/login"
+          className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+        >
+          Login
+        </Link>
+      )}
+    </nav>
+  </div>
+)}
     </header>
+
   );
 }
 

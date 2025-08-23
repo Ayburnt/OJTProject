@@ -106,11 +106,14 @@ const ManageAccount = () => {
     );
   }
 
-  return (
-    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 font-outfit">
+return (
+          <div className="flex min-h-screen bg-gray-100 font-outfit">
+    {/* Sidebar */}
+    <div className="md:block md:w-56 lg:w-64 shrink-0">
       <OrganizerNav />
-      <main className="flex-1 p-4 lg:p-8 max-w-5xl mt-15 md:mt-0 mx-auto w-full lg:translate-x-25">
-
+    </div>
+    {/* Main Content */}
+    <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full">
         {/* Profile Picture and Account Actions */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-7 flex-1">
           <div className="flex flex-col lg:flex-row w-full items-center sm:items-start justify-between gap-6">
