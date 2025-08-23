@@ -25,6 +25,7 @@ import AdminReviewPage from './pages/AdminReviewPage.jsx';
 import AdminAttendees from './pages/AdminAttendees.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
 import EditEvent from './pages/EditEvent.jsx';
+import BuyTicket from './pages/BuyTicket.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 
 import Q1 from './footer/Q1.jsx';
@@ -119,6 +120,7 @@ function App() {
           <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
           <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
           <Route path='/org/edit/:eventcode' element={<PrivateRoute requiredRole={'organizer'}><EditEvent /></PrivateRoute>} />
+          <Route path='/events/:eventcode/checkout' element={<BuyTicket />} />
 
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}
           <Route path='/org/:userCode/verification-form' element={<PrivateRoute requiredRole={'organizer'}><VerificationForm /></PrivateRoute>} />

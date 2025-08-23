@@ -32,22 +32,22 @@ const OrganizerEvent = () => {
   // Format date + time
   // Add this helper function inside OrganizerEvent
   function formatEventDateTime(startDate, startTime, endDate, endTime) {
-    if (!startDate || !startTime) return "TBA";
+        if (!startDate || !startTime) return "TBA";
 
-    const start = new Date(`${startDate}T${startTime}`);
-    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+        const start = new Date(`${startDate}T${startTime}`);
+        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
 
-    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
 
-    if (!end || start.toDateString() === end.toDateString()) {
-      // Single-day event
-      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${endTime ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
-    } else {
-      // Multi-day event
-      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+        if (!end || start.toDateString() === end.toDateString()) {
+            // Single-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+        } else {
+            // Multi-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+        }
     }
-  }
 
 
   // Determine event status based on current date/time

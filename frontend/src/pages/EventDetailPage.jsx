@@ -382,11 +382,11 @@ function EventDetailPage() {
                                     <div className="mt-6">
                                         <button
                                             className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${agreeToTerms
-                                                ? "bg-orange-500 hover:bg-orange-600 text-white"
+                                                ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
                                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
                                             disabled={!agreeToTerms}
-                                            onClick={() => { /* This is an empty function, so the button does nothing */ }}
+                                            onClick={() => navigate(`/events/${eventDetails.event_code}/checkout`)}
                                         >
                                             Register
                                         </button>

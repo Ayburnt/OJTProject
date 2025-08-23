@@ -126,17 +126,23 @@ const EventCard = ({ event, onCardClick }) => {
   const statusColorClass = getStatusColor(category);
   const navigate = useNavigate();
 
-  function formatDateTime(dateStr, timeStr) {
-    const dt = new Date(`${dateStr}T${timeStr}`);
-    return new Intl.DateTimeFormat("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-      hour12: true,
-    }).format(dt);
-  }
+  function formatEventDateTime(startDate, startTime, endDate, endTime) {
+        if (!startDate || !startTime) return "TBA";
+
+        const start = new Date(`${startDate}T${startTime}`);
+        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+
+        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+
+        if (!end || start.toDateString() === end.toDateString()) {
+            // Single-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+        } else {
+            // Multi-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+        }
+    }
 
   return (
     <div
@@ -162,9 +168,7 @@ const EventCard = ({ event, onCardClick }) => {
           <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0">
             <FiCalendar className="w-4 h-4" />
             <p>
-              {event.start_date === event.end_date
-                ? `${formatDateTime(event.start_date, event.start_time)} - ${event.end_time}`
-                : `${formatDateTime(event.start_date, event.start_time)} - ${formatDateTime(event.end_date, event.end_time)}`}
+              {formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
             </p>
           </div>
           <div className="flex items-center font-outfit space-x-2 text-sm">

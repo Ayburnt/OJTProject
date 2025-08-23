@@ -5,9 +5,8 @@ function RegisterSuccess({setIsModalOpen}) {
   
 
   return (
-    <div className="min-h-screen flex items-center justify-center font-outfit">
       
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-100 font-outfit">
           <div className="bg-white p-6 rounded-lg max-w-md w-full">
             <h2 className="text-xl font-bold mb-4">Registration Successful!</h2>
             <p>Success! You’re officially registered. We look forward to seeing you there!🎉🎉</p>
@@ -21,8 +20,7 @@ function RegisterSuccess({setIsModalOpen}) {
                 </div>
           </div>
         </div>
-     
-    </div>
+    
   );
 }
 
