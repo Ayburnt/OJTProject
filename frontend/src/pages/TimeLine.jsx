@@ -7,9 +7,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 // Back Button Component
 const BackButton = () => {
+  const navigate = useNavigate();
   return (
     <button
-      onClick={() => navigation.back()}
+      onClick={() => navigate(`/`)}
       className="flex items-center cursor-pointer font-outfit text-teal-600 hover:text-teal-800 mb-4 font-medium"
     >
       <span className="mr-1">&lt;</span> Back

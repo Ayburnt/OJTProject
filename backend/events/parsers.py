@@ -1,3 +1,4 @@
+#event/parsers.py
 from rest_framework.parsers import MultiPartParser, DataAndFiles
 import json
 

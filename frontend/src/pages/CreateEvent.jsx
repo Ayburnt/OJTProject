@@ -55,6 +55,8 @@ const CreateEventForm = () => {
     venue_place_id: '',
     venue_name: '',
     venue_address: '',
+    venue_lat: null,   // 👈 add this
+    venue_lng: null,   // 👈 and this
     age_restriction: 'all',
     age_allowed: '',
     parking: '',
@@ -393,6 +395,8 @@ const CreateEventForm = () => {
       venue_place_id: loc.place_id || "",
       venue_name: loc.name || "",
       venue_address: loc.address || loc.display_name || "",
+      venue_lat: loc.lat,
+      venue_lng: loc.lng,
     }));
   };
 

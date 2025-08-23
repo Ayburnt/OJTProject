@@ -16,6 +16,16 @@ export default function LocationPicker({ value, onChange, handleLocationChange }
   const [searchTerm, setSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState([]);
 
+  // Sync input when parent `value` changes
+useEffect(() => {
+  if (value?.address) {
+    setSearchTerm(value.address);   // 👈 show full address
+  } else if (value?.name) {
+    setSearchTerm(value.name);      // fallback
+  }
+}, [value]);
+
+
   // Autocomplete search (fetch suggestions as user types)
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
@@ -55,9 +65,6 @@ export default function LocationPicker({ value, onChange, handleLocationChange }
   setSearchTerm(loc.display_name);
   setSuggestions([]);
 };
-
-
-
 
 
   // Click map to move marker
@@ -115,7 +122,7 @@ export default function LocationPicker({ value, onChange, handleLocationChange }
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Marker position={markerPos}>
-        <Popup>{searchTerm || `Lat: ${markerPos.lat}, Lng: ${markerPos.lng}`}</Popup>
+        <Popup>{value?.address || searchTerm || `Lat: ${markerPos.lat}, Lng: ${markerPos.lng}`}</Popup>
       </Marker>
       <MapClickHandler />
     </MapContainer>

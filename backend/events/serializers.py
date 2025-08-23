@@ -6,25 +6,29 @@ from api.models import CustomUser
 
 # Serializer for Question_Option
 class QuestionOptionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = Question_Option
-        fields = ['option_value']
+        fields = ['id', 'option_value']
 
 # Serializer for Reg_Form_Question
 class RegFormQuestionSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     options = QuestionOptionSerializer(many=True, required=False)
 
     class Meta:
         model = Reg_Form_Question
-        fields = ['question_label', 'question_type', 'is_required', 'options']
+        fields = ['id', 'question_label', 'question_type', 'is_required', 'options']
 
 # Serializer for Reg_Form_Template
 class RegFormTemplateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     questions = RegFormQuestionSerializer(many=True, required=False)
 
     class Meta:
         model = Reg_Form_Template
-        fields = ['is_active', 'questions']
+        fields = ['id', 'is_active', 'questions']
 
     def validate_questions(self, value):
         """
@@ -39,6 +43,7 @@ class RegFormTemplateSerializer(serializers.ModelSerializer):
 
 # Serializer for Ticket_Type
 class TicketTypeSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
     class Meta:
         model = Ticket_Type
         fields = '__all__'
@@ -54,8 +59,7 @@ class userserializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     created_by = userserializer(read_only=True)
     ticket_types = TicketTypeSerializer(many=True)
-    reg_form_templates = RegFormTemplateSerializer(many=True, required=False)
-    reg_form_questions = RegFormQuestionSerializer(many=True, required=False)    
+    reg_form_templates = RegFormTemplateSerializer(many=True, required=False)    
     event_poster = serializers.ImageField(required=False, allow_null=True)
     seating_map = serializers.ImageField(required=False, allow_null=True)
 
@@ -96,48 +100,115 @@ class EventSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({field: "This field is required."})
         return data
 
-    #FOR UPDATING EVENT
     def update(self, instance, validated_data):
-        # Extract nested data
-        ticket_types_data = validated_data.pop('ticket_types', None)
-        reg_form_templates_data = validated_data.pop('reg_form_templates', None)
-        
-        # 1. Update the main Event instance fields
-        # This handles fields like event_name, location, dates, etc.
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
+        tickets_data = validated_data.pop("ticket_types", None)
+        templates_data = validated_data.pop("reg_form_templates", None)
 
-        # 2. Handle nested Ticket_Type updates
-        if ticket_types_data is not None:
-            # Delete existing tickets and create new ones
-            # This is a simple, but effective way to handle updates
-            # For more complex logic, you could compare and update
-            # based on unique IDs if they exist.
-            instance.ticket_types.all().delete()
-            for ticket_data in ticket_types_data:
-                Ticket_Type.objects.create(event=instance, **ticket_data)
+        with transaction.atomic():
+            # --- Update normal fields ---
+            for attr, value in validated_data.items():
+                setattr(instance, attr, value)
+            instance.save()
 
-        # 3. Handle nested Reg_Form_Template and its questions
-        if reg_form_templates_data is not None:
-            # Clear existing templates and recreate
-            # Again, this is a destructive but straightforward update approach.
-            instance.reg_form_templates.all().delete()
-            for template_data in reg_form_templates_data:
-                questions_data = template_data.pop('questions', [])
-                reg_form_template = Reg_Form_Template.objects.create(
-                    event=instance,
-                    created_by=instance.created_by,
-                    **template_data
-                )
-                for question_data in questions_data:
-                    options_data = question_data.pop('options', [])
-                    reg_form_question = Reg_Form_Question.objects.create(
-                        regForm_template=reg_form_template,
-                        **question_data
-                    )
-                    for option_data in options_data:
-                        Question_Option.objects.create(question=reg_form_question, **option_data)
+            # --- Handle tickets ---
+            if tickets_data is not None:
+                existing_ticket_ids = [t.id for t in instance.ticket_types.all()]
+                sent_ticket_ids = []
+
+                for ticket_data in tickets_data:
+                    ticket_id = ticket_data.get("id")
+                    if ticket_id and ticket_id in existing_ticket_ids:
+                        # Update existing ticket
+                        ticket = Ticket_Type.objects.get(id=ticket_id, event=instance)
+                        for attr, value in ticket_data.items():
+                            if attr != "id":
+                                setattr(ticket, attr, value)
+                        ticket.save()
+                        sent_ticket_ids.append(ticket_id)
+                    else:
+                        # Create new ticket
+                        new_ticket = Ticket_Type.objects.create(event=instance, **ticket_data)
+                        sent_ticket_ids.append(new_ticket.id)
+
+                # Delete tickets not in payload
+                instance.ticket_types.exclude(id__in=sent_ticket_ids).delete()
+
+            # --- Handle reg form templates + questions + options ---
+            if templates_data is not None:
+                existing_template_ids = [t.id for t in instance.reg_form_templates.all()]
+                sent_template_ids = []
+
+                request = self.context.get('request')
+                user = request.user if request and request.user.is_authenticated else None
+
+                for template_data in templates_data:
+                    template_id = template_data.get("id")
+                    questions_data = template_data.pop("questions", [])
+
+                    if template_id and template_id in existing_template_ids:
+                        # Update existing template
+                        template = Reg_Form_Template.objects.get(id=template_id, event=instance)
+                        template.is_active = template_data.get("is_active", template.is_active)
+                        template.save()
+                        sent_template_ids.append(template_id)
+                    else:
+                        # Create new template
+                        template = Reg_Form_Template.objects.create(
+                            event=instance,
+                            created_by=user,
+                            **template_data
+                        )
+                        sent_template_ids.append(template.id)
+
+                    # --- Handle questions ---
+                    existing_question_ids = [q.id for q in template.questions.all()]
+                    sent_question_ids = []
+
+                    for question_data in questions_data:
+                        question_id = question_data.get("id")
+                        options_data = question_data.pop("options", [])
+
+                        if question_id and question_id in existing_question_ids:
+                            # Update existing question
+                            question = Reg_Form_Question.objects.get(id=question_id, regForm_template=template)
+                            for attr, value in question_data.items():
+                                if attr != "id":
+                                    setattr(question, attr, value)
+                            question.save()
+                            sent_question_ids.append(question_id)
+                        else:
+                            # Create new question
+                            question = Reg_Form_Question.objects.create(
+                                regForm_template=template,
+                                **question_data
+                            )
+                            sent_question_ids.append(question.id)
+
+                        # --- Handle options ---
+                        existing_option_ids = [o.id for o in question.options.all()]
+                        sent_option_ids = []
+
+                        for option_data in options_data:
+                            option_id = option_data.get("id")
+                            if option_id and option_id in existing_option_ids:
+                                # Update existing option
+                                option = Question_Option.objects.get(id=option_id, question=question)
+                                option.option_value = option_data.get("option_value", option.option_value)
+                                option.save()
+                                sent_option_ids.append(option_id)
+                            else:
+                                # Create new option
+                                new_option = Question_Option.objects.create(question=question, **option_data)
+                                sent_option_ids.append(new_option.id)
+
+                        # Delete options not in payload
+                        question.options.exclude(id__in=sent_option_ids).delete()
+
+                    # Delete questions not in payload
+                    template.questions.exclude(id__in=sent_question_ids).delete()
+
+                # Delete templates not in payload
+                instance.reg_form_templates.exclude(id__in=sent_template_ids).delete()
 
         return instance
 
@@ -214,6 +285,3 @@ class EventSerializer(serializers.ModelSerializer):
                         Question_Option.objects.create(question=reg_form_question, **option_data)
 
         return event
-
-
-    # ...existing code...

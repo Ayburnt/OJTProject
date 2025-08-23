@@ -89,14 +89,14 @@ class EventListCreateAPIView(APIView):
 
 
 class EventRetrieveUpdateDestroyAPIView(APIView):
+    parser_classes = [NestedMultiPartParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def get(self, request, event_code, *args, **kwargs):
         event = get_object_or_404(Event, event_code=event_code)
-        # Check permissions for this object
         self.check_object_permissions(request, event)
-        serializer = EventSerializer(event)
+        serializer = EventSerializer(event, context={"request": request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def put(self, request, event_code, *args, **kwargs):
@@ -104,31 +104,23 @@ class EventRetrieveUpdateDestroyAPIView(APIView):
         self.check_object_permissions(request, event)
         
         with transaction.atomic():
-            serializer = EventSerializer(event, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-    def patch(self, request, event_code, *args, **kwargs):
-        event = get_object_or_404(Event, event_code=event_code)
-        self.check_object_permissions(request, event)
-        
-        with transaction.atomic():
-            serializer = EventSerializer(event, data=request.data, partial=True)
+            serializer = EventSerializer(event, data=request.data, context={"request": request})
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, event_code, *args, **kwargs):
+    def patch(self, request, event_code, *args, **kwargs):
         event = get_object_or_404(Event, event_code=event_code)
         self.check_object_permissions(request, event)
         
         with transaction.atomic():
-            event.delete()
-        
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            serializer = EventSerializer(event, data=request.data, partial=True, context={"request": request})
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class EventDetailView(APIView):
     permission_classes = [AllowAny]

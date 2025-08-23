@@ -27,6 +27,24 @@ const createNewQuestion = () => ({
     options: [{ option_value: '' }],
 });
 
+// Helper function to parse 24-hour time string into an object
+const parseTime = (timeString) => {
+    if (!timeString) {
+        return { hour: '', minute: '', period: 'AM' };
+    }
+    const [hour24, minute] = timeString.split(':').map(Number);
+    let hour = hour24 % 12;
+    if (hour === 0) {
+        hour = 12; // Handle midnight
+    }
+    const period = hour24 >= 12 ? 'PM' : 'AM';
+    return {
+        hour: String(hour),
+        minute: String(minute).padStart(2, '0'),
+        period
+    };
+};
+
 const EditEventForm = () => {
     const { eventcode } = useParams();
     const navigate = useNavigate();
@@ -116,33 +134,70 @@ const EditEventForm = () => {
     // End of helper functions
 
     useEffect(() => {
-        const fetchEventData = async () => {
-            setIsLoading(true);
-            try {
-                const response = await api.get(`/events/${eventcode}/`);
-                const eventData = response.data;
-                setFormData({
-                    ...eventData,
-                    start_date: eventData.start_date.split('T')[0],
-                    end_date: eventData.end_date.split('T')[0],
-                    ticket_types: eventData.ticket_types || [createNewTicket()],
-                    reg_form_template: eventData.reg_form_template || [{ // Change here
-                        is_active: true,
-                        questions: [createNewQuestion()],
-                    }],
-                });
-            } catch (err) {
-                console.error("Failed to fetch event data:", err);
-                navigate(`/org/${userCode}/my-event`);
-            } finally {
-                setIsLoading(false);
-            }
-        };
+    const fetchEventData = async () => {
+        setIsLoading(true);
+        try {
+            const response = await api.get(`/events/${eventcode}/`);
+            const eventData = response.data;
+            console.log("Fetched event data:", eventData);
 
-        if (eventcode) {
-            fetchEventData();
+            // Parse start and end times
+            const { hour: startHour, minute: startMinute, period: startPeriod } = parseTime(eventData.start_time);
+            const { hour: endHour, minute: endMinute, period: endPeriod } = parseTime(eventData.end_time);
+
+            setFormData({
+                ...eventData,
+                start_date: eventData.start_date.split('T')[0],
+                end_date: eventData.end_date.split('T')[0],
+                ticket_types: eventData.ticket_types?.length
+                    ? eventData.ticket_types
+                    : [createNewTicket()],
+
+                // ✅ FIX: map reg_form_templates properly
+                reg_form_templates: eventData.reg_form_templates?.length
+          ? eventData.reg_form_templates.map(t => ({
+              ...t,
+              questions: t.questions?.length
+                ? t.questions.map(q => ({
+                    ...q,
+                    options: q.options?.length ? q.options : [{ option_value: "" }]
+                  }))
+                : []
+            }))
+          : [{
+              is_active: true,
+              questions: []
+            }],
+
+                // ✅ Add parsed time values
+                startHour,
+                startMinute,
+                startPeriod,
+                endHour,
+                endMinute,
+                endPeriod,
+
+                // ✅ Fix location handling (address included)
+                location: {
+                    lat: parseFloat(eventData.venue_lat) || 14.5995,
+                    lng: parseFloat(eventData.venue_lng) || 120.9842,
+                    name: eventData.venue_name || "",
+                    address: eventData.venue_address || "",
+                }
+            });
+        } catch (err) {
+            console.error("Failed to fetch event data:", err);
+            navigate(`/org/${userCode}/my-event`);
+        } finally {
+            setIsLoading(false);
         }
-    }, [eventcode, navigate, userCode]);
+    };
+
+    if (eventcode) {
+        fetchEventData();
+    }
+}, [eventcode, navigate, userCode]);
+
 
     // src/pages/EditEvent.jsx
 
@@ -154,30 +209,28 @@ const handleUpdate = async (e) => {
 
     const form = new FormData();
 
-    // The filter below is the problem. Let's make it more flexible.
-    // We will now only check that a ticket has a name to be considered valid.
+    // ✅ Filter valid ticket types
     const validTicketTypes = formData.ticket_types.filter(ticket =>
         ticket.ticket_name?.trim()
     );
 
-    // Check if there are any valid tickets.
     if (validTicketTypes.length === 0) {
         console.error("Validation Error: You must have at least one valid ticket type.");
         setAlert({ show: true, message: "You must have at least one valid ticket type." });
         setIsLoading(false);
-        return; // Prevent the API call
+        return;
     }
 
-    // Append all top-level fields
+    // ✅ Append all top-level fields except nested/ignored ones
     Object.entries(formData).forEach(([key, value]) => {
-        if (key !== 'ticket_types' && key !== 'reg_form_template' && key !== 'event_poster' && key !== 'seating_map' && key !== 'event_qr_image') {
+        if (key !== 'ticket_types' && key !== 'reg_form_templates' && key !== 'event_poster' && key !== 'seating_map' && key !== 'event_qr_image') {
             if (value !== null && value !== undefined) {
                 form.append(key, value);
             }
         }
     });
 
-    // Handle files: only append a new File object if it exists.
+    // ✅ Handle files
     if (formData.event_poster instanceof File) {
         form.append("event_poster", formData.event_poster);
     }
@@ -185,7 +238,7 @@ const handleUpdate = async (e) => {
         form.append("seating_map", formData.seating_map);
     }
 
-    // Append valid ticket types with proper ID handling
+    // ✅ Append tickets
     validTicketTypes.forEach((ticket, index) => {
         const { id, ...ticketData } = ticket;
         Object.entries(ticketData).forEach(([key, value]) => {
@@ -198,44 +251,44 @@ const handleUpdate = async (e) => {
         }
     });
 
-    // Append reg form templates
-    const validRegFormTemplates = formData.reg_form_template.filter(template =>
+    // ✅ Append reg form templates (plural)
+    const validRegFormTemplates = formData.reg_form_templates.filter(template =>
         template.questions.some(q => q.question_label?.trim())
     );
 
     validRegFormTemplates.forEach((template, index) => {
         const { id, questions, ...templateData } = template;
+
         Object.entries(templateData).forEach(([key, value]) => {
             if (value !== null && value !== undefined) {
-                form.append(`reg_form_template[${index}][${key}]`, value);
+                form.append(`reg_form_templates[${index}][${key}]`, value);
             }
         });
         if (id) {
-            form.append(`reg_form_template[${index}][id]`, id);
+            form.append(`reg_form_templates[${index}][id]`, id);
         }
 
         questions.filter(q => q.question_label?.trim()).forEach((question, qIndex) => {
             const { id: qId, options, ...questionData } = question;
+
             Object.entries(questionData).forEach(([questionKey, questionValue]) => {
                 if (questionValue !== null && questionValue !== undefined) {
-                    // Corrected this line to use `reg_form_template` (singular)
-                    form.append(`reg_form_template[${index}][questions][${qIndex}][${questionKey}]`, questionValue);
+                    form.append(`reg_form_templates[${index}][questions][${qIndex}][${questionKey}]`, questionValue);
                 }
             });
             if (qId) {
-                form.append(`reg_form_template[${index}][questions][${qIndex}][id]`, qId);
+                form.append(`reg_form_templates[${index}][questions][${qIndex}][id]`, qId);
             }
 
             options.forEach((option, oIndex) => {
                 const { id: oId, ...optionData } = option;
                 Object.entries(optionData).forEach(([optionKey, optionValue]) => {
                     if (optionValue !== null && optionValue !== undefined) {
-                        // Corrected this line to use `reg_form_template` (singular)
-                        form.append(`reg_form_template[${index}][questions][${qIndex}][options][${oIndex}][${optionKey}]`, optionValue);
+                        form.append(`reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][${optionKey}]`, optionValue);
                     }
                 });
                 if (oId) {
-                    form.append(`reg_form_template[${index}][questions][${qIndex}][options][${oIndex}][id]`, oId);
+                    form.append(`reg_form_templates[${index}][questions][${qIndex}][options][${oIndex}][id]`, oId);
                 }
             });
         });
@@ -252,6 +305,7 @@ const handleUpdate = async (e) => {
         setIsLoading(false);
     }
 };
+
 
     if (!formData || isLoading) {
         return (
@@ -277,8 +331,34 @@ const handleUpdate = async (e) => {
                     <h1 className="text-3xl md:text-4xl font-bold mt-4 text-gray-900">Edit Event</h1>
                     <p className="text-gray-600 mt-2">Update your event details.</p>
                 </div>
+
+                {/* Step Indicator */}
+          <div className="flex justify-center items-start mb-12 w-full">
+            {[1, 2, 3, 4].map(s => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStep(s)}
+                className="flex-1 flex flex-col items-center focus:outline-none"
+              >
+                <div
+                  className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
+                  ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
+                >
+                  {s}
+                </div>
+                <span className="mt-2 text-xs sm:text-sm md:text-base text-gray-600 text-center leading-tight min-h-[32px] flex items-center justify-center">
+                  {s === 1 && "Details"}
+                  {s === 2 && "Date & Location"}
+                  {s === 3 && "Ticketing"}
+                  {s === 4 && "Registration Form"}
+                </span>
+              </button>
+            ))}
+          </div>
+
                 {/* Step Indicator and Form are the same as CreateEvent.jsx */}
-                <form onSubmit={handleUpdate} encType="multipart/form-data" className="space-y-6">
+                <form encType="multipart/form-data" className="space-y-6">
                     {alert.show && (
                         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
                             <span className="block sm:inline">{alert.message}</span>
@@ -313,7 +393,8 @@ const handleUpdate = async (e) => {
                                 </button>
                             ) : (
                                 <button
-                                    type="submit"
+                                    type="button"
+                                    onClick={handleUpdate}
                                     className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
                                 >
                                     Update Event

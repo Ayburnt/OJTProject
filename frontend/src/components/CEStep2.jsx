@@ -79,113 +79,109 @@ function CEStep2({
 
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
-{/* Start Time */}
-<div>
-  <label className="block text-sm font-medium text-gray-700">Start Time</label>
-  <div className="mt-1 flex items-center space-x-2">
-    <input
-      type="number"
-      name="startHour"
-      value={formData.startHour}
-      onChange={(e) => handleTimeChange("start", "hour", e.target.value)}
-      placeholder="00"
-      maxLength={2}
-      min={1}
-      max={12}
-      className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
-    />
-    <span>:</span>
-    <input
-      type="number"
-      name="startMinute"
-      value={formData.startMinute}
-      onChange={(e) => handleTimeChange("start", "minute", e.target.value)}
-      placeholder="00"
-      maxLength={2}
-      min={0}
-      max={59}
-      className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
-    />
-    <div className="flex space-x-2">
-      <button
-        type="button"
-        onClick={() => handleTimeChange("start", "period", "AM")}
-        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${
-          formData.startPeriod === "AM"
-            ? "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
-      >
-        AM
-      </button>
-      <button
-        type="button"
-        onClick={() => handleTimeChange("start", "period", "PM")}
-        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${
-          formData.startPeriod === "PM"
-            ? "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
-      >
-        PM
-      </button>
-    </div>
-  </div>
-</div>
+          {/* Start Time */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Start Time</label>
+            <div className="mt-1 flex items-center space-x-2">
+              <input
+                type="number"
+                name="startHour"
+                value={formData.startHour}
+                onChange={(e) => handleTimeChange("start", "hour", e.target.value)}
+                placeholder="00"
+                maxLength={2}
+                min={1}
+                max={12}
+                className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
+              />
+              <span>:</span>
+              <input
+                type="number"
+                name="startMinute"
+                value={formData.startMinute}
+                onChange={(e) => handleTimeChange("start", "minute", e.target.value)}
+                placeholder="00"
+                maxLength={2}
+                min={0}
+                max={59}
+                className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
+              />
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange("start", "period", "AM")}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.startPeriod === "AM"
+                      ? "bg-teal-500 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                  AM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange("start", "period", "PM")}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.startPeriod === "PM"
+                      ? "bg-teal-500 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                  PM
+                </button>
+              </div>
+            </div>
+          </div>
 
-{/* End Time */}
-<div>
-  <label className="block text-sm font-medium text-gray-700">End Time</label>
-  <div className="mt-1 flex items-center space-x-2">
-    <input
-      type="number"
-      name="endHour"
-      value={formData.endHour}
-      onChange={(e) => handleTimeChange("end", "hour", e.target.value)}
-      placeholder="00"
-      maxLength={2}
-      min={1}
-      max={12}
-      className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
-    />
-    <span>:</span>
-    <input
-      type="number"
-      name="endMinute"
-      value={formData.endMinute}
-      onChange={(e) => handleTimeChange("end", "minute", e.target.value)}
-      placeholder="00"
-      maxLength={2}
-      min={0}
-      max={59}
-      className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
-    />
-    <div className="flex space-x-2">
-      <button
-        type="button"
-        onClick={() => handleTimeChange("end", "period", "AM")}
-        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${
-          formData.endPeriod === "AM"
-            ? "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
-      >
-        AM
-      </button>
-      <button
-        type="button"
-        onClick={() => handleTimeChange("end", "period", "PM")}
-        className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${
-          formData.endPeriod === "PM"
-            ? "bg-teal-500 text-white"
-            : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-        }`}
-      >
-        PM
-      </button>
-    </div>
-  </div>
-</div>
+          {/* End Time */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">End Time</label>
+            <div className="mt-1 flex items-center space-x-2">
+              <input
+                type="number"
+                name="endHour"
+                value={formData.endHour}
+                onChange={(e) => handleTimeChange("end", "hour", e.target.value)}
+                placeholder="00"
+                maxLength={2}
+                min={1}
+                max={12}
+                className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
+              />
+              <span>:</span>
+              <input
+                type="number"
+                name="endMinute"
+                value={formData.endMinute}
+                onChange={(e) => handleTimeChange("end", "minute", e.target.value)}
+                placeholder="00"
+                maxLength={2}
+                min={0}
+                max={59}
+                className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
+              />
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange("end", "period", "AM")}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.endPeriod === "AM"
+                      ? "bg-teal-500 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                  AM
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTimeChange("end", "period", "PM")}
+                  className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.endPeriod === "PM"
+                      ? "bg-teal-500 text-white"
+                      : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                    }`}
+                >
+                  PM
+                </button>
+              </div>
+            </div>
+          </div>
 
 
         </div>
@@ -194,10 +190,13 @@ function CEStep2({
 
           <LocationPicker
             value={{
-              lat: formData.lat ?? 14.5995,
-              lng: formData.lng ?? 120.9842,
+              lat: formData.venue_lat ?? 14.5995,
+              lng: formData.venue_lng ?? 120.9842,
+              name: formData.venue_name || "",
+              address: formData.venue_address || "",
             }}
-            onChange={handleLocationChange}
+
+
             handleLocationChange={handleLocationChange}
           />
 
@@ -269,51 +268,51 @@ function CEStep2({
             </div>
           </>
         )}
-{formData.event_type !== 'virtual' && (
-  <>
-    <label className="block text-sm font-medium text-gray-700 mb-2 mt-6">
-      Parking Options
-    </label>
-    <div className="flex flex-wrap justify-center gap-4 mb-4">
-      {["Free Parking", "Paid Parking", "No Parking"].map((option) => {
-        const isChecked = formData.parking.split(", ").includes(option);
-        return (
-          <label
-            key={option}
-            className="flex items-center space-x-2 min-w-[140px] sm:min-w-[160px] md:min-w-[180px] max-w-full justify-center"
-          >
-            <input
-              type="checkbox"
-              name="parking"
-              value={option}
-              checked={isChecked}
-              onChange={(e) => {
-                const { value, checked } = e.target;
-                let selected = formData.parking
-                  ? formData.parking.split(", ")
-                  : [];
+        {formData.event_type !== 'virtual' && (
+          <>
+            <label className="block text-sm font-medium text-gray-700 mb-2 mt-6">
+              Parking Options
+            </label>
+            <div className="flex flex-wrap justify-center gap-4 mb-4">
+              {["Free Parking", "Paid Parking", "No Parking"].map((option) => {
+                const isChecked = formData.parking.split(", ").includes(option);
+                return (
+                  <label
+                    key={option}
+                    className="flex items-center space-x-2 min-w-[140px] sm:min-w-[160px] md:min-w-[180px] max-w-full justify-center"
+                  >
+                    <input
+                      type="checkbox"
+                      name="parking"
+                      value={option}
+                      checked={isChecked}
+                      onChange={(e) => {
+                        const { value, checked } = e.target;
+                        let selected = formData.parking
+                          ? formData.parking.split(", ")
+                          : [];
 
-                if (checked) {
-                  selected.push(value);
-                } else {
-                  selected = selected.filter((p) => p !== value);
-                }
+                        if (checked) {
+                          selected.push(value);
+                        } else {
+                          selected = selected.filter((p) => p !== value);
+                        }
 
-                setFormData((prev) => ({
-                  ...prev,
-                  parking: selected.join(", "),
-                }));
-              }}
-              className="h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
-            />
-            <span className="text-sm font-medium text-gray-700">{option}</span>
-          </label>
-        );
-      })}
-    </div>
-  </>
-)}
-        
+                        setFormData((prev) => ({
+                          ...prev,
+                          parking: selected.join(", "),
+                        }));
+                      }}
+                      className="h-5 w-5 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                    />
+                    <span className="text-sm font-medium text-gray-700">{option}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </>
+        )}
+
 
 
       </FormSection>

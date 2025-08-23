@@ -172,7 +172,7 @@ class Reg_Form_Template(models.Model):
     event = models.ForeignKey(
         'Event',  # Refers to the Events model in the same file
         on_delete=models.CASCADE,
-        related_name='reg_form_template',
+        related_name='reg_form_templates',
         to_field='event_code',
     )
     created_by = models.ForeignKey(
