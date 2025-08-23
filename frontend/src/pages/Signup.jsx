@@ -647,7 +647,7 @@ function Signup({ onAuthSuccess }) {
                                     <div className="mb-4 w-full">
                                         <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">User Code</label>
                                         <input
-                                            type="text" id="user_code" name="user_code" maxLength={25}
+                                            type="text" id="user_code" name="user_code" maxLength={25} required
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                             placeholder="e.g. JOHN-DOE2025"
                                             value={user_code}
@@ -665,9 +665,10 @@ function Signup({ onAuthSuccess }) {
                         </div>
 
 
-                        <div className="flex items-center w-[70%] flex-row">
+                        <div className="flex items-center mb-2">
                             <input
-                                type="checkbox" id="agree" className="mr-2"
+                              required
+                                type="checkbox" id="agree" className="mr-2 h-4 w-4"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
                             <p className="font-outfit text-sm mb-4">
                                 I agree and I have read and accepted <Link to='/term' target="_blank" className="text-blue-500">Terms of services</Link> and <Link to='/policy' target="_blank" className="text-blue-500">Privacy Policy</Link>.

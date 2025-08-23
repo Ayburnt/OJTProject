@@ -54,7 +54,7 @@ function RecommendedEvents() {
             ))
           ) : (
             <div className='w-full col-span-4 item-center'>
-           <p className="text-gray-300 text-3xl font-outfit italic text-center"> No events available😭😭</p>
+           <p className="text-gray-300 text-3xl font-outfit italic text-center"> No events available</p>
           </div>
           )}
         </div>
