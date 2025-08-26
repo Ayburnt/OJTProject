@@ -340,7 +340,7 @@ function EventDetailPage() {
                                             <div className="mb-2 md:mb-0">
                                                 <h4 className="text-lg font-semibold text-gray-800">{ticket.ticket_name}</h4>
                                                 <p className="text-sm text-gray-500">
-                                                    Available: {ticket.quantity_total}
+                                                    Available: {ticket.quantity_available}
                                                 </p>
                                             </div>
                                             <span className="text-2xl font-bold text-orange-600">

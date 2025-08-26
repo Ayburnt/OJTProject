@@ -78,6 +78,16 @@ export default function CreateEventRegForm({ formData, setFormData }) {
               <label htmlFor="" className="font-outfit text-base">Email <span className="text-red-500">*</span></label>
               <input type="text" disabled placeholder="Email required" className="outline-none border-1 px-2 rounded border-gray-300 font-outfit text-base py-2" />
             </div>
+
+            <div className="flex flex-col mt-10">
+              <label htmlFor="" className="font-outfit text-base">Full Name (FirstName LastName [e.g., Jane Doe]) <span className="text-red-500">*</span></label>
+              <input type="text" disabled placeholder="Full Name required" className="outline-none border-1 px-2 rounded border-gray-300 font-outfit text-base py-2" />
+            </div>
+
+            <div className="flex flex-col mt-10">
+              <label htmlFor="" className="font-outfit text-base">Contact Number<span className="text-red-500">*</span></label>
+              <input type="text" disabled placeholder="Contact Number required" className="outline-none border-1 px-2 rounded border-gray-300 font-outfit text-base py-2" />
+            </div>
           </div>
 
 

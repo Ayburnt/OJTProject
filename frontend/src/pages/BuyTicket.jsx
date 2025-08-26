@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, Link, useParams } from "react-router-dom";
 import RegisterSuccess from "../components/RegisterSucess.jsx";
 import api from "../api.js";
+import { toast } from "react-toastify";
 
 function BuyTicket() {
   const { eventcode } = useParams();
@@ -20,14 +21,17 @@ function BuyTicket() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
+    contactNumber: "",
+    fullName: "",
     ticketType: "", // will store ticket.id
-    quantity: 1,
+    ticket_quantity: 1,
     promoCode: "",
     agree: false,
+    questions: {},
   });
 
   const [ticketHolders, setTicketHolders] = useState([
-    { fullName: "", email: "", phone: "" },
+    { fullName: "", email: "", contactNumber: "" },
   ]);
 
   // 🔹 Compute total price from backend tickets
@@ -35,7 +39,7 @@ function BuyTicket() {
     (t) => t.id === Number(formData.ticketType)
   );
   const totalPrice = selectedTicket
-    ? formData.quantity * selectedTicket.price
+    ? formData.ticket_quantity * selectedTicket.price
     : 0;
 
   const handleChange = (e) => {
@@ -50,16 +54,16 @@ function BuyTicket() {
   useEffect(() => {
     setTicketHolders((prev) => {
       const updated = [...prev];
-      if (formData.quantity > prev.length) {
-        for (let i = prev.length; i < formData.quantity; i++) {
-          updated.push({ fullName: "", email: "", phone: "" });
+      if (formData.ticket_quantity > prev.length) {
+        for (let i = prev.length; i < formData.ticket_quantity; i++) {
+          updated.push({ fullName: "", email: "", contactNumber: "" });
         }
-      } else if (formData.quantity < prev.length) {
-        updated.length = formData.quantity;
+      } else if (formData.ticket_quantity < prev.length) {
+        updated.length = formData.ticket_quantity;
       }
       return updated;
     });
-  }, [formData.quantity]);
+  }, [formData.ticket_quantity]);
 
   const handleHolderChange = (index, field, value) => {
     setTicketHolders((prev) => {
@@ -69,15 +73,65 @@ function BuyTicket() {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!formData.agree) {
-      alert("You must agree to the Terms & Conditions.");
-      return;
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (!formData.agree) {    
+    toast.error("You must agree to the Terms & Conditions.");
+    return;
+  }
+
+  const forceSingle = Number(formData.ticket_quantity) <= 5;
+
+  try {
+    // Buyer (main attendee)
+    const mainAttendee = {
+      fullName: formData.fullName,
+      email: formData.email,
+      attendee_code: `${eventDetails.event_code}_${formData.email}`, // simple unique code
+      contactNumber: formData.contactNumber,
+      event: eventDetails.event_code,
+      ticket_type: formData.ticketType, // must be ticket_type.id
+      ticket_quantity: forceSingle ? 1 : formData.ticket_quantity,
+      price_at_purchase: formData.price,
+      responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
+        question: qId,
+        response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ convert array -> string
+      })),
+    };
+
+    await api.post("/attendees/buy-ticket/", mainAttendee);
+
+    // Other ticket holders
+    for (const holder of ticketHolders) {
+      const extraAttendee = {
+        fullName: holder.fullName || "Guest",
+        email: holder.email,
+        attendee_code: `${eventDetails.event_code}_${holder.email}`,
+        contactNumber: formData.contactNumber,
+        event: eventDetails.event_code,
+        ticket_type: formData.ticketType,
+        ticket_quantity: 1,
+        price_at_purchase: formData.price,
+        responses: holder.questions
+          ? Object.entries(holder.questions).map(([qId, value]) => ({
+              question: qId,
+              response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ here too
+            }))
+          : [],
+      };
+      await api.post("/attendees/buy-ticket/", extraAttendee);
     }
-    console.log("Submitting:", { formData, ticketHolders });
+
     setIsModalOpen(true);
-  };
+  } catch (err) {
+    console.error("Error submitting:", err.response?.data || err.message);
+    alert("Something went wrong while booking. Please try again.");
+  }
+};
+
+
+
 
   // 🔹 Fetch event details
   useEffect(() => {
@@ -121,6 +175,28 @@ function BuyTicket() {
     }
   }
 
+  // 🔹 Sync ticket holders count with quantity
+  useEffect(() => {
+    if (formData.ticket_quantity > 5) {
+      setTicketHolders([]); // no ticket holders shown if > 5
+    } else {
+      // Only render (quantity - 1) holders since buyer is already one
+      const neededHolders = Math.max(0, formData.ticket_quantity - 1);
+      setTicketHolders((prev) => {
+        const updated = [...prev];
+        if (neededHolders > prev.length) {
+          for (let i = prev.length; i < neededHolders; i++) {
+            updated.push({ email: "", phone: "" });
+          }
+        } else if (neededHolders < prev.length) {
+          updated.length = neededHolders;
+        }
+        return updated;
+      });
+    }
+  }, [formData.ticket_quantity]);
+
+
   const shortLongInput =
     "px-3 text-gray-600 w-full border-b-1 border-grey focus:border-teal-600 outline-none py-2 bg-transparent";
 
@@ -131,10 +207,31 @@ function BuyTicket() {
     };
   }, [isPrivate]);
 
+  // ------------------ HANDLER -------------------
+const handleQuestionChange = (qId, value, type, checked) => {
+  setFormData((prev) => {
+    let updated = { ...prev.questions };
+
+    if (type === "checkbox") {
+      // Multiple answers allowed
+      const current = updated[qId] || [];
+      updated[qId] = checked
+        ? [...current, value]
+        : current.filter((v) => v !== value);
+    } else {
+      // Single value (short, long, radio)
+      updated[qId] = value;
+    }
+
+    return { ...prev, questions: updated };
+  });
+};
+
+
   return (
     <>
       {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} />}
-      <div className="max-w-md mx-4 mt-5 mb-5 min-h-screen shadow-lg rounded-lg bg-white overflow-hidden px-4 font-outfit md:mx-auto lg:max-w-xl">
+      <div className="max-w-lg mx-4 mt-5 mb-5 min-h-screen shadow-lg rounded-3xl bg-white overflow-hidden px-10 font-outfit md:mx-auto lg:max-w-2xl 2xl:max-w-4xl">
         {/* Private Event Modal */}
         {isPrivate && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
@@ -153,11 +250,10 @@ function BuyTicket() {
                 type="button"
                 disabled={privateCodeInput !== eventDetails.private_code}
                 onClick={() => setIsPrivate(false)}
-                className={`px-6 py-3 font-semibold rounded-xl ${
-                  privateCodeInput === eventDetails.private_code
+                className={`px-6 py-3 font-semibold rounded-xl ${privateCodeInput === eventDetails.private_code
                     ? "bg-secondary text-white"
                     : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 Enter
               </button>
@@ -220,101 +316,175 @@ function BuyTicket() {
             />
           </div>
 
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Full Name (FirstName LastName) <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="fullName"
+              value={formData.fullName}
+              onChange={handleChange}
+              placeholder="e.g., Jane Doe"
+              className={shortLongInput}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Contact Number <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="contactNumber"
+              value={formData.contactNumber}
+              onChange={handleChange}
+              className={shortLongInput}
+              placeholder="09XXXXXXXXX"
+              maxLength={11}
+              required
+            />
+          </div>
+
           {/* Custom Questions */}
-          {questions.map((q) => (
-            <div key={q.id}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                {q.question_label}
-                {q.is_required && <span className="text-red-500">*</span>}
-              </label>
-              {q.question_type === "short" && (
-                <input
-                  type="text"
-                  className={shortLongInput}
-                  required={q.is_required}
-                />
-              )}
-              {q.question_type === "long" && (
-                <textarea
-                  rows={3}
-                  className="px-3 text-gray-600 w-full border rounded-lg focus:border-teal-600 outline-none py-2"
-                  required={q.is_required}
-                />
-              )}
-              {q.question_type === "radio" && (
-                <div className="flex flex-col gap-2">
-                  {q.options.map((opt) => (
-                    <label key={opt.id} className="inline-flex items-center">
-                      <input
-                        type="radio"
-                        name={`q_${q.id}`}
-                        value={opt.option_value}
-                        required={q.is_required}
-                        className="mr-2"
-                      />
-                      {opt.option_value}
-                    </label>
-                  ))}
-                </div>
-              )}
-              {q.question_type === "checkbox" && (
-                <div className="flex flex-col gap-2">
-                  {q.options.map((opt) => (
-                    <label key={opt.id} className="inline-flex items-center">
-                      <input
-                        type="checkbox"
-                        name={`q_${q.id}`}
-                        value={opt.option_value}
-                        className="mr-2"
-                      />
-                      {opt.option_value}
-                    </label>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+{questions.map((q) => (
+  <div key={q.id}>
+    <label className="block text-sm font-medium text-gray-700 mb-1">
+      {q.question_label}
+      {q.is_required && <span className="text-red-500">*</span>}
+    </label>
+
+    {q.question_type === "short" && (
+      <input
+        type="text"
+        className={shortLongInput}
+        required={q.is_required}
+        value={formData.questions[q.id] || ""}
+        onChange={(e) =>
+          handleQuestionChange(q.id, e.target.value, "short")
+        }
+      />
+    )}
+
+    {q.question_type === "long" && (
+      <textarea
+        rows={3}
+        className="px-3 text-gray-600 w-full border rounded-lg focus:border-teal-600 outline-none py-2"
+        required={q.is_required}
+        value={formData.questions[q.id] || ""}
+        onChange={(e) =>
+          handleQuestionChange(q.id, e.target.value, "long")
+        }
+      />
+    )}
+
+    {q.question_type === "radio" && (
+      <div className="flex flex-col gap-2">
+        {q.options.map((opt) => (
+          <label key={opt.id} className="inline-flex items-center">
+            <input
+              type="radio"
+              name={`q_${q.id}`}
+              value={opt.option_value}
+              checked={formData.questions[q.id] === opt.option_value}
+              onChange={(e) =>
+                handleQuestionChange(q.id, e.target.value, "radio")
+              }
+              required={q.is_required}
+              className="mr-2"
+            />
+            {opt.option_value}
+          </label>
+        ))}
+      </div>
+    )}
+
+    {q.question_type === "checkbox" && (
+      <div className="flex flex-col gap-2">
+        {q.options.map((opt) => (
+          <label key={opt.id} className="inline-flex items-center">
+            <input
+              type="checkbox"
+              name={`q_${q.id}`}
+              value={opt.option_value}
+              checked={(formData.questions[q.id] || []).includes(opt.option_value)}
+              onChange={(e) =>
+                handleQuestionChange(
+                  q.id,
+                  e.target.value,
+                  "checkbox",
+                  e.target.checked
+                )
+              }
+              className="mr-2"
+            />
+            {opt.option_value}
+          </label>
+        ))}
+      </div>
+    )}
+  </div>
+))}
+
 
           {/* Ticket Holders */}
-          {ticketHolders.map((holder, idx) => (
-            <div
-              key={idx}
-              className="p-4 border rounded-lg shadow-sm bg-gray-50 space-y-3"
-            >
-              <h3 className="font-semibold text-gray-700">
-                Ticket {idx + 1} Details
-              </h3>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={holder.fullName}
-                onChange={(e) =>
-                  handleHolderChange(idx, "fullName", e.target.value)
-                }
-                className={shortLongInput}
-                required
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={holder.email}
-                onChange={(e) =>
-                  handleHolderChange(idx, "email", e.target.value)
-                }
-                className={shortLongInput}
-                required
-              />
-              <input
-                type="text"
-                placeholder="Phone"
-                value={holder.phone}
-                onChange={(e) =>
-                  handleHolderChange(idx, "phone", e.target.value)
-                }
-                className={shortLongInput}
-              />
+          {formData.ticket_quantity > 5 ? (
+            <div className="p-4 border rounded-lg bg-yellow-50 text-sm text-gray-700">
+              You are booking more than 5 tickets.
+              Please email the list of ticket holders (email and contact number) to{" "}
+              <a
+                href="mailto:info@sari-sari.com"
+                className="text-blue-600 underline"
+              >
+                info@sari-sari.com
+              </a>
+              . For easier processing, you may submit it in an Excel file.
             </div>
-          ))}
+          ) : (
+            ticketHolders.map((holder, idx) => (
+              <div
+                key={idx}
+                className="p-4 border rounded-lg shadow-sm bg-gray-50 space-y-3"
+              >
+                <h3 className="font-semibold text-gray-700">
+                  Ticket Holder {idx + 2} Details
+                </h3>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={holder.fullName}
+                  onChange={(e) =>
+                    handleHolderChange(idx, "fullName", e.target.value)
+                  }
+                  className={shortLongInput}
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={holder.email}
+                  onChange={(e) =>
+                    handleHolderChange(idx, "email", e.target.value)
+                  }
+                  className={shortLongInput}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Phone"
+                  value={holder.contactNumber}
+                  maxLength={11}
+                  onChange={(e) =>
+                    handleHolderChange(idx, "contactNumber", e.target.value)
+                  }
+                  className={shortLongInput}
+                  required
+                />
+              </div>
+            ))
+          )}
+
 
           {/* Ticket Selection */}
           <div>
@@ -342,12 +512,12 @@ function BuyTicket() {
               Quantity
             </label>
             <select
-              name="quantity"
-              value={formData.quantity}
+              name="ticket_quantity"
+              value={formData.ticket_quantity}
               onChange={handleChange}
               className="border border-gray-400 p-2 rounded"
             >
-              {Array.from({ length: 5 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>
@@ -404,7 +574,7 @@ function BuyTicket() {
             Check Out
           </button>
         </form>
-      </div>  
+      </div>
     </>
   );
 }
