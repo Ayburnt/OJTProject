@@ -32,22 +32,22 @@ const OrganizerEvent = () => {
   // Format date + time
   // Add this helper function inside OrganizerEvent
   function formatEventDateTime(startDate, startTime, endDate, endTime) {
-        if (!startDate || !startTime) return "TBA";
+    if (!startDate || !startTime) return "TBA";
 
-        const start = new Date(`${startDate}T${startTime}`);
-        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
 
-        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
 
-        if (!end || start.toDateString() === end.toDateString()) {
-            // Single-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
-        } else {
-            // Multi-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
-        }
+    if (!end || start.toDateString() === end.toDateString()) {
+      // Single-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+    } else {
+      // Multi-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
     }
+  }
 
 
   // Determine event status based on current date/time
@@ -88,7 +88,7 @@ const OrganizerEvent = () => {
   });
 
   return (
-    <div className="bg-gray-50 min-h-screen font-sans">
+    <div className="bg-gray-50 min-h-screen font-outfit pb-10">
       <OrganizerNav />
 
       <div className="pt-23 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
@@ -161,8 +161,6 @@ const OrganizerEvent = () => {
                 eventStatusColor={getStatusColor(getEventStatus(event))}
                 eventName={event.title}
                 eventDate={formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
-
-
                 eventLocation={event.venue_name}
                 eventAttendees={event.attendees}
                 ticketTypes={event.ticket_types}

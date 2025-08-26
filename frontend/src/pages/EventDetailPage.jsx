@@ -121,11 +121,13 @@ function EventDetailPage() {
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
+
     const navigate = useNavigate();
     const { eventcode } = useParams();
 
     useEffect(() => {
         window.scrollTo(0, 0);
+        document.title = `Event | Sari-Sari Events`;
     }, []);
 
     useEffect(() => {
@@ -352,6 +354,7 @@ function EventDetailPage() {
                                     No tickets available at this time.
                                 </p>
                             )}
+                            
 
                             {/* Registration confirmation/button */}
                             {isRegistered ? (
@@ -363,8 +366,11 @@ function EventDetailPage() {
                                 </div>
                             ) : (
                                 <>
-                                    {/* Terms */}
-                                    <div className="mt-8 pt-6 border-t border-gray-200">
+                                    {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 &&
+                                        eventDetails.ticket_types[0].is_selling === false ? (
+                                            <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
+                                        ) : (
+                                            <div className="mt-8 pt-6 border-t border-gray-200">
                                         <label className="flex items-start cursor-pointer">
                                             <input
                                                 type="checkbox"
@@ -377,6 +383,8 @@ function EventDetailPage() {
                                             </span>
                                         </label>
                                     </div>
+                                        )
+                                    }                                    
 
                                     {/* Register Button */}
                                     <div className="mt-6">
@@ -385,14 +393,14 @@ function EventDetailPage() {
                                                 ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
                                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
                                                 }`}
-                                            disabled={!agreeToTerms}
+                                            disabled={!agreeToTerms || (eventDetails.ticket_types && eventDetails.ticket_types.length > 0 && eventDetails.ticket_types[0].is_selling === false)}
                                             onClick={() => navigate(`/events/${eventDetails.event_code}/checkout`)}
                                         >
                                             Register
                                         </button>
                                     </div>
                                 </>
-                            )}
+                            )}                            
                         </div>
                     </div>
                 </div>

@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { GoCalendar, GoLocation, GoPeople } from "react-icons/go";
 import api from '../api.js';
 import { useNavigate } from 'react-router-dom';
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiEditLine } from "react-icons/ri";
+import { toast } from 'react-toastify';
 
 function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -19,13 +22,36 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
     }
   };
 
+  // OrganizerEventCard.jsx
+
+  // Determine if tickets are selling (if at least one has is_selling true)
+  const isSelling = ticketTypes.some(ticket => ticket.is_selling);
+
+  // Toggle selling handler
+  const handleTicketSelling = async () => {
+    try {
+      await api.patch(`/events/${eventCode}/toggle-selling/`, { is_selling: !isSelling });
+      toast.success(isSelling ? "Ticket selling stopped!" : "Ticket selling started!", {
+        autoClose: 3000,
+      }) 
+      fetchEventDetails(); // refresh state after update
+    } catch (err) {
+      console.error(err);
+       toast.error("Failed to update ticket selling status. Please try again.", {
+        autoClose: 5000,
+      })
+    }
+  };
+
+
   // Calculate total tickets
   const totalTickets = ticketTypes.reduce((sum, ticket) => sum + ticket.quantity_total, 0);
 
   const eDetailsStyle = `font-outfit text-grey flex flex-row gap-3`;
 
   return (
-    <>
+    <>    
+      
       {/* Delete confirmation modal */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -85,10 +111,10 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
           <p className={`font-outfit py-1 px-3 text-xs text-white rounded-full ml-3 
             ${eventStatus === 'pending' ? 'bg-slate-700' :
               eventStatus === 'published' ? 'bg-green-700' :
-              eventStatus === 'cancelled' ? 'bg-red-500' :
-              eventStatus === 'draft' ? 'bg-stone-700' :
-              eventStatus === 'completed' ? 'bg-secondary' :
-              'bg-amber-600'
+                eventStatus === 'cancelled' ? 'bg-red-500' :
+                  eventStatus === 'draft' ? 'bg-stone-700' :
+                    eventStatus === 'completed' ? 'bg-secondary' :
+                      'bg-amber-600'
             }`}
           >{eventStatus}</p>
         </div>
@@ -97,14 +123,29 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
         <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
         <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
 
-        <div className='flex flex-row gap-3 mt-3'>
-          <button className='font-outfit px-4 py-2 bg-secondary text-white font-semibold cursor-pointer' onClick={() => navigate(`/org/edit/${eventCode}`)}>Edit</button>
+        <div className='flex flex-row gap-3 mt-3 w-full'>
           <button
-            className='font-outfit text-secondary px-4 py-2 border-1 border-secondary font-semibold cursor-pointer'
-            onClick={() => setConfirmDelete(true)}
+            className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 
+    ${isSelling ? 'bg-red-600 hover:bg-red-700' : 'bg-secondary hover:bg-secondary/90'}`}
+            onClick={handleTicketSelling}
           >
-            Delete
+            {isSelling ? "Stop ticket selling" : "Start ticket selling"}
           </button>
+
+          <div className='flex flex-row gap-3'>
+            <button
+              className='text-secondary text-lg cursor-pointer outline-none'
+              onClick={() => navigate(`/org/edit/${eventCode}`)}
+            >
+              <RiEditLine />
+            </button>
+            <button
+              className='text-red-600 text-lg outline-none cursor-pointer'
+              onClick={() => setConfirmDelete(true)}
+            >
+              <RiDeleteBin6Line />
+            </button>
+          </div>
         </div>
       </div>
     </>

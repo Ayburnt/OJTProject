@@ -4,7 +4,8 @@ from .views import (
     EventListCreateAPIView,
     EventPublicView,
     EventDetailView,
-    OrganizerProfilePublicView
+    OrganizerProfilePublicView,
+    toggle_ticket_selling,
 )
 
 urlpatterns = [
@@ -16,4 +17,5 @@ urlpatterns = [
     path("events/<str:event_code>/", EventDetailView.as_view(), name="event-detail"),
     path('update/<str:event_code>/', EventRetrieveUpdateDestroyAPIView.as_view(), name='event-retrieve-update-destroy'),
     path('profile/<str:user_code>/', OrganizerProfilePublicView.as_view(), name='organizer-public-profile'),
+    path("events/<str:event_code>/toggle-selling/", toggle_ticket_selling, name="toggle_ticket_selling"),
 ]

@@ -39,6 +39,9 @@ import Term from './footer/Term.jsx';
 import Policy from './footer/Policy.jsx';
 import Security from './footer/Security.jsx';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // A component that wraps the main App logic
 function App() {
   const location = useLocation();
@@ -155,6 +158,19 @@ function App() {
 function RootApp() {
   return (
     <Router>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+        className="z-[9999]"
+      />
       <App />
     </Router>
   );

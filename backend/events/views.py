@@ -15,6 +15,24 @@ from rest_framework.exceptions import ParseError
 from .parsers import NestedMultiPartParser
 from django.db.models import Q
 from api.models import CustomUser
+from rest_framework.decorators import api_view, permission_classes
+
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
+def toggle_ticket_selling(request, event_code):
+    try:
+        event = Event.objects.get(event_code=event_code, created_by=request.user)
+    except Event.DoesNotExist:
+        return Response({"detail": "Event not found or unauthorized."}, status=status.HTTP_404_NOT_FOUND)
+
+    is_selling = request.data.get("is_selling", True)
+
+    Ticket_Type.objects.filter(event=event).update(is_selling=is_selling)
+
+    return Response(
+        {"detail": f"Ticket selling set to {is_selling} for event {event_code}"},
+        status=status.HTTP_200_OK,
+    )
 
 # events.py
 class OrganizerProfilePublicView(APIView):
