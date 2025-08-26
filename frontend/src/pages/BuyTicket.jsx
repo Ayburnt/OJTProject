@@ -347,7 +347,7 @@ function BuyTicket() {
               onChange={handleChange}
               className="border border-gray-400 p-2 rounded"
             >
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+              {Array.from({ length: 5 }, (_, i) => i + 1).map((num) => (
                 <option key={num} value={num}>
                   {num}
                 </option>
@@ -404,7 +404,7 @@ function BuyTicket() {
             Check Out
           </button>
         </form>
-      </div>
+      </div>  
     </>
   );
 }

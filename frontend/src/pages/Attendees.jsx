@@ -1,55 +1,98 @@
-import React, { useEffect, useState } from 'react';
-import OrganizerNav from '../components/OrganizerNav';
-import { FaChevronDown } from 'react-icons/fa';
-import { CiSearch } from 'react-icons/ci';
-import { CgProfile } from 'react-icons/cg';
+import React, { useEffect, useState, useRef } from "react";
+import OrganizerNav from "../components/OrganizerNav";
+import { FaChevronDown } from "react-icons/fa";
+import { CiSearch } from "react-icons/ci";
+import { CgProfile } from "react-icons/cg";
+import api from "../api"; // ✅ using your axios instance
 
 const Attendees = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEvent, setSelectedEvent] = useState('All Events');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedEvent, setSelectedEvent] = useState("All Events");
+  const [attendees, setAttendees] = useState([]);
+  const fileInputRef = useRef(null);
 
-   useEffect(() => {
-        document.title = "Organizer Attendees | Sari-Sari Events";
-      }, []);
+  useEffect(() => {
+    document.title = "Organizer Attendees | Sari-Sari Events";
+    fetchAttendees();
+  }, []);
 
-  // These will later come from the backend (currently empty)
-  const events = [
-    'All Events',
-    'Corporate',
-    'Social',
-    'Cultural',
-    'Sports & Recreational',
-    'Political & Government',
-    'Educational',
-    'Fundraising',
-  ];
-  const attendees = [];
+  // 🔄 Fetch attendees from backend
+  const fetchAttendees = async () => {
+    try {
+      const res = await api.get("/attendees/");
+      setAttendees(res.data);
+    } catch (err) {
+      console.error("Error fetching attendees:", err);
+    }
+  };
 
+  // 📤 Upload CSV
+  const uploadCsv = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await api.post("/attendees/upload-csv/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      alert(response.data.message || "CSV uploaded successfully!");
+      fetchAttendees(); // refresh table
+    } catch (err) {
+      console.error("Error uploading CSV:", err);
+      alert("Failed to upload CSV.");
+    }
+  };
+
+  // 📥 Download CSV from DB (via API)
+  const downloadCsv = async () => {
+    try {
+      const res = await api.get("/attendees/export-csv/", {
+        responseType: "blob",
+      });
+
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "attendees.csv");
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    } catch (err) {
+      console.error("Error downloading CSV:", err);
+    }
+  };
+
+  // 🔎 Filter attendees
   const filteredAttendees = attendees.filter((attendee) => {
     const matchesSearch =
       attendee.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       attendee.email?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesEvent =
-      selectedEvent === 'All Events' || attendee.event === selectedEvent;
+      selectedEvent === "All Events" || attendee.event === selectedEvent;
     return matchesSearch && matchesEvent;
   });
-const uploadCsv = () => {
-  // existing download function...
-};
-  const downloadCsv = () => {
-    const headers = ['Name', 'Email', 'Event', 'Registration Date', 'Ticket Type'];
-    const rows = filteredAttendees.map(
-      (a) =>
-        `"${a.name}","${a.email}","${a.event}","${a.regDate}","${a.ticketType}"`
-    );
-    const csvContent = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.setAttribute('href', url);
-    link.setAttribute('download', 'attendees.csv');
-    link.click();
-  };
+
+  // Categories
+  const events = [
+    "All Events",
+    "Corporate",
+    "Social",
+    "Cultural",
+    "Sports & Recreational",
+    "Political & Government",
+    "Educational",
+    "Fundraising",
+  ];
 
   return (
     <div className="bg-gray-50 min-h-screen font-outfit">
@@ -82,9 +125,8 @@ const uploadCsv = () => {
               />
             </div>
 
-            {/* Filter + Download */}
+            {/* Event Filter + Buttons */}
             <div className="flex flex-col gap-3 w-full lg:flex-row lg:items-end lg:w-auto">
-              {/* Event Filter */}
               <div className="flex flex-col w-full lg:w-52">
                 <label className="text-sm text-gray-600 font-medium mb-1">
                   Filter by Event:
@@ -95,8 +137,6 @@ const uploadCsv = () => {
                     onChange={(e) => setSelectedEvent(e.target.value)}
                     className="appearance-none w-full pl-4 pr-8 py-2 rounded-full border border-teal-500 focus:border-teal-600 text-gray-700 bg-white cursor-pointer"
                   >
-                    <option value="All Events">All Events</option>
-                    {/* Map real events here */}
                     {events.map((event) => (
                       <option key={event} value={event}>
                         {event}
@@ -110,22 +150,31 @@ const uploadCsv = () => {
                 </div>
               </div>
 
-            {/* Download Button */}
-            <div className="w-full flex flex-row gap-2 justify-center md:gap-3">
-              <button
-                onClick={uploadCsv}
-                className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center cursor-pointer"
-              >
-                Upload CSV
-              </button>
+              {/* Upload + Download */}
+              <div className="w-full flex flex-row gap-2 justify-center md:gap-3">
+                <button
+                  onClick={uploadCsv}
+                  className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center cursor-pointer"
+                >
+                  Upload CSV
+                </button>
 
-              <button
-                onClick={downloadCsv}
-                className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center cursor-pointer"
-              >
-                Download CSV
-              </button>
-            </div>
+                <button
+                  onClick={downloadCsv}
+                  className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center cursor-pointer"
+                >
+                  Download CSV
+                </button>
+
+                {/* Hidden file input */}
+                <input
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+              </div>
             </div>
           </div>
 
@@ -157,15 +206,17 @@ const uploadCsv = () => {
                     <tr
                       key={idx}
                       className={`text-sm ${
-                        idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'
+                        idx % 2 === 0 ? "bg-white" : "bg-gray-50"
                       } hover:bg-gray-100 transition`}
                     >
                       <td className="py-3 px-4 border border-black">{a.name}</td>
                       <td className="py-3 px-4 border border-black">{a.email}</td>
                       <td className="py-3 px-4 border border-black">{a.event}</td>
-                      <td className="py-3 px-4 border border-black">{a.regDate}</td>
                       <td className="py-3 px-4 border border-black">
-                        {a.ticketType}
+                        {a.reg_date}
+                      </td>
+                      <td className="py-3 px-4 border border-black">
+                        {a.ticket_type}
                       </td>
                     </tr>
                   ))

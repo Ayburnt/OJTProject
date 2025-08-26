@@ -125,7 +125,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'verification',
-    'storages'
+    'storages',
+    'attendees'
 ]
 
 MIDDLEWARE = [
