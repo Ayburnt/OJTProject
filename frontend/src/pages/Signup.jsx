@@ -481,9 +481,17 @@ function Signup({ onAuthSuccess }) {
                                 <label htmlFor="password" className="block mb-2 pl-1 text-sm font-outfit font-medium leading-none">Password</label>
                                 <input
                                     type="password" id="password" name="password"
-                                    className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${isMatch === false ? `border-red-500 focus:ring-red-500` : `focus:ring-secondary`}`}
+                                    className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${password && password.length < 8 ? `border-red-500 focus:ring-red-500` : password && password.length >= 8
+                                            ? "border-secondary focus:ring-secondary" : `focus:ring-secondary`}`}
                                     value={password} onChange={(e) => setPassword(e.target.value)} required />
-                            </div>
+
+                                      {/* alert if password too short */}
+                                    {password && password.length < 8 && (
+                                        <p className="text-xs text-red-500 pl-1 mt-1">
+                                        Password must be at minimum of 8 characters in length
+                                        </p>
+                                         )}
+                                   </div>
 
                             <div className="mb-4 w-full">
                                 <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium leading-none">Confirm Password</label>
@@ -494,9 +502,9 @@ function Signup({ onAuthSuccess }) {
                                 {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
                             </div>
                             <button
-                                className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition"
+                              className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
-                                disabled={isLoading} // Disable button while loading
+                                disabled={isLoading || password.length < 8 || password !== confirmPassword} // Disable button while loading
                             >
                                 {isLoading ? 'Processing...' : 'Sign up'}
                             </button>
@@ -631,19 +639,21 @@ function Signup({ onAuthSuccess }) {
                             {selectedRoleRef.current === 'organizer' && (
                                 <>
                                     <div className="mb-4 w-full">
-                                        <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name</label>
+                                        <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name <span className="text-gray-400 font-sm">(optional)</span> </label>
                                         <input
                                             type="text" id="companyName" name="companyName"
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                             value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
                                     </div>
+
                                     <div className="mb-4 w-full">
-                                        <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website</label>
+                                        <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website <span className="text-gray-400 font-sm">(optional)</span> </label>
                                         <input
                                             type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
                                             value={companyWebsite} onChange={(e) => setCompanyWebsite(e.target.value)} />
                                     </div>
+
                                     <div className="mb-4 w-full">
                                         <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">User Code</label>
                                         <input
@@ -665,19 +675,19 @@ function Signup({ onAuthSuccess }) {
                         </div>
 
 
-                        <div className="flex items-center mb-2">
+                        <div className="flex items-center mb-4">
                             <input
                               required
                                 type="checkbox" id="agree" className="mr-2 h-4 w-4"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-                            <p className="font-outfit text-sm mb-4">
+                            <p className="font-outfit text-sm">
                                 I agree and I have read and accepted <Link to='/term' target="_blank" className="text-blue-500">Terms of services</Link> and <Link to='/policy' target="_blank" className="text-blue-500">Privacy Policy</Link>.
                             </p>
                         </div>
                         <button
                             type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
-                            className="w-65 bg-secondary text-white py-2 rounded-lg transition"
-                            disabled={isLoading}
+                            className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isLoading || !user_code} // 👈 disables if loading OR empty user_code
                         >
                             {isLoading ? 'Saving...' : 'Continue'}
                         </button>

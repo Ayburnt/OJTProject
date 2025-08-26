@@ -30,7 +30,7 @@ function FooterNav() {
     <header className="w-full bg-white shadow-sm relative" ref={navRef}>
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Link to="/event" className="cursor-pointer">
+          <Link to="/" className="cursor-pointer">
             <img src="/sariLogo.png" alt="Logo" className="h-8 w-auto" />
           </Link>
         </div>

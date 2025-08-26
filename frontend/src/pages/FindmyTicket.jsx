@@ -33,7 +33,7 @@ const FindMyTicket = () => {
   };
 
   const handleDontKnowClick = () => {
-    alert("This would typically redirect to a help page or a different flow.");
+    alert("Please contact customer support for assistance.");
   };
 
   return (
