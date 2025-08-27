@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 
-export default function LocationPicker({ value, onChange, handleLocationChange }) {
+export default function LocationPicker({ value, onChange, handleLocationChange, formData, handleEventChange }) {
   const defaultCenter = { lat: 14.5995, lng: 120.9842 }; // Manila default
 
   const safeValue =
@@ -87,10 +87,19 @@ useEffect(() => {
     <div className="flex flex-col"> {/* Fixed height */}
   {/* Search box */}
   <p className="block text-sm font-medium text-gray-700 mb-2">Location of the Event/Address</p>
+
+  <input 
+    type="text" 
+    placeholder="Floor/Unit No./Building Name"
+    value={formData.venue_specific} 
+    name="venue_specific" 
+    onChange={handleEventChange}
+    className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none mb-3"
+  />
   <div className="relative mb-2">
     <input
       type="text"
-      placeholder="Search location"
+      placeholder="Search venue"
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
       className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"

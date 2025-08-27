@@ -248,7 +248,7 @@ function EventDetailPage() {
                                 <div className="flex items-start space-x-3">
                                     <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
                                     <span className="text-gray-700">
-                                        {eventDetails.venue_name}, {eventDetails.venue_address}
+                                        {eventDetails.venue_specific !== null && eventDetails.venue_specific !== '' ? eventDetails.venue_specific + ', ' : ''}{eventDetails.venue_address}
                                     </span>
                                 </div>
 

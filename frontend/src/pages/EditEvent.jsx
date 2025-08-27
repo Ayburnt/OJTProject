@@ -437,7 +437,7 @@ const handleUpdate = async (e) => {
                     {step === 1 && <CEStep1 formData={formData} handleEventChange={handleEventChange} isPosterErr={isPosterErr} posterErr={posterErr} />}
                     {step === 2 && <CEStep2 formData={formData} setFormData={setFormData} handleLocationChange={handleLocationChange} handleEventChange={handleEventChange} handleCheckboxChange={handleCheckboxChange} handleTimeChange={handleTimeChange} />}
                     {step === 3 && <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />}
-                    {step === 4 && <CEStep4 formData={formData} setFormData={setFormData} />}
+                    {step === 4 && <CEStep4 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} />}
                     <div className="flex justify-between items-center mt-8">
                         <div className="flex justify-end ml-auto space-x-4">
                             <button

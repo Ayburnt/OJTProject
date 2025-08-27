@@ -195,7 +195,8 @@ function CEStep2({
               name: formData.venue_name || "",
               address: formData.venue_address || "",
             }}
-
+            formData={formData}
+            handleEventChange={handleEventChange}
 
             handleLocationChange={handleLocationChange}
           />

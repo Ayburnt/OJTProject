@@ -47,6 +47,11 @@ class Event(models.Model):
         ('ongoing', 'Ongoing'),
     )
 
+    COLLECT_EMAIL_CHOICES = (
+        ('collect', 'Collect'),
+        ('do-not-collect', 'Do not collect'),
+    )
+
     # Use settings.AUTH_USER_MODEL for the custom user model
     # and specify 'user_code' in the to_field argument.
     created_by = models.ForeignKey(
@@ -70,6 +75,7 @@ class Event(models.Model):
     end_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
     end_time = models.TimeField(blank=True, null=True)
+    venue_specific = models.CharField(max_length=255, blank=True, null=True)
     venue_place_id = models.CharField(max_length=255, blank=True, null=True)
     venue_name = models.CharField(max_length=500, blank=True, null=True)
     venue_address = models.CharField(max_length=500, blank=True, null=True)
@@ -81,6 +87,7 @@ class Event(models.Model):
     posting_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     isFee_paid = models.BooleanField(default=False)
     seating_map = models.ImageField(upload_to=unique_seating_map_path, blank=True, null=True)
+    collect_email = models.CharField(max_length=20, choices=COLLECT_EMAIL_CHOICES, default='collect')
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

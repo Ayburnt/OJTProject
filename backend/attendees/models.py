@@ -14,8 +14,7 @@ class Attendee(models.Model):
     )
 
     fullName = models.CharField(max_length=255)
-    email = models.EmailField()
-    contactNumber = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(null=True, blank=True)
     attendee_code = models.CharField(max_length=100, unique=True, null=True, blank=True)
     event = models.ForeignKey(
         'events.Event',
@@ -29,8 +28,8 @@ class Attendee(models.Model):
         related_name='attendees'
     )
     price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, null=True, blank=True)
-    ticket_qr_data = models.TextField(null=True, blank=True)
-    ticket_qr_image = models.ImageField(upload_to="event/qr_codes/", blank=True, null=True)
+    ticket_qr_data = models.TextField(null=True, blank=True, unique=True)
+    ticket_qr_image = models.ImageField(upload_to="event/attendees_qr/", blank=True, null=True)
     attendee_status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='registered')
     ticket_quantity = models.PositiveIntegerField(default=1)
     created_at = models.DateTimeField(default=timezone.now)

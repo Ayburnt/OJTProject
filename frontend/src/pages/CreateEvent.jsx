@@ -53,6 +53,7 @@ const CreateEventForm = () => {
     start_time: '',
     end_time: '',
     venue_place_id: '',
+    venue_specific: '',
     venue_name: '',
     venue_address: '',
     venue_lat: null,   // 👈 add this
@@ -63,6 +64,7 @@ const CreateEventForm = () => {
     isFee_paid: false,
     posting_fee: 0,
     seating_map: null,
+    collect_email: 'collect',
     status: 'pending',
     ticket_types: [createNewTicket()],
     reg_form_templates: [{
@@ -584,7 +586,7 @@ const CreateEventForm = () => {
               <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />
             )}
             {step === 4 && (
-              <CEStep4 formData={formData} setFormData={setFormData} />
+              <CEStep4 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} />
             )}
 
             {/* Buttons Section */}

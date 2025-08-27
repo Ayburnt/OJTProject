@@ -21,7 +21,6 @@ function BuyTicket() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    contactNumber: "",
     fullName: "",
     ticketType: "", // will store ticket.id
     ticket_quantity: 1,
@@ -31,7 +30,7 @@ function BuyTicket() {
   });
 
   const [ticketHolders, setTicketHolders] = useState([
-    { fullName: "", email: "", contactNumber: "" },
+    { fullName: "", email: ""},
   ]);
 
   // 🔹 Compute total price from backend tickets
@@ -56,7 +55,7 @@ function BuyTicket() {
       const updated = [...prev];
       if (formData.ticket_quantity > prev.length) {
         for (let i = prev.length; i < formData.ticket_quantity; i++) {
-          updated.push({ fullName: "", email: "", contactNumber: "" });
+          updated.push({ fullName: "", email: ""});
         }
       } else if (formData.ticket_quantity < prev.length) {
         updated.length = formData.ticket_quantity;
@@ -88,8 +87,6 @@ function BuyTicket() {
       const mainAttendee = {
         fullName: formData.fullName,
         email: formData.email,
-        attendee_code: `${eventDetails.event_code}_${formData.email}`, // simple unique code
-        contactNumber: formData.contactNumber,
         event: eventDetails.event_code,
         ticket_type: formData.ticketType, // must be ticket_type.id
         ticket_quantity: forceSingle ? 1 : formData.ticket_quantity,
@@ -107,8 +104,6 @@ function BuyTicket() {
         const extraAttendee = {
           fullName: holder.fullName || "Guest",
           email: holder.email,
-          attendee_code: `${eventDetails.event_code}_${holder.email}`,
-          contactNumber: formData.contactNumber,
           event: eventDetails.event_code,
           ticket_type: formData.ticketType,
           ticket_quantity: 1,
@@ -138,6 +133,7 @@ function BuyTicket() {
     const fetchEvent = async () => {
       try {
         const res = await api.get(`/events/${eventcode}/`);
+        console.log(res.data);
         setIsPrivate(!!res.data.private_code);
         setEventDetails(res.data);
         setQuestions(
@@ -289,7 +285,7 @@ function BuyTicket() {
               eventDetails?.end_date,
               eventDetails?.end_time
             )}{" "}
-            <br /> {eventDetails?.venue_address}
+            <br /> {eventDetails?.venue_specific !== null && eventDetails?.venue_specific !== '' ? eventDetails?.venue_specific + ', ' : ''}{eventDetails?.venue_address}
           </p>
           <div className="mt-4">
             <h2 className="font-medium text-gray-800">Description</h2>
@@ -302,19 +298,21 @@ function BuyTicket() {
         {/* Ticket Form */}
         <form onSubmit={handleSubmit} className="p-4 border-t space-y-6">
           {/* Email */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className={shortLongInput}
-              required
-            />
-          </div>
+          {eventDetails?.collect_email === "collect" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email Address <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className={shortLongInput}
+                required
+              />
+            </div>
+          )}
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -330,29 +328,12 @@ function BuyTicket() {
               required
             />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Contact Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="contactNumber"
-              value={formData.contactNumber}
-              onChange={handleChange}
-              className={shortLongInput}
-              placeholder="09XXXXXXXXX"
-              maxLength={11}
-              required
-            />
-          </div>
-
           {/* Custom Questions */}
           {questions.map((q) => (
             <div key={q.id}>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 {q.question_label}
-                {q.is_required && <span className="text-red-500">*</span>}
+                {q.is_required && <span className="text-red-500"> *</span>}
               </label>
 
               {q.question_type === "short" && (
@@ -426,13 +407,61 @@ function BuyTicket() {
               )}
             </div>
           ))}
+          
 
+
+          {/* Ticket Selection */}
+          <div className="w-full mt-10">
+            {eventDetails?.seating_map && (
+              <div className="mb-4 w-full">
+                <p className="text-gray-600">Seating Map</p>
+                <img className="w-full object-contain" src={eventDetails.seating_map} alt="" />
+              </div>
+            )}
+          </div>
+          <div>
+            <label className="block font-medium text-gray-700 mb-2">
+              Ticket Type
+            </label>
+            <select
+              name="ticketType"
+              value={formData.ticketType}
+              onChange={handleChange}
+              className="w-full border border-gray-400 p-2 rounded"
+              required
+            >
+              {tickets.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.ticket_name} – ₱{t.price}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Quantity */}
+          <div>
+            <label className="block font-medium text-gray-700 mb-2">
+              Quantity
+            </label>
+            <select
+              name="ticket_quantity"
+              value={formData.ticket_quantity}
+              onChange={handleChange}
+              className="border border-gray-400 p-2 rounded"
+            >
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                <option key={num} value={num}>
+                  {num}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* Ticket Holders */}
           {formData.ticket_quantity > 5 ? (
             <div className="p-4 border rounded-lg bg-yellow-50 text-sm text-gray-700">
               You are booking more than 5 tickets.
-              Please email the list of ticket holders (email and contact number) to{" "}
+              Please email the list of ticket holders (full name{eventDetails?.collect_email === 'collect' ? ' and email' : ''} to{" "}
               <a
                 href="mailto:info@sari-sari.com"
                 className="text-blue-600 underline"
@@ -460,7 +489,8 @@ function BuyTicket() {
                   className={shortLongInput}
                   required
                 />
-                <input
+                {eventDetails?.collect_email === "collect" && (
+                  <input
                   type="email"
                   placeholder="Email"
                   value={holder.email}
@@ -470,117 +500,59 @@ function BuyTicket() {
                   className={shortLongInput}
                   required
                 />
-                <input
-                  type="text"
-                  placeholder="Phone"
-                  value={holder.contactNumber}
-                  maxLength={11}
-                  onChange={(e) =>
-                    handleHolderChange(idx, "contactNumber", e.target.value)
-                  }
-                  className={shortLongInput}
-                  required
-                />
+                )}                                
               </div>
             ))
           )}
 
+          {/* Promo Code */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Promo Code (Optional)
+            </label>
+            <input
+              type="text"
+              name="promoCode"
+              value={formData.promoCode}
+              onChange={handleChange}
+              className={shortLongInput}
+            />
+          </div>
 
-          {/* Ticket Selection */}
-          <div className="w-full mt-10">
-            {eventDetails?.seating_map && (
-              <div className="mb-4 w-full">
-                <p className="text-gray-600">Seating Map</p>
-                <img className="w-full object-contain" src={eventDetails.seating_map} alt="" />
-              </div>
-            )}
-            </div>
-            <div>
-              <label className="block font-medium text-gray-700 mb-2">
-                Ticket Type
-              </label>
-              <select
-                name="ticketType"
-                value={formData.ticketType}
-                onChange={handleChange}
-                className="w-full border border-gray-400 p-2 rounded"
-                required
-              >
-                {tickets.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.ticket_name} – ₱{t.price}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Total Price */}
+          <div className="text-lg font-semibold text-gray-800">
+            Total: ₱{totalPrice.toLocaleString()}
+          </div>
 
-            {/* Quantity */}
-            <div>
-              <label className="block font-medium text-gray-700 mb-2">
-                Quantity
-              </label>
-              <select
-                name="ticket_quantity"
-                value={formData.ticket_quantity}
-                onChange={handleChange}
-                className="border border-gray-400 p-2 rounded"
-              >
-                {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                  <option key={num} value={num}>
-                    {num}
-                  </option>
-                ))}
-              </select>
-            </div>
+          {/* Agreement */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              name="agree"
+              checked={formData.agree}
+              onChange={handleChange}
+              className="w-4 h-4"
+            />
+            <p className="text-sm text-gray-700">
+              I agree to{" "}
+              <Link to="/term" target="_blank" className="text-blue-500">
+                Terms & Conditions
+              </Link>{" "}
+              and{" "}
+              <Link to="/policy" target="_blank" className="text-blue-500">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </div>
 
-            {/* Promo Code */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Promo Code (Optional)
-              </label>
-              <input
-                type="text"
-                name="promoCode"
-                value={formData.promoCode}
-                onChange={handleChange}
-                className={shortLongInput}
-              />
-            </div>
-
-            {/* Total Price */}
-            <div className="text-lg font-semibold text-gray-800">
-              Total: ₱{totalPrice.toLocaleString()}
-            </div>
-
-            {/* Agreement */}
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="agree"
-                checked={formData.agree}
-                onChange={handleChange}
-                className="w-4 h-4"
-              />
-              <p className="text-sm text-gray-700">
-                I agree to{" "}
-                <Link to="/term" target="_blank" className="text-blue-500">
-                  Terms & Conditions
-                </Link>{" "}
-                and{" "}
-                <Link to="/policy" target="_blank" className="text-blue-500">
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-            </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer"
-            >
-              Check Out
-            </button>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer"
+          >
+            Check Out
+          </button>
         </form>
       </div>
     </>

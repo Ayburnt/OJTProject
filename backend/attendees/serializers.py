@@ -2,6 +2,8 @@
 from rest_framework import serializers
 from .models import Attendee, Attendee_Response
 from events.models import Reg_Form_Question, Question_Option
+import uuid
+from django.db import IntegrityError
 
 class AttendeeResponseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,7 +20,6 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "id",
             "fullName",
             "email",
-            "contactNumber",
             "attendee_code",
             "event",            
             "ticket_type",
@@ -30,14 +31,22 @@ class AttendeeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         responses_data = validated_data.pop("responses", [])
-        
-        # auto-generate attendee_code if not provided
-        event_code = validated_data["event"].event_code  # since FK has to_field='event_code'
-        email = validated_data["email"]
-        validated_data["attendee_code"] = f"{event_code}_{email}"
+        event_code = validated_data["event"].event_code  
 
-        attendee = Attendee.objects.create(**validated_data)
+        # ✅ retry until unique attendee_code is found
+        for _ in range(5):  # small retry loop
+            random_code = uuid.uuid4().hex[:8]
+            attendee_code = f"{event_code}_{random_code}"
+            validated_data["attendee_code"] = attendee_code
+            try:
+                attendee = Attendee.objects.create(**validated_data)
+                break
+            except IntegrityError:
+                continue  # try again if collision
+        else:
+            raise serializers.ValidationError("Could not generate a unique ticket code.")
+
         for resp in responses_data:
             Attendee_Response.objects.create(attendee=attendee, **resp)
-        return attendee
 
+        return attendee
