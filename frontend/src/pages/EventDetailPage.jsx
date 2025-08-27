@@ -243,11 +243,25 @@ function EventDetailPage() {
                             {/* Location */}
                             <div>
                                 <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
+
+                                {/* Venue Details */}
                                 <div className="flex items-start space-x-3">
                                     <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
                                     <span className="text-gray-700">
                                         {eventDetails.venue_name}, {eventDetails.venue_address}
                                     </span>
+                                </div>
+
+                                {/* Map Preview */}
+                                <div className="mt-3">
+                                    <iframe
+                                        className="rounded-xl shadow-md w-full h-64"
+                                        loading="lazy"
+                                        allowFullScreen
+                                        src={`https://www.google.com/maps?q=${encodeURIComponent(
+                                            eventDetails.venue_address
+                                        )}&output=embed`}
+                                    ></iframe>
                                 </div>
                             </div>
 
@@ -354,7 +368,7 @@ function EventDetailPage() {
                                     No tickets available at this time.
                                 </p>
                             )}
-                            
+
 
                             {/* Registration confirmation/button */}
                             {isRegistered ? (
@@ -368,23 +382,23 @@ function EventDetailPage() {
                                 <>
                                     {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 &&
                                         eventDetails.ticket_types[0].is_selling === false ? (
-                                            <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
-                                        ) : (
-                                            <div className="mt-8 pt-6 border-t border-gray-200">
-                                        <label className="flex items-start cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                className="form-checkbox h-5 w-5 text-teal-600 rounded focus:ring-teal-500 mt-1"
-                                                checked={agreeToTerms}
-                                                onChange={(e) => setAgreeToTerms(e.target.checked)}
-                                            />
-                                            <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                                                By checking this box, I hereby agree that my information will be shared to our Event Organizer.
-                                            </span>
-                                        </label>
-                                    </div>
-                                        )
-                                    }                                    
+                                        <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
+                                    ) : (
+                                        <div className="mt-8 pt-6 border-t border-gray-200">
+                                            <label className="flex items-start cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="form-checkbox h-5 w-5 text-teal-600 rounded focus:ring-teal-500 mt-1"
+                                                    checked={agreeToTerms}
+                                                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                                                />
+                                                <span className="ml-3 text-sm text-gray-700 leading-relaxed">
+                                                    By checking this box, I hereby agree that my information will be shared to our Event Organizer.
+                                                </span>
+                                            </label>
+                                        </div>
+                                    )
+                                    }
 
                                     {/* Register Button */}
                                     <div className="mt-6">
@@ -400,7 +414,7 @@ function EventDetailPage() {
                                         </button>
                                     </div>
                                 </>
-                            )}                            
+                            )}
                         </div>
                     </div>
                 </div>

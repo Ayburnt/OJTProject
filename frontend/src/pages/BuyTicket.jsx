@@ -74,61 +74,61 @@ function BuyTicket() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!formData.agree) {    
-    toast.error("You must agree to the Terms & Conditions.");
-    return;
-  }
+    if (!formData.agree) {
+      toast.error("You must agree to the Terms & Conditions.");
+      return;
+    }
 
-  const forceSingle = Number(formData.ticket_quantity) <= 5;
+    const forceSingle = Number(formData.ticket_quantity) <= 5;
 
-  try {
-    // Buyer (main attendee)
-    const mainAttendee = {
-      fullName: formData.fullName,
-      email: formData.email,
-      attendee_code: `${eventDetails.event_code}_${formData.email}`, // simple unique code
-      contactNumber: formData.contactNumber,
-      event: eventDetails.event_code,
-      ticket_type: formData.ticketType, // must be ticket_type.id
-      ticket_quantity: forceSingle ? 1 : formData.ticket_quantity,
-      price_at_purchase: formData.price,
-      responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
-        question: qId,
-        response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ convert array -> string
-      })),
-    };
-
-    await api.post("/attendees/buy-ticket/", mainAttendee);
-
-    // Other ticket holders
-    for (const holder of ticketHolders) {
-      const extraAttendee = {
-        fullName: holder.fullName || "Guest",
-        email: holder.email,
-        attendee_code: `${eventDetails.event_code}_${holder.email}`,
+    try {
+      // Buyer (main attendee)
+      const mainAttendee = {
+        fullName: formData.fullName,
+        email: formData.email,
+        attendee_code: `${eventDetails.event_code}_${formData.email}`, // simple unique code
         contactNumber: formData.contactNumber,
         event: eventDetails.event_code,
-        ticket_type: formData.ticketType,
-        ticket_quantity: 1,
+        ticket_type: formData.ticketType, // must be ticket_type.id
+        ticket_quantity: forceSingle ? 1 : formData.ticket_quantity,
         price_at_purchase: formData.price,
-        responses: holder.questions
-          ? Object.entries(holder.questions).map(([qId, value]) => ({
+        responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
+          question: qId,
+          response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ convert array -> string
+        })),
+      };
+
+      await api.post("/attendees/buy-ticket/", mainAttendee);
+
+      // Other ticket holders
+      for (const holder of ticketHolders) {
+        const extraAttendee = {
+          fullName: holder.fullName || "Guest",
+          email: holder.email,
+          attendee_code: `${eventDetails.event_code}_${holder.email}`,
+          contactNumber: formData.contactNumber,
+          event: eventDetails.event_code,
+          ticket_type: formData.ticketType,
+          ticket_quantity: 1,
+          price_at_purchase: formData.price,
+          responses: holder.questions
+            ? Object.entries(holder.questions).map(([qId, value]) => ({
               question: qId,
               response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ here too
             }))
-          : [],
-      };
-      await api.post("/attendees/buy-ticket/", extraAttendee);
-    }
+            : [],
+        };
+        await api.post("/attendees/buy-ticket/", extraAttendee);
+      }
 
-    setIsModalOpen(true);
-  } catch (err) {
-    console.error("Error submitting:", err.response?.data || err.message);
-    alert("Something went wrong while booking. Please try again.");
-  }
-};
+      setIsModalOpen(true);
+    } catch (err) {
+      console.error("Error submitting:", err.response?.data || err.message);
+      alert("Something went wrong while booking. Please try again.");
+    }
+  };
 
 
 
@@ -208,24 +208,24 @@ function BuyTicket() {
   }, [isPrivate]);
 
   // ------------------ HANDLER -------------------
-const handleQuestionChange = (qId, value, type, checked) => {
-  setFormData((prev) => {
-    let updated = { ...prev.questions };
+  const handleQuestionChange = (qId, value, type, checked) => {
+    setFormData((prev) => {
+      let updated = { ...prev.questions };
 
-    if (type === "checkbox") {
-      // Multiple answers allowed
-      const current = updated[qId] || [];
-      updated[qId] = checked
-        ? [...current, value]
-        : current.filter((v) => v !== value);
-    } else {
-      // Single value (short, long, radio)
-      updated[qId] = value;
-    }
+      if (type === "checkbox") {
+        // Multiple answers allowed
+        const current = updated[qId] || [];
+        updated[qId] = checked
+          ? [...current, value]
+          : current.filter((v) => v !== value);
+      } else {
+        // Single value (short, long, radio)
+        updated[qId] = value;
+      }
 
-    return { ...prev, questions: updated };
-  });
-};
+      return { ...prev, questions: updated };
+    });
+  };
 
 
   return (
@@ -251,8 +251,8 @@ const handleQuestionChange = (qId, value, type, checked) => {
                 disabled={privateCodeInput !== eventDetails.private_code}
                 onClick={() => setIsPrivate(false)}
                 className={`px-6 py-3 font-semibold rounded-xl ${privateCodeInput === eventDetails.private_code
-                    ? "bg-secondary text-white"
-                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                  ? "bg-secondary text-white"
+                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
                   }`}
               >
                 Enter
@@ -348,84 +348,84 @@ const handleQuestionChange = (qId, value, type, checked) => {
           </div>
 
           {/* Custom Questions */}
-{questions.map((q) => (
-  <div key={q.id}>
-    <label className="block text-sm font-medium text-gray-700 mb-1">
-      {q.question_label}
-      {q.is_required && <span className="text-red-500">*</span>}
-    </label>
+          {questions.map((q) => (
+            <div key={q.id}>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {q.question_label}
+                {q.is_required && <span className="text-red-500">*</span>}
+              </label>
 
-    {q.question_type === "short" && (
-      <input
-        type="text"
-        className={shortLongInput}
-        required={q.is_required}
-        value={formData.questions[q.id] || ""}
-        onChange={(e) =>
-          handleQuestionChange(q.id, e.target.value, "short")
-        }
-      />
-    )}
+              {q.question_type === "short" && (
+                <input
+                  type="text"
+                  className={shortLongInput}
+                  required={q.is_required}
+                  value={formData.questions[q.id] || ""}
+                  onChange={(e) =>
+                    handleQuestionChange(q.id, e.target.value, "short")
+                  }
+                />
+              )}
 
-    {q.question_type === "long" && (
-      <textarea
-        rows={3}
-        className="px-3 text-gray-600 w-full border rounded-lg focus:border-teal-600 outline-none py-2"
-        required={q.is_required}
-        value={formData.questions[q.id] || ""}
-        onChange={(e) =>
-          handleQuestionChange(q.id, e.target.value, "long")
-        }
-      />
-    )}
+              {q.question_type === "long" && (
+                <textarea
+                  rows={3}
+                  className="px-3 text-gray-600 w-full border rounded-lg focus:border-teal-600 outline-none py-2"
+                  required={q.is_required}
+                  value={formData.questions[q.id] || ""}
+                  onChange={(e) =>
+                    handleQuestionChange(q.id, e.target.value, "long")
+                  }
+                />
+              )}
 
-    {q.question_type === "radio" && (
-      <div className="flex flex-col gap-2">
-        {q.options.map((opt) => (
-          <label key={opt.id} className="inline-flex items-center">
-            <input
-              type="radio"
-              name={`q_${q.id}`}
-              value={opt.option_value}
-              checked={formData.questions[q.id] === opt.option_value}
-              onChange={(e) =>
-                handleQuestionChange(q.id, e.target.value, "radio")
-              }
-              required={q.is_required}
-              className="mr-2"
-            />
-            {opt.option_value}
-          </label>
-        ))}
-      </div>
-    )}
+              {q.question_type === "radio" && (
+                <div className="flex flex-col gap-2">
+                  {q.options.map((opt) => (
+                    <label key={opt.id} className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        name={`q_${q.id}`}
+                        value={opt.option_value}
+                        checked={formData.questions[q.id] === opt.option_value}
+                        onChange={(e) =>
+                          handleQuestionChange(q.id, e.target.value, "radio")
+                        }
+                        required={q.is_required}
+                        className="mr-2"
+                      />
+                      {opt.option_value}
+                    </label>
+                  ))}
+                </div>
+              )}
 
-    {q.question_type === "checkbox" && (
-      <div className="flex flex-col gap-2">
-        {q.options.map((opt) => (
-          <label key={opt.id} className="inline-flex items-center">
-            <input
-              type="checkbox"
-              name={`q_${q.id}`}
-              value={opt.option_value}
-              checked={(formData.questions[q.id] || []).includes(opt.option_value)}
-              onChange={(e) =>
-                handleQuestionChange(
-                  q.id,
-                  e.target.value,
-                  "checkbox",
-                  e.target.checked
-                )
-              }
-              className="mr-2"
-            />
-            {opt.option_value}
-          </label>
-        ))}
-      </div>
-    )}
-  </div>
-))}
+              {q.question_type === "checkbox" && (
+                <div className="flex flex-col gap-2">
+                  {q.options.map((opt) => (
+                    <label key={opt.id} className="inline-flex items-center">
+                      <input
+                        type="checkbox"
+                        name={`q_${q.id}`}
+                        value={opt.option_value}
+                        checked={(formData.questions[q.id] || []).includes(opt.option_value)}
+                        onChange={(e) =>
+                          handleQuestionChange(
+                            q.id,
+                            e.target.value,
+                            "checkbox",
+                            e.target.checked
+                          )
+                        }
+                        className="mr-2"
+                      />
+                      {opt.option_value}
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
 
 
           {/* Ticket Holders */}
@@ -487,92 +487,100 @@ const handleQuestionChange = (qId, value, type, checked) => {
 
 
           {/* Ticket Selection */}
-          <div>
-            <label className="block font-medium text-gray-700 mb-2">
-              Ticket Type
-            </label>
-            <select
-              name="ticketType"
-              value={formData.ticketType}
-              onChange={handleChange}
-              className="w-full border border-gray-400 p-2 rounded"
-              required
+          <div className="w-full mt-10">
+            {eventDetails?.seating_map && (
+              <div className="mb-4 w-full">
+                <p className="text-gray-600">Seating Map</p>
+                <img className="w-full object-contain" src={eventDetails.seating_map} alt="" />
+              </div>
+            )}
+            </div>
+            <div>
+              <label className="block font-medium text-gray-700 mb-2">
+                Ticket Type
+              </label>
+              <select
+                name="ticketType"
+                value={formData.ticketType}
+                onChange={handleChange}
+                className="w-full border border-gray-400 p-2 rounded"
+                required
+              >
+                {tickets.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.ticket_name} – ₱{t.price}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Quantity */}
+            <div>
+              <label className="block font-medium text-gray-700 mb-2">
+                Quantity
+              </label>
+              <select
+                name="ticket_quantity"
+                value={formData.ticket_quantity}
+                onChange={handleChange}
+                className="border border-gray-400 p-2 rounded"
+              >
+                {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
+                  <option key={num} value={num}>
+                    {num}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Promo Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Promo Code (Optional)
+              </label>
+              <input
+                type="text"
+                name="promoCode"
+                value={formData.promoCode}
+                onChange={handleChange}
+                className={shortLongInput}
+              />
+            </div>
+
+            {/* Total Price */}
+            <div className="text-lg font-semibold text-gray-800">
+              Total: ₱{totalPrice.toLocaleString()}
+            </div>
+
+            {/* Agreement */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                name="agree"
+                checked={formData.agree}
+                onChange={handleChange}
+                className="w-4 h-4"
+              />
+              <p className="text-sm text-gray-700">
+                I agree to{" "}
+                <Link to="/term" target="_blank" className="text-blue-500">
+                  Terms & Conditions
+                </Link>{" "}
+                and{" "}
+                <Link to="/policy" target="_blank" className="text-blue-500">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer"
             >
-              {tickets.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.ticket_name} – ₱{t.price}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Quantity */}
-          <div>
-            <label className="block font-medium text-gray-700 mb-2">
-              Quantity
-            </label>
-            <select
-              name="ticket_quantity"
-              value={formData.ticket_quantity}
-              onChange={handleChange}
-              className="border border-gray-400 p-2 rounded"
-            >
-              {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-                <option key={num} value={num}>
-                  {num}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Promo Code */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Promo Code (Optional)
-            </label>
-            <input
-              type="text"
-              name="promoCode"
-              value={formData.promoCode}
-              onChange={handleChange}
-              className={shortLongInput}
-            />
-          </div>
-
-          {/* Total Price */}
-          <div className="text-lg font-semibold text-gray-800">
-            Total: ₱{totalPrice.toLocaleString()}
-          </div>
-
-          {/* Agreement */}
-          <div className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              name="agree"
-              checked={formData.agree}
-              onChange={handleChange}
-              className="w-4 h-4"
-            />
-            <p className="text-sm text-gray-700">
-              I agree to{" "}
-              <Link to="/term" target="_blank" className="text-blue-500">
-                Terms & Conditions
-              </Link>{" "}
-              and{" "}
-              <Link to="/policy" target="_blank" className="text-blue-500">
-                Privacy Policy
-              </Link>
-              .
-            </p>
-          </div>
-
-          {/* Submit */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer"
-          >
-            Check Out
-          </button>
+              Check Out
+            </button>
         </form>
       </div>
     </>
