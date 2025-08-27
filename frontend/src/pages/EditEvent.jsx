@@ -10,6 +10,7 @@ import useAuth from '../hooks/useAuth.js';
 import { IoIosArrowBack } from "react-icons/io";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import LoadingScreen from "../components/LoadingScreen.jsx";
 
 // Use the same helper functions
 const createNewTicket = () => ({
@@ -376,12 +377,7 @@ const handleUpdate = async (e) => {
 
     if (!formData || isLoading) {
         return (
-            <Backdrop
-                sx={{ color: '#fff', zIndex: 9999 }}
-                open={true}
-            >
-                <CircularProgress color="inherit" />
-            </Backdrop>
+            <LoadingScreen isLoading={isLoading} />
         );
     }
 

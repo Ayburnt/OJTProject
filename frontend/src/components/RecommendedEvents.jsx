@@ -42,11 +42,7 @@ function RecommendedEvents() {
                 <EventCard
                   eventPoster={event.event_poster}
                   eventTitle={event.title}
-                  eventDate={
-                    event.start_date === event.end_date
-                      ? event.start_date
-                      : `${event.start_date} - ${event.end_date}`
-                  }
+                  eventDate={event}
                   eventLocation={event.venue_place}
                   eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
                 />

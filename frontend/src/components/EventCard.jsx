@@ -1,19 +1,24 @@
 import React from 'react';
 
-function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCreator }) {
+function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCreator, eventDetails }) {
   // ✅ Date formatter
-  function formatDate(dateStr) {
-    if (!dateStr) return "TBA";
-    const dateObj = new Date(dateStr);
-    return dateObj.toLocaleString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    });
-  }
+  function formatEventDateTime(startDate, startTime, endDate, endTime) {
+        if (!startDate || !startTime) return "TBA";
+
+        const start = new Date(`${startDate}T${startTime}`);
+        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+
+        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+
+        if (!end || start.toDateString() === end.toDateString()) {
+            // Single-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+        } else {
+            // Multi-day event
+            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+        }
+    }
 
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group">
@@ -38,7 +43,7 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
 
         {/* Date */}
         <div className="flex items-center text-sm text-teal-100 mb-1">
-          <span className="truncate">{formatDate(eventDate)}</span>
+          <span className="truncate">{formatEventDateTime(eventDate.start_date, eventDate.start_time, eventDate.end_date, eventDate.end_time)}</span>
         </div>
 
         {/* Creator */}

@@ -24,6 +24,8 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "event",            
             "ticket_type",
             "ticket_quantity",
+            "ticket_qr_data",
+            "ticket_qr_image",
             "price_at_purchase",
             "attendee_status",
             "responses",

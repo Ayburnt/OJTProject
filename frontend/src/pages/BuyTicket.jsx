@@ -3,6 +3,7 @@ import { useNavigate, Link, useParams } from "react-router-dom";
 import RegisterSuccess from "../components/RegisterSucess.jsx";
 import api from "../api.js";
 import { toast } from "react-toastify";
+import LoadingScreen from "../components/LoadingScreen.jsx";
 
 function BuyTicket() {
   const { eventcode } = useParams();
@@ -17,6 +18,9 @@ function BuyTicket() {
   const [tickets, setTickets] = useState([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [privateCodeInput, setPrivateCodeInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [ticketLinks, setTicketLinks] = useState([]);
+
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -74,13 +78,16 @@ function BuyTicket() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     if (!formData.agree) {
       toast.error("You must agree to the Terms & Conditions.");
+      setIsLoading(false);
       return;
     }
 
     const forceSingle = Number(formData.ticket_quantity) <= 5;
+    let newTicketLinks = [];
 
     try {
       // Buyer (main attendee)
@@ -97,7 +104,11 @@ function BuyTicket() {
         })),
       };
 
-      await api.post("/attendees/buy-ticket/", mainAttendee);
+      const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
+      console.log("resMain.data:", resMain.data);
+      newTicketLinks.push(resMain.data.ticket_qr_data);
+
+
 
       // Other ticket holders
       for (const holder of ticketHolders) {
@@ -115,13 +126,18 @@ function BuyTicket() {
             }))
             : [],
         };
-        await api.post("/attendees/buy-ticket/", extraAttendee);
+        const resExtra = await api.post("/attendees/buy-ticket/", extraAttendee);
+        console.log("resExtra.data:", resExtra.data);
+        newTicketLinks.push(resExtra.data.ticket_qr_data);
       }
 
+      setTicketLinks(newTicketLinks);
+      setIsLoading(false);
       setIsModalOpen(true);
     } catch (err) {
+      setIsLoading(false);
+      toast.error("Something went wrong while booking. Please try again.");
       console.error("Error submitting:", err.response?.data || err.message);
-      alert("Something went wrong while booking. Please try again.");
     }
   };
 
@@ -133,7 +149,6 @@ function BuyTicket() {
     const fetchEvent = async () => {
       try {
         const res = await api.get(`/events/${eventcode}/`);
-        console.log(res.data);
         setIsPrivate(!!res.data.private_code);
         setEventDetails(res.data);
         setQuestions(
@@ -225,8 +240,9 @@ function BuyTicket() {
 
 
   return (
-    <>
-      {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} />}
+    <> 
+      {isLoading && <LoadingScreen isLoading={isLoading} />}
+      {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} ticketLinks={ticketLinks} />}
       <div className="max-w-lg mx-4 mt-5 mb-5 min-h-screen shadow-lg rounded-3xl bg-white overflow-hidden px-10 font-outfit md:mx-auto lg:max-w-2xl 2xl:max-w-4xl">
         {/* Private Event Modal */}
         {isPrivate && (
@@ -549,7 +565,8 @@ function BuyTicket() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer"
+            disabled={!formData.agree || !formData.ticketType || isLoading}
+            className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
           >
             Check Out
           </button>

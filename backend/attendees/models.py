@@ -45,7 +45,7 @@ class Attendee(models.Model):
 
         # --- Generate QR code if not already set ---
         if self.attendee_code and not self.ticket_qr_image:
-            self.ticket_qr_data = f"https://event.sari-sari.com/attendance/{self.attendee_code}"
+            self.ticket_qr_data = f"https://event.sari-sari.com/attendee/{self.attendee_code}"
 
             qr = qrcode.QRCode(version=1, box_size=10, border=5)
             qr.add_data(self.ticket_qr_data)
