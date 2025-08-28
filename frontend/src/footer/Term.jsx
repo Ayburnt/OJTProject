@@ -10,101 +10,143 @@ function Term() {
       <div className="max-w-xl mt-8 md:mt-12 lg:mt-16 py-10 mx-5 md:mx-auto px-5 md:px-10 lg:px-15 bg-primary mb-10 rounded-lg md:max-w-2xl lg:max-w-6xl font-outfit">
         <div className="max-w-5xl space-y-8">
           <h1 className="text-4xl font-semibold text-secondary mb-10 lg:text-5xl md:text-5xl">
-            Terms & Conditions
+            Terms & Condition
           </h1>
 
           {/* Section Links */}
           <div id="top" className="space-y-1">
             <a href="#section1" className="block underline text-secondary">
-              1. Account Registration and Accuracy of Information
+              1. General Terms and Conditions
             </a>
             <a href="#section2" className="block underline text-secondary">
-              2. Event Organizer Duties and Compliance
+              2. Rights and Responsibilities of Users (Attendees)
             </a>
             <a href="#section3" className="block underline text-secondary">
-              3. Ticketing and Refund Policy
+              3. Rights and Responsibilities of Organizers
             </a>
             <a href="#section4" className="block underline text-secondary">
-              4. Prohibited Use
+              4. Limitation of Liability
             </a>
             <a href="#section5" className="block underline text-secondary">
-              5. Intellectual Property
+              5. Third-Party Links
             </a>
             <a href="#section6" className="block underline text-secondary">
-              6. Acceptance of Terms
+              6. Privacy
+            </a>
+            <a href="#section7" className="block underline text-secondary">
+              7. Company Rights
+            </a>
+            <a href="#section8" className="block underline text-secondary">
+              8. Safety
+            </a>
+            <a href="#section9" className="block underline text-secondary">
+              9. Miscellaneous
             </a>
           </div>
 
           {/* Section Content */}
           <section id="section1">
             <h2 className="text-xl font-semibold mb-2">
-              1. Account Registration and Accuracy of Information
+              1. General Terms and Conditions
             </h2>
             <p className="text-gray-700 text-sm">
-              Users are required to create an account in order to access and utilize the event
-              management services. You agree that all information provided during registration and
-              throughout your use of the platform shall be true, accurate, current, and complete.
-              You further acknowledge that it is your responsibility to update such information
-              promptly in the event of any changes. The Company shall not be liable for any loss or
-              damage arising from inaccurate or incomplete information provided by you.
+              Event Sari-Sari operates www.event.sari-sari.com (“the website”) to provide digital
+              ticketing solutions. By purchasing or using tickets through this website, users agree
+              to be bound by these Terms of Service, as well as any other applicable agreements or
+              policies provided by the company. Users who do not agree must refrain from using the
+              website.
             </p>
           </section>
 
           <section id="section2">
             <h2 className="text-xl font-semibold mb-2">
-              2. Event Organizer Duties and Compliance
+              2. Rights and Responsibilities of Users (Attendees)
             </h2>
-            <p className="text-gray-700 text-sm">
-              Event organizers are solely responsible for ensuring that their events comply with all
-              applicable laws, regulations, and licensing requirements. This includes, but is not limited
-              to, securing the necessary permits, providing accurate event descriptions, and taking all
-              reasonable measures to ensure participant safety. The Company acts only as a facilitator
-              of event listings and ticket sales and shall bear no responsibility for the conduct or
-              organization of any event.
-            </p>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>Users may purchase tickets without creating an account.</li>
+              <li>Users must provide accurate, current, and complete information when purchasing tickets.</li>
+              <li>Users are fully responsible for the safekeeping and condition of their tickets.</li>
+              <li>Users under 18 years old must obtain parental or guardian consent before transactions.</li>
+              <li>Tickets cannot be resold, exchanged, or used for profit without consent.</li>
+              <li>Tickets are not redeemable for cash, gifts, or promotional credits.</li>
+              <li>Tickets are valid only for event entry unless otherwise stated by the organizer.</li>
+              <li>Late arrivals may be denied entry at the organizer’s discretion, with no refunds provided.</li>
+            </ul>
           </section>
 
           <section id="section3">
             <h2 className="text-xl font-semibold mb-2">
-              3. Ticketing and Refund Policy
+              3. Rights and Responsibilities of Organizers
             </h2>
-            <p className="text-gray-700 text-sm">
-              All ticket sales completed through the platform are final unless otherwise stated by the
-              event organizer. In the event of cancellation or postponement of an event, the organizer
-              shall be solely responsible for issuing refunds in accordance with their stated policies
-              and applicable law. The Company may, at its sole discretion, provide reasonable assistance
-              regarding communications with attendees but shall bear no obligation to issue refunds itself.
-            </p>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>Organizers must create an account to host or manage events.</li>
+              <li>Organizers are responsible for providing accurate event details, pricing, and refund policies.</li>
+              <li>Organizers are solely responsible for the planning and execution of their events.</li>
+              <li>Organizers must honor valid tickets issued through Event Sari-Sari.</li>
+              <li>Event Sari-Sari reserves the right to suspend or cancel accounts engaging in fraud or illegal activities.</li>
+            </ul>
           </section>
 
           <section id="section4">
-            <h2 className="text-xl font-semibold mb-2">4. Prohibited Use</h2>
-            <p className="text-gray-700 text-sm">
-              You agree not to use the platform for any unlawful, fraudulent, or abusive purpose, including
-              the distribution of false or misleading information or the transmission of malicious software.
-              You further agree not to interfere with or disrupt the operation of the platform or engage in
-              any activity that may compromise the security or integrity of the platform, its systems, or the
-              data of other users.
-            </p>
+            <h2 className="text-xl font-semibold mb-2">4. Limitation of Liability</h2>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>
+                <strong>Content Accuracy –</strong> Event Sari-Sari reviews content but does not guarantee accuracy or timeliness.
+              </li>
+              <li>
+                <strong>Event Responsibility –</strong> Event Sari-Sari only provides ticketing services. Organizers are fully responsible for their events.
+              </li>
+              <li>
+                <strong>Service Availability –</strong> No guarantee of uninterrupted or error-free service.
+              </li>
+              <li>
+                <strong>Refunds –</strong> Refunds are the responsibility of the event organizer. Tickets are non-refundable unless canceled or postponed.
+              </li>
+              <li>Event Sari-Sari is not liable for lost, stolen, or damaged tickets.</li>
+              <li>Fraud protection measures may restrict payment methods.</li>
+            </ul>
           </section>
 
           <section id="section5">
-            <h2 className="text-xl font-semibold mb-2">5. Intellectual Property</h2>
+            <h2 className="text-xl font-semibold mb-2">5. Third-Party Links</h2>
             <p className="text-gray-700 text-sm">
-              All intellectual property rights in and to the platform and its content, other than user-submitted
-              material, are owned by or licensed to the Company. Users retain ownership of their own submitted
-              content, but grant the Company a non-exclusive, worldwide, royalty-free license to use, display,
-              and process such content solely for the purpose of providing the event management services.
+              The website may contain links to external sites. Event Sari-Sari is not responsible for the
+              content or damages arising from visiting those sites.
             </p>
           </section>
 
           <section id="section6">
-            <h2 className="text-xl font-semibold mb-2">6. Acceptance of Terms</h2>
+            <h2 className="text-xl font-semibold mb-2">6. Privacy</h2>
             <p className="text-gray-700 text-sm">
-              By accessing or using the platform, you acknowledge that you have read, understood, and agree to
-              be bound by these Terms and Conditions. If you do not agree to any part of these Terms, you must
-              discontinue your use of the platform immediately.
+              Event Sari-Sari’s Privacy Policy governs the collection, storage, and use of user data.
             </p>
+          </section>
+
+          <section id="section7">
+            <h2 className="text-xl font-semibold mb-2">7. Company Rights</h2>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>The company may amend these Terms at any time without prior notice.</li>
+              <li>All intellectual property is owned by the company and protected by law.</li>
+              <li>Website content may only be used for personal, non-commercial purposes.</li>
+            </ul>
+          </section>
+
+          <section id="section8">
+            <h2 className="text-xl font-semibold mb-2">8. Safety</h2>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>Users must comply with safety instructions or risk denied entry/removal.</li>
+              <li>Organizers may conduct security checks; unauthorized items may result in denied entry.</li>
+              <li>The company is not liable for lost, stolen, or damaged belongings at events.</li>
+              <li>No liability for damages caused by force majeure such as terrorism, protests, or riots.</li>
+            </ul>
+          </section>
+
+          <section id="section9">
+            <h2 className="text-xl font-semibold mb-2">9. Miscellaneous</h2>
+            <ul className="list-disc pl-5 text-gray-700 text-sm space-y-1">
+              <li>Users may not resell or duplicate tickets without organizer approval.</li>
+              <li>Organizers and the company may deny entry for prohibited items (weapons, drugs, fireworks, etc.).</li>
+            </ul>
           </section>
         </div>
       </div>

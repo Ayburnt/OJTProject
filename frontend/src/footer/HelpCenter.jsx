@@ -9,36 +9,28 @@ const SariSariHelpCenter = () => {
   const categories = [
     {
       id: 1,
-      title: 'Getting Started',
+      title: 'Getting Started as an Organizer',
       icon: '🚀',
-      description: 'Learn how to create your account and get started',
-      articleCount: 6,
+      description: 'Learn how to create your organizer account and get started',
+      articleCount: 2,
       articles: [
         { 
           id: 1, 
-          title: 'How to create a Sari-sari account?',
+          title: 'How to create a Sari-sari organizer account?',
           content: `Creating your Sari-sari account is simple and quick:
 
-1. Visit www.sari-sari.com and click "Sign Up"
-2. Choose to register with your email or Facebook account
-3. Fill in your personal information (name, email, phone number)
-4. Verify your email address by clicking the link sent to your inbox
-5. Complete your profile by adding additional details
+1. Visit event.sari-sari.com and click "Sign Up"
+2. Register with your email 
+3. Verify your email address by the otp that sent to your email
+4. Fill in all the required details
+5. Agree to the terms and conditions
+6. Click "Continue" 
 
 Once your account is verified, you can start browsing and purchasing tickets for events!`
         },
         { 
           id: 2, 
           title: 'How to verify my email address?',
-          content: `Email verification is required to secure your account:
-
-1. After registration, check your email inbox for a verification message from Sari-sari
-2. Click on the "Verify Email" button in the email
-3. You'll be redirected to our website with a confirmation message
-4. If you don't see the email, check your spam/junk folder
-5. You can request a new verification email from your account settings
-
-Your email must be verified before you can purchase tickets.`
         }
       ]
     },
@@ -47,50 +39,17 @@ Your email must be verified before you can purchase tickets.`
       title: 'Buying Tickets',
       icon: '🎫',
       description: 'Everything about purchasing tickets',
-      articleCount: 8,
+      articleCount: 1,
       articles: [
         { 
           id: 3, 
           title: 'How to buy tickets on Sari-sari?',
           content: `Follow these steps to purchase your tickets:
 
-1. Sign up or sign in to your Sari-sari account with either Facebook or email registration. Click on the poster or the 'Get Tickets' button of the event you would like to attend.
-
-2. On the event page, select your ticket quantity and click on the 'Buy Tickets' button.
-
-3. On the check-out page, select your preferred payment method (card or cash) and fill in the required information. Choose the answer to protect your ticket.
-
-4. Review all the prices. Then, click on the checkbox next to "I agree to Ticketmelon's Terms of Service and Event Organizer's Agreement", and click the 'Pay Now' button.
-
-If you wish to pay using cash, please print the payment slip to the selected payment channel as their system may not support scanning directly from the mobile phone screen.`
+        1. Click on the poster, and then press the 'Register' button for the event you would like to attend.
+        2. On the checkout page, fill out the form, select the ticket quantity, and click the 'Check Out' button to complete your registration.`
         },
-        { 
-          id: 4, 
-          title: 'What payment methods are accepted?',
-          content: `We accept various payment methods for your convenience:
-
-Credit/Debit Cards:
-• Visa
-• Mastercard
-• American Express
-
-Digital Wallets:
-• GCash
-• PayMaya
-• GrabPay
-
-Bank Transfer:
-• BPI
-• BDO
-• Metrobank
-
-Cash Payment:
-• 7-Eleven stores
-• SM Business Centers
-• Cebuana Lhuillier
-
-All transactions are secured with SSL encryption to protect your payment information.`
-        }
+        
       ]
     },
     {
@@ -98,126 +57,75 @@ All transactions are secured with SSL encryption to protect your payment informa
       title: 'Managing Tickets',
       icon: '📱',
       description: 'View, transfer, and manage your purchased tickets',
-      articleCount: 5,
+      articleCount:2,
       articles: [
         { 
-          id: 5, 
+          id: 4, 
           title: 'Where can I view my tickets?',
-          content: `There are 3 ways to access your ticket, through your email, and Ticketmelon app. We highly suggest that you use your current email address that you have access to because all of the information, including your tickets, will be sent to that email.
+          content: `There are two ways to access your ticket: through your email or via the Event Sari-Sari website.
+We highly recommend using an active email address that you can access, as all event details—including your tickets—will be sent there.
 
-Option 1: On Sari-sari website
-1. Go to www.sari-sari.com and login to your Sari-sari account. Then, in the drop-down below your profile picture on the top right corner, click on 'My Tickets'.
-2. In the 'Tickets' page, click on the poster of the event or 'View Ticket' to view your tickets.
-3. This is an example of what your ticket looks like.
+Option 1: Through the Event Sari-Sari Website
+1. Go to event.sari-sari.com, then navigate to "Find My Ticket" and enter your Ticket Code to retrieve your ticket.
+2.You may also use the saved URL to view your ticket.
 
-Option 2: Check the confirmation email in your Mailbox
-Click the "Go to your Tickets" button to access your ticket! Tickets are also attached to your order confirmation email as a PDF file after you've successfully completed the transaction.`
+Option 2: Through Your Confirmation Email
+Your tickets are also included in the order confirmation email sent to your mailbox after you successfully complete the transaction.`
         },
         { 
-          id: 6, 
+          id: 5, 
           title: 'How to use E-Ticket?',
-          content: `Option 1: Show your ticket (QR code) from your mobile phone for a paperless ticket experience.
-Show your QR code through the Sari-sari application by:
-• Sign in → Select 'Tickets' → Tap on the event poster
+          content: `Option 1: Show your ticket QR code from your mobile phone to the Organizer.
+Show your QR code through the Event Sari-sari web application by:
+• go to find my ticket → input "Ticket Code" → Tap on the ticket
+• or go to the save url to view ticket information.
 
-Or find your ticket confirmation email from Sari-sari and open the attached PDF file.
+Show your QR code to the registration staff to scan and follow further instructions to enter the event.
 
-Show your QR code to the registration staff to scan and follow further instructions to enter the event. This may include waiting a wristband or presenting a valid ID card.
+Option 2: Show your Qr code through email.
+• Go to your email → Open the ticket confirmation email from Event Sari-sari → Tap 'View Ticket'.
 
-Option 2: Print your ticket(s) from your email.
-• Find your ticket confirmation email from Ticketmelon
-• Open the attached PDF file
-• Print your ticket(s)
+Show your QR code to the registration staff to scan and follow further instructions to enter the event.
 
-Option 3: Print your ticket(s) from www.Sari-sari.com
-• Go to www.Sari-sari.com and Sign in to your account
-• Click on 'My Tickets' on the top right corner dropdown menu
-• Click on 'Print Tickets' and print! Make sure you are connected to a printer`
+Option 3: Print your ticket(s) from the Event Sari-sari web application or from the confirmation email.
+
+You can print your ticket by following these steps in the Event Sari-sari web application:
+
+• Enter the ticket code to find your ticket.
+• Click 'Next' to view the ticket details. Make sure your device is connected to a printer before printing your ticket.
+
+Or, you can print your ticket from the confirmation email by:
+• Open the ticket confirmation email from Event Sari-sari.
+• View your ticket details.
+• Make sure your device is connected to a printer before printing your ticket.
+
+Present the printed ticket to the registration staff for scanning and follow further instructions to enter the event.`
         }
       ]
     },
     {
       id: 4,
-      title: 'Account & Profile',
-      icon: '👤',
-      description: 'Manage your account settings and profile information',
-      articleCount: 7,
+      title: 'Refunds & Cancellations',
+      icon: '💰',
+      description: 'Information about refunds and cancellation policies',
+      articleCount: 1,
       articles: [
         { 
-          id: 7, 
-          title: 'How to update my profile information?',
-          content: `Keep your profile information up to date:
-
-1. Log in to your Sari-sari account
-2. Click on your profile picture in the top right corner
-3. Select 'Profile Settings' from the dropdown menu
-4. Update your information:
-   • Name
-   • Email address
-   • Phone number
-   • Profile picture
-   • Address
-5. Click 'Save Changes' to confirm your updates
-
-Note: Some changes may require email verification before they take effect.`
-        },
-        { 
-          id: 8, 
-          title: 'How to change my password?',
-          content: `To change your password for security:
-
-1. Log in to your account
-2. Go to Profile Settings
-3. Click on 'Security' tab
-4. Click 'Change Password'
-5. Enter your current password
-6. Enter your new password (must be at least 8 characters)
-7. Confirm your new password
-8. Click 'Update Password'
-
-For security reasons, you'll be logged out of all devices and need to sign in again with your new password.`
+          id: 6, 
+          title: 'What is the refund policy?',
+          content: ``
         }
       ]
     },
     {
       id: 5,
-      title: 'Refunds & Cancellations',
-      icon: '💰',
-      description: 'Information about refunds and cancellation policies',
-      articleCount: 4,
-      articles: [
-        { 
-          id: 9, 
-          title: 'What is the refund policy?',
-          content: `Our refund policy varies by event and organizer:
-
-Standard Policy:
-• Refunds are available up to 48 hours before the event
-• A processing fee may apply (typically 10% of ticket price)
-• Refunds are processed within 5-7 business days
-
-Event Cancellation:
-• Full refunds are provided if the event is cancelled by the organizer
-• Refunds are automatically processed within 7-14 business days
-
-Refund Protection:
-• Optional insurance available during checkout
-• Covers cancellations for various reasons
-• Additional fee applies (usually 5-10% of ticket price)
-
-To request a refund, contact our support team with your order number.`
-        }
-      ]
-    },
-    {
-      id: 6,
       title: 'Technical Issues',
       icon: '⚙️',
       description: 'Troubleshooting and technical support',
-      articleCount: 6,
+      articleCount: 1,
       articles: [
         { 
-          id: 10, 
+          id:7, 
           title: 'Website is not loading properly',
           content: `If you're experiencing issues with our website:
 
@@ -229,21 +137,17 @@ To request a refund, contact our support team with your order number.`
 6. Check if the issue persists on mobile
 
 If problems continue:
-• Try accessing from a different device
+• Try accessing from a different device 
 • Contact our technical support team
 • Check our status page for known issues
 
-Our technical team is available 24/7 to assist with any issues.`
+Our technical team will be glad to assist you promptly during business hours.`
         }
       ]
     }
   ];
 
-  const popularArticles = [
-    'How to buy tickets on Sari-sari?',
-    'Where can I view my tickets?',
-    'How to enter the event using E-Ticket?',
-  ];
+
 
   const filteredCategories = categories.filter(category =>
     category.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -251,8 +155,8 @@ Our technical team is available 24/7 to assist with any issues.`
     category.articles.some(article =>
       article.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  );
 
+  );
   const handleBackToCategories = () => {
     setSelectedCategory(null);
     setSelectedArticle(null);
@@ -314,18 +218,7 @@ Our technical team is available 24/7 to assist with any issues.`
                 {selectedArticle.content}
               </div>
             </div>
-            
-            <div className="border-t border-gray-200 pt-6 mt-8">
-              <p className="text-sm text-gray-600 mb-4">Was this article helpful?</p>
-              <div className="flex gap-3">
-                <button className="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">
-                  Yes, helpful
-                </button>
-                <button className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors">
-                  No, not helpful
-                </button>
-              </div>
-            </div>
+         
           </article>
         </div>
       </div>
@@ -406,7 +299,7 @@ Our technical team is available 24/7 to assist with any issues.`
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-16 text-center">
           <h1 className="text-4xl font-bold font-outfit text-secondary mb-4">How can we help you?</h1>
-          <p className="text-xl text-gray-600 mb-8">Search our knowledge base or browse categories below</p>
+
           
           {/* Search Bar */}
           <div className="relative max-w-2xl mx-auto">
@@ -428,27 +321,7 @@ Our technical team is available 24/7 to assist with any issues.`
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-12">
-        {/* Popular Articles */}
-        {!searchQuery && (
-          <div className="mb-12">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Popular Articles</h2>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 divide-y divide-gray-200">
-              {popularArticles.map((article, index) => (
-                <button
-                  key={index}
-                  className="w-full px-6 py-4 text-left hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                >
-                  <span className="text-gray-800 group-hover:text-teal-600 transition-colors">{article}</span>
-                  <div className="text-gray-400 group-hover:text-teal-600 transition-colors">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m9 18 6-6-6-6" />
-                    </svg>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
+
 
         {/* Categories */}
         <div className="mb-12">
@@ -514,7 +387,6 @@ Our technical team is available 24/7 to assist with any issues.`
               </div>
               <div className="text-left">
                 <div className="font-medium text-gray-800">Live Chat</div>
-                <div className="text-sm text-gray-600">Available 24/7</div>
               </div>
             </button>
             
@@ -526,7 +398,7 @@ Our technical team is available 24/7 to assist with any issues.`
               </div>
               <div className="text-left">
                 <div className="font-medium text-gray-800">Email Support</div>
-                <div className="text-sm text-gray-600">Response in 2-4 hours</div>
+
               </div>
             </button>
             
@@ -538,7 +410,6 @@ Our technical team is available 24/7 to assist with any issues.`
               </div>
               <div className="text-left">
                 <div className="font-medium text-gray-800">Phone Support</div>
-                <div className="text-sm text-gray-600">Mon-Fri 9AM-6PM</div>
               </div>
             </button>
           </div>
