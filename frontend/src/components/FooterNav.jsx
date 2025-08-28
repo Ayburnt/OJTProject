@@ -20,7 +20,7 @@ function FooterNav() {
   const navItems = [
     { key: "help", label: "Need Help", links: ["How to buy tickets?", "Where are my tickets?", "How to use e-ticket?", "Help Center"] },
     { key: "CustomerSupport", label: "Customer Support", links: ["Customer Support"] },
-    { key: "Organizers", label: "Event organizer", links: ["Our Solutions", "Pricing", "Contact Us"] },
+    { key: "Organizers", label: "Event organizer", links: ["", "Contact Us"] },
     { key: "Legal", label: "Legal", links: ["Term", "Policy", "Security"] },
   ];
 
