@@ -113,7 +113,7 @@ return (
       <OrganizerNav />
     </div>
     {/* Main Content */}
-    <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full">
+    <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full mt-10 ml-5">
         {/* Profile Picture and Account Actions */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-7 flex-1">
           <div className="flex flex-col lg:flex-row w-full items-center sm:items-start justify-between gap-6">

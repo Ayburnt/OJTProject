@@ -34,7 +34,7 @@ export default function SariSariETicketHelp() {
               <strong>Option 2:</strong> Print your ticket/s from your email.
             </p>
             <ul className="list-disc list-inside text-gray-600 mb-6 space-y-1 ml-4">
-              <li>Find your ticket confirmation email from Ticketmelon</li>
+              <li>Find your ticket confirmation email from Sari-sari</li>
               <li>Open the attached PDF file</li>
             </ul>
           </div>

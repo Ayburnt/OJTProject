@@ -29,7 +29,7 @@ const Q1 = () => {
             </div>
 
             <div className="text-gray-800">
-              <span className="font-medium">4.</span> Review all the prices. Then, click on the checkbox next to "I agree to Ticketmelon's Terms of Service and Event Organizer's Agreement", and click the 'Pay Now' button.
+              <span className="font-medium">4.</span> Review all the prices. Then, click on the checkbox next to "I agree to Sari-sari's Terms of Service and Event Organizer's Agreement", and click the 'Pay Now' button.
             </div>
           </div>
 
