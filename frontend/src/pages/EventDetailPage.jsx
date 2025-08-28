@@ -223,7 +223,7 @@ function EventDetailPage() {
                                 <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate(`/org/${eventDetails.created_by.user_code}`)}>
                                     <FaRegUser className="text-teal-600 text-lg" />
                                     <span className="text-gray-800 font-medium">
-                                        {eventDetails.created_by.first_name} {eventDetails.created_by.last_name}
+                                        {eventDetails.created_by.company_name}
                                     </span>
                                 </div>
                             </div>

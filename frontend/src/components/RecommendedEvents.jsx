@@ -44,7 +44,7 @@ function RecommendedEvents() {
                   eventTitle={event.title}
                   eventDate={event}
                   eventLocation={event.venue_place}
-                  eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
+                  eventCreator={`${event.created_by.company_name}`}
                 />
               </Link>
             ))

@@ -102,6 +102,7 @@ function Signup({ onAuthSuccess }) {
     const [companyWebsite, setCompanyWebsite] = useState(""); // New field for client
     const [user_code, setUserCode] = useState("");
     const [agree, setAgree] = useState(false);
+    const [authorized, setAuthorized] = useState(false);
 
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -227,6 +228,11 @@ function Signup({ onAuthSuccess }) {
         e.preventDefault();
         if (!agree) {
             setMessage("Please agree to the terms and conditions.");
+            return;
+        }
+
+        if (!authorized) {
+            setMessage("Please confirm that you are authorized to represent your organization.");
             return;
         }
 
@@ -393,7 +399,7 @@ function Signup({ onAuthSuccess }) {
 
 
     return (
-        <div className="flex items-center justify-center h-screen 2xl:h-screen xl:h-auto xl:py-10 bg-white md:bg-gray-100"> {/* Light background like in the image */}
+        <div className="flex items-center justify-center md:py-10 bg-white md:bg-gray-100"> {/* Light background like in the image */}
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
@@ -639,7 +645,7 @@ function Signup({ onAuthSuccess }) {
                             {selectedRoleRef.current === 'organizer' && (
                                 <>
                                     <div className="mb-4 w-full">
-                                        <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Name <span className="text-gray-400 font-sm">(optional)</span> </label>
+                                        <label htmlFor="companyName" className="block mb-2 pl-1 text-sm font-medium font-outfit">Organization Name</label>
                                         <input
                                             type="text" id="companyName" name="companyName"
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
@@ -647,7 +653,7 @@ function Signup({ onAuthSuccess }) {
                                     </div>
 
                                     <div className="mb-4 w-full">
-                                        <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Company Website <span className="text-gray-400 font-sm">(optional)</span> </label>
+                                        <label htmlFor="companyWebsite" className="block mb-2 pl-1 text-sm font-medium font-outfit">Organization URL <span className="text-gray-400 font-sm">(optional)</span> </label>
                                         <input
                                             type="url" id="companyWebsite" name="companyWebsite" // Changed type to url
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
@@ -675,7 +681,17 @@ function Signup({ onAuthSuccess }) {
                         </div>
 
 
-                        <div className="flex items-center mb-4">
+                        <div className="flex flex-row items-start mb-4 w-[80%]">
+                            <input
+                              required
+                                type="checkbox" id="authorized" className="mr-2 h-4 w-4"
+                                checked={authorized} onChange={(e) => setAuthorized(e.target.checked)} />
+                            <p className="font-outfit text-sm">
+                                I confirm that I am duly authorized by my organization to create and post events on its behalf.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-row items-start mb-4 w-[80%]">
                             <input
                               required
                                 type="checkbox" id="agree" className="mr-2 h-4 w-4"
