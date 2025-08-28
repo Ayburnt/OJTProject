@@ -13,7 +13,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 // A helper function to create a new, empty ticket object
 const createNewTicket = () => ({
-  ticket_name: '',
+  ticket_name: 'Standard',
   ticket_type: 'free',
   price: 0,
   quantity_total: 100,
@@ -65,6 +65,7 @@ const CreateEventForm = () => {
     posting_fee: 0,
     seating_map: null,
     collect_email: 'collect',
+    is_broadcast: 'broadcast',
     status: 'pending',
     ticket_types: [createNewTicket()],
     reg_form_templates: [{
@@ -147,6 +148,7 @@ const CreateEventForm = () => {
         // Clear private_code if audience is set to public
         if (name === 'audience' && value === 'public') {
           updated.private_code = '';
+          updated.is_broadcast = 'broadcast';
         }
 
         if (name === 'event_type' && value === 'in-person') {

@@ -52,6 +52,11 @@ class Event(models.Model):
         ('do-not-collect', 'Do not collect'),
     )
 
+    BROADCAST_CHOICES = (
+        ('broadcast', 'Broadcast'),
+        ('do-not-broadcast', 'Do not broadcast'),
+    )
+
     # Use settings.AUTH_USER_MODEL for the custom user model
     # and specify 'user_code' in the to_field argument.
     created_by = models.ForeignKey(
@@ -88,6 +93,7 @@ class Event(models.Model):
     isFee_paid = models.BooleanField(default=False)
     seating_map = models.ImageField(upload_to=unique_seating_map_path, blank=True, null=True)
     collect_email = models.CharField(max_length=20, choices=COLLECT_EMAIL_CHOICES, default='collect')
+    is_broadcast = models.CharField(max_length=20, choices=BROADCAST_CHOICES, default='broadcast')
     status = models.CharField(max_length=100, choices=STATUS_CHOICES, default='pending')    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

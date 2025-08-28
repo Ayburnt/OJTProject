@@ -140,11 +140,57 @@ function CEStep1({
           </div>
 
           {formData.audience === 'private' && (
+            <>
             <InputField label='Event Private Code' inputType='text' inputName='private_code'
               inputValue={formData.private_code} inputOnChange={handleEventChange}
               inputPlaceholder='e.g., my-event-password'
             />
+
+            <div className="col-span-2">
+            <label className="font-outfit text-sm leading-none m-0 text-gray-700">
+              Broadcast Event <br />
+              <span className='text-gray-400'>Manage how your event will appear and be shared.</span>
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Single-day event */}
+              <input
+                type="radio"
+                id="broadcast_yes"
+                name="is_broadcast"
+                value="broadcast"
+                checked={formData.is_broadcast === "broadcast"}
+                onChange={handleEventChange}
+                className="hidden peer/broadcast"
+              />
+              <label
+                htmlFor="broadcast_yes"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/broadcast:bg-teal-500 peer-checked/broadcast:border-teal-500 peer-checked/broadcast:text-white hover:text-secondary"
+              >
+                <span className="text-sm font-medium">Broadcast</span>
+              </label>
+
+              {/* Multi-day event */}
+              <input
+                type="radio"
+                id="broadcast_no"
+                name="is_broadcast"
+                value="do-not-broadcast"
+                checked={formData.is_broadcast === "do-not-broadcast"}
+                onChange={handleEventChange}
+                className="hidden peer/do-not-broadcast"
+              />
+              <label
+                htmlFor="broadcast_no"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/do-not-broadcast:bg-teal-500 peer-checked/do-not-broadcast:border-teal-500 peer-checked/do-not-broadcast:text-white hover:text-secondary"
+              >
+                <span className="text-sm font-medium">Do not broadcast</span>
+              </label>
+            </div>
+          </div>
+          </>
           )}
+          
       </FormSection>
 
       <FormSection title="EVENT IMAGE / POSTER">

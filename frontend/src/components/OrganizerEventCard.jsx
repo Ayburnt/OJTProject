@@ -31,13 +31,13 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
   const handleTicketSelling = async () => {
     try {
       await api.patch(`/events/${eventCode}/toggle-selling/`, { is_selling: !isSelling });
-      toast.success(isSelling ? "Ticket selling stopped!" : "Ticket selling started!", {
+      toast.success(isSelling ? "Registration closed!" : "Registration opened!", {
         autoClose: 3000,
       }) 
       fetchEventDetails(); // refresh state after update
     } catch (err) {
       console.error(err);
-       toast.error("Failed to update ticket selling status. Please try again.", {
+       toast.error("Failed to update registration status. Please try again.", {
         autoClose: 5000,
       })
     }
@@ -129,7 +129,7 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
     ${isSelling ? 'bg-red-600 hover:bg-red-700' : 'bg-secondary hover:bg-secondary/90'}`}
             onClick={handleTicketSelling}
           >
-            {isSelling ? "Stop ticket selling" : "Start ticket selling"}
+            {isSelling ? "Close registration" : "Open registration"}
           </button>
 
           <div className='flex flex-row gap-3'>
