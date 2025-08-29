@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect } from "react";
 import FooterNav from "../components/FooterNav";
 
 function Term() {
+
+     useEffect(() => {
+        document.documentElement.style.scrollBehavior = "smooth";
+        return () => {
+          document.documentElement.style.scrollBehavior = "auto";
+        };
+      }, []);
+
   return (
     <div className="min-h-screen bg-gray-100 pb-4">
       <FooterNav />

@@ -1,8 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
 import FooterNav from "../components/FooterNav";
 
 export default function ContactUs() {
+
+   useEffect(() => {
+      document.documentElement.style.scrollBehavior = "smooth";
+      return () => {
+        document.documentElement.style.scrollBehavior = "auto";
+      };
+    }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 font-outfit">
       <FooterNav />
@@ -24,7 +32,7 @@ export default function ContactUs() {
   <h3 className="text-xl font-semibold text-gray-800">Get in touch</h3>
   <div className="flex items-center gap-3 text-gray-700">
     <FiMail className="text-teal-600 text-2xl" />
-    <span>support@sari-sari.com</span>
+    <span>event.sari-sari.com</span>
   </div>
   <div className="flex items-center gap-3 text-gray-700">
     <FiPhone className="text-teal-600 text-2xl" />

@@ -252,7 +252,7 @@ const TimeLine = () => {
   const [eventData, setEventData] = useState([]);
 
   useEffect(() => {
-          document.title = "Time Line | Sari-Sari Events";
+          document.title = "Timeline | Sari-Sari Events";
         }, []);
 
   const fetchProfile = async () => {
