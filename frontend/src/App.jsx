@@ -27,6 +27,7 @@ import ChangePassword from './pages/ChangePassword.jsx';
 import EditEvent from './pages/EditEvent.jsx';
 import BuyTicket from './pages/BuyTicket.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
+import BookingConfirmation from './pages/BookingConfirmation.jsx';
 
 import Q1 from './footer/Q1.jsx';
 import Q2 from './footer/Q2.jsx';
@@ -75,7 +76,7 @@ function App() {
     '/term',
     '/policy',
     '/security',  
-
+    '/attendee',
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -133,6 +134,7 @@ function App() {
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
           <Route path='/admin-attendees' element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
+          <Route path="/attendee/:attendeeCode" element={<BookingConfirmation />} /> 
 
           <Route path="/q1" element={<Q1 />} />
           <Route path="/q2" element={<Q2 />} />

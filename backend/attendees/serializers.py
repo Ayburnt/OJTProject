@@ -1,7 +1,7 @@
 # attendees/serializers.py
 from rest_framework import serializers
 from .models import Attendee, Attendee_Response
-from events.models import Reg_Form_Question, Question_Option
+from events.models import Reg_Form_Question, Question_Option, Event, Ticket_Type
 import uuid
 from django.db import IntegrityError
 
@@ -10,10 +10,21 @@ class AttendeeResponseSerializer(serializers.ModelSerializer):
         model = Attendee_Response
         fields = ["question", "response_value"]
 
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = "__all__"
+
+class TicketTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket_Type
+        fields = "__all__"
+
 # attendees/serializers.py
 class AttendeeSerializer(serializers.ModelSerializer):
     responses = AttendeeResponseSerializer(many=True, required=False)
-
+    event = EventSerializer(read_only=True)
+    ticket_type = TicketTypeSerializer(read_only=True)
     class Meta:
         model = Attendee
         fields = [
@@ -29,6 +40,7 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "price_at_purchase",
             "attendee_status",
             "responses",
+            'created_at',
         ]
 
     def create(self, validated_data):

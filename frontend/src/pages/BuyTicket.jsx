@@ -106,7 +106,7 @@ function BuyTicket() {
 
       const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
       console.log("resMain.data:", resMain.data);
-      newTicketLinks.push(resMain.data.ticket_qr_data);
+      newTicketLinks.push(resMain.data.attendee_code);
 
 
 
@@ -128,7 +128,7 @@ function BuyTicket() {
         };
         const resExtra = await api.post("/attendees/buy-ticket/", extraAttendee);
         console.log("resExtra.data:", resExtra.data);
-        newTicketLinks.push(resExtra.data.ticket_qr_data);
+        newTicketLinks.push(resExtra.data.attendee_code);
       }
 
       setTicketLinks(newTicketLinks);
@@ -448,7 +448,8 @@ function BuyTicket() {
             >
               {tickets.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.ticket_name} – ₱{t.price}
+                  {t.price === 0 || t.price === '0.00' ? " Free" : 
+                  t.ticket_name + ' - ' + '₱' + t.price}
                 </option>
               ))}
             </select>

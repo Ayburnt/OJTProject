@@ -1,3 +1,4 @@
+#attendees/views.py
 import csv
 from io import TextIOWrapper
 from django.http import HttpResponse
@@ -74,3 +75,12 @@ class ExportCSVView(APIView):
 
         return response
 
+class AttendeeDetailView(APIView):
+    def get(self, request, attendee_code):
+        try:
+            attendee = Attendee.objects.get(attendee_code=attendee_code)
+        except Attendee.DoesNotExist:
+            return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = AttendeeSerializer(attendee, context={"request": request})
+        return Response(serializer.data)
