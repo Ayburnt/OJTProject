@@ -6,8 +6,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
 from .models import Attendee
-from .serializers import AttendeeSerializer
+from .serializers import AttendeeSerializer, OrganizerEventSerializer
 from events.models import Event, Ticket_Type
+from rest_framework.generics import ListAPIView
+from django.db.models import Count
+
 
 class AttendeeCreateView(generics.CreateAPIView):
     queryset = Attendee.objects.all()
@@ -88,3 +91,26 @@ class AttendeeDetailView(APIView):
         serializer = AttendeeSerializer(attendee, context={"request": request})
         print("📦 Serialized data:", serializer.data)
         return Response(serializer.data)
+
+
+class OrganizerEventsView(APIView):
+    def get(self, request, userCode):
+        try:
+            print(f"🔎 OrganizerEventsView called with userCode: {userCode}")
+            
+            events = Event.objects.filter(created_by__user_code=userCode) \
+                .annotate(attendees_count=Count('attendees')) \
+                .values('id', 'title', 'event_code', 'attendees_count')
+
+            return Response(events, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(f"❌ Error in OrganizerEventsView: {e}")
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class EventAttendeesView(ListAPIView):
+    serializer_class = AttendeeSerializer
+
+    def get_queryset(self):
+        event_code = self.kwargs.get("eventcode")
+        return Attendee.objects.filter(event__event_code=event_code)

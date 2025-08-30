@@ -134,7 +134,7 @@ function App() {
           <Route path='/admin-dashboard' element={<PrivateRoute requiredRole={'admin'}><AdminDashboard /></PrivateRoute>} /> 
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
-          <Route path='/admin-attendees' element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
+          <Route path="/attendees/:eventcode" element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
           <Route path="/attendee/:attendeeCode" element={<BookingConfirmation />} /> 
 
           <Route path="/q1" element={<Q1 />} />

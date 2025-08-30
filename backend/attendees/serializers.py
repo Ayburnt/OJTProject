@@ -64,3 +64,10 @@ class AttendeeSerializer(serializers.ModelSerializer):
             Attendee_Response.objects.create(attendee=attendee, **resp)
 
         return attendee
+
+class OrganizerEventSerializer(serializers.ModelSerializer):
+    attendees_count = serializers.IntegerField()
+
+    class Meta:
+        model = Event
+        fields = ["title", "event_code", "attendees_count"]
