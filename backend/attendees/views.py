@@ -16,9 +16,22 @@ class AttendeeCreateView(generics.CreateAPIView):
     queryset = Attendee.objects.all()
     serializer_class = AttendeeSerializer
 
+from rest_framework import generics
+from .models import Attendee
+from .serializers import AttendeeSerializer
+from events.models import Event
+
 class AttendeeListView(generics.ListAPIView):
-    queryset = Attendee.objects.all()
     serializer_class = AttendeeSerializer
+
+    def get_queryset(self):
+        event_code = self.kwargs.get('event_code')  # get event_code from URL
+        try:
+            event = Event.objects.get(event_code=event_code)
+        except Event.DoesNotExist:
+            return Attendee.objects.none()
+        return Attendee.objects.filter(event=event)
+
 
 
 class UploadCSVView(APIView):
