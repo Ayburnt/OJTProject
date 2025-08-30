@@ -127,6 +127,7 @@ const Attendees = () => {
           <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
         </div>
 
+      
         {!currentEvent ? (
           // --- EVENTS LIST ---
           <div className="w-full max-w-6xl mx-auto">
@@ -238,8 +239,8 @@ const Attendees = () => {
               </div>
 
               {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-center border-collapse">
+              <div className="overflow-x-auto rounded-md">
+                <table className="w-full text-center border-collapse rounded-md">
                   <thead>
                     <tr className="text-gray-600 text-sm bg-gray-100">
                       <th className="py-3 px-4 font-medium border border-gray-300">Reg.date</th>
@@ -262,7 +263,9 @@ const Attendees = () => {
                           className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
                           onClick={() => setSelectedAttendee(a)}
                         >
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{new Date(a.created_at).toLocaleDateString()}</td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
+                            {new Date(a.created_at).toLocaleDateString()}
+                          </td>
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.email}</td>
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
@@ -282,59 +285,75 @@ const Attendees = () => {
           </div>
         )}
 
-        {/* Attendee Modal */}
+        {/* ATTENDEE MODAL */}
         {selectedAttendee && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] font-outfit lg:justify-end lg:items-start">
-            <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md h-auto lg:h-screen">
+            <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md h-auto lg:h-screen flex flex-col">
+              {/* Header */}
               <div className="relative flex items-center justify-center px-4 py-3 border-b border-gray-200 bg-gray-500">
                 <h2 className="text-base font-semibold text-white">Attendee Information</h2>
-                <button onClick={() => setSelectedAttendee(null)} className="absolute right-4 text-gray-200 hover:text-white">✕</button>
-              </div>
-
-              <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-500">Registration Date</span>
-                  <span className="text-gray-800 font-medium">{new Date(selectedAttendee.created_at).toLocaleDateString()}</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-500">Name</span>
-                  <span className="text-gray-800 font-medium">{selectedAttendee.fullName}</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-500">Email</span>
-                  <span className="text-gray-800 font-medium">{selectedAttendee.email}</span>
-                </div>
-                <div className="flex justify-between py-2">
-                  <span className="text-gray-500">Ticket Type</span>
-                  <span className="text-gray-800 font-medium">{selectedAttendee.ticket_read?.ticket_name}</span>
-                </div>
-              </div>
-
-              {selectedAttendee.responses?.length > 0 && (
-                <div className="px-6 py-4">
-                  <h3 className="text-gray-700 font-semibold mb-2">Responses</h3>
-                  <ul className="space-y-2">
-                    {selectedAttendee.responses.map((resp, idx) => (
-                      <li key={idx} className="border-b pb-2">
-                        <p className="text-gray-500 text-sm">{resp.question?.question_text}</p>
-                        <p className="text-gray-800 font-medium">{resp.response_value || "No response"}</p>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between px-6 pb-5 border-t border-gray-200 text-sm">
-                <span className="text-gray-600">Ticket Link:</span>
                 <button
-                  className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
-                  onClick={() => window.open(`https://sari-sari.com/ticket/${selectedAttendee.id}`, "_blank")}
+                  onClick={() => setSelectedAttendee(null)}
+                  className="absolute right-4 text-gray-200 hover:text-white"
                 >
-                  <span>URL</span>
-                  <MdContentCopy className="text-lg" />
+                  ✕
                 </button>
               </div>
-              <div className="w-full h-6 bg-gray-500"></div>
+
+              {/* Scrollable Content */}
+              <div className="flex-1 overflow-y-auto">
+                <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Registration Date</span>
+                    <span className="text-gray-800 font-medium">
+                      {new Date(selectedAttendee.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Name</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.fullName}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Email</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.email}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Ticket Type</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.ticket_read?.ticket_name}</span>
+                  </div>
+                </div>
+
+                {selectedAttendee.responses?.length > 0 && (
+                  <div className="px-6 py-4">
+                    <h3 className="text-gray-700 font-semibold mb-2">Responses</h3>
+                    <ul className="space-y-2">
+                      {selectedAttendee.responses.map((resp, idx) => (
+                        <li key={idx} className="border-b pb-2">
+                          <p className="text-gray-500 text-sm">{resp.question?.question_text}</p>
+                          <p className="text-gray-800 font-medium">{resp.response_value || "No response"}</p>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Sticky Footer */}
+              <div className="border-t border-gray-200">
+                <div className="flex items-center justify-between px-6 py-4 text-sm">
+                  <span className="text-gray-600">Ticket Link:</span>
+                  <button
+                    className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
+                    onClick={() =>
+                      window.open(`https://sari-sari.com/ticket/${selectedAttendee.id}`, "_blank")
+                    }
+                  >
+                    <span>URL</span>
+                    <MdContentCopy className="text-lg" />
+                  </button>
+                </div>
+                <div className="w-full h-6 bg-gray-500"></div>
+              </div>
             </div>
           </div>
         )}
