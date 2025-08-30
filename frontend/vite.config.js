@@ -8,4 +8,7 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  optimizeDeps: {
+    include: ["@yudiel/react-qr-scanner"], // 👈 force Vite to prebundle
+  },
 })

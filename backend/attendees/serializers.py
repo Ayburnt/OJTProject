@@ -1,6 +1,6 @@
 # attendees/serializers.py
 from rest_framework import serializers
-from .models import Attendee, Attendee_Response
+from .models import Attendee, Attendee_Response, Event_Attendance
 from events.models import Reg_Form_Question, Question_Option, Event, Ticket_Type
 import uuid
 from django.db import IntegrityError
@@ -21,6 +21,18 @@ class TicketTypeSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 # attendees/serializers.py
+class EventAttendanceSerializer(serializers.ModelSerializer):    
+    attendee_details = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Event_Attendance
+        fields = ["id", "attendee", "check_in_time", "attendee_details", "checked_in_by_organizer", "created_at"]
+
+    def create(self, validated_data):
+        attendance = Event_Attendance.objects.create(**validated_data)
+        return attendance
+
+
 class AttendeeSerializer(serializers.ModelSerializer):
     responses = AttendeeResponseSerializer(many=True, required=False)
     event = serializers.SlugRelatedField(
@@ -31,6 +43,10 @@ class AttendeeSerializer(serializers.ModelSerializer):
     event_details = EventSerializer(source="event", read_only=True)
     ticket_read = TicketTypeSerializer(source="ticket_type", read_only=True)
     ticket_type = serializers.PrimaryKeyRelatedField(queryset=Ticket_Type.objects.all())
+
+    # ✅ embed attendance
+    attendance = serializers.SerializerMethodField()
+
     class Meta:
         model = Attendee
         fields = [
@@ -48,8 +64,15 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "price_at_purchase",
             "attendee_status",
             "responses",
-            'created_at',
+            "attendance",        # 👈 added
+            "created_at",
         ]
+
+    def get_attendance(self, obj):
+        attendance = Event_Attendance.objects.filter(attendee=obj).first()
+        if attendance:
+            return EventAttendanceSerializer(attendance, context=self.context).data
+        return None
 
     def create(self, validated_data):
         responses_data = validated_data.pop("responses", [])
@@ -80,3 +103,5 @@ class OrganizerEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ["title", "event_code", "attendees_count"]
+
+    

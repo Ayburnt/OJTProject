@@ -1,114 +1,168 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CiSaveDown2 } from "react-icons/ci";
-import { IoCalendarClearOutline } from "react-icons/io5";
-import { IoLocationOutline } from "react-icons/io5";
+import { IoCalendarClearOutline, IoLocationOutline } from "react-icons/io5";
 import { useReactToPrint } from "react-to-print";
 import api from "../api.js";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth.js";
+import { toast } from "react-toastify";
+import { RiQrScan2Line } from "react-icons/ri";
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 export default function Ticket() {
-  const componentRef = useRef();  
+  const componentRef = useRef();
+  const [scanning, setScanning] = useState(false);
+  const navigate = useNavigate();
+
+  // Corrected handleDecode function to properly handle the result object
+  const handleDecode = (result) => {
+  if (result && result.length > 0) {
+    console.log("✅ Scanned:", result);
+    const scannedValue = result[0].rawValue; // Correctly access the rawValue property
+    setScanning(false);    
+    window.location.href = scannedValue;
+  }
+};
 
   const [attendee, setAttendee] = useState(null);
   const [eventDetails, setEventDetails] = useState(null);
   const [ticketType, setTicketType] = useState(null);
-  const {attendeeCode} = useParams();
+  const { attendeeCode } = useParams();
   const handlePrint = useReactToPrint({
-    contentRef: componentRef, // Changed from 'content' to 'contentRef'
+    contentRef: componentRef,
     documentTitle: `${attendeeCode}-booking-confirmation`,
   });
+
+  const [isOrganizer, setIsOrganizer] = useState(false);
+  const [attendanceDetails, setAttendanceDetails] = useState(null);
+  const { isLoggedIn, userCode, userRole } = useAuth();
+  
+  useEffect(() => {
+    if (isLoggedIn && userRole === 'organizer') {
+      setIsOrganizer(true);
+    } else {
+      setIsOrganizer(false);
+    }
+  }, [isLoggedIn, userRole]);
+
   useEffect(() => {
     api.get(`/attendees/booking-info/${attendeeCode}/`)
       .then(res => {
         setAttendee(res.data);
         setEventDetails(res.data.event_details);
         setTicketType(res.data.ticket_read);
-        console.log("Attendee data:", res.data);
+        setAttendanceDetails(res.data.attendance);
+        console.log("Attendee data:", res.data.attendance);
       })
       .catch(err => console.error("Error fetching attendee:", err));
-  }, [attendeeCode]);  
+  }, [attendeeCode]);
 
   function formatEventDateTime(startDate, startTime, endDate, endTime) {
-        if (!startDate || !startTime) return "TBA";
-
-        const start = new Date(`${startDate}T${startTime}`);
-        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
-
-        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
-
-        if (!end || start.toDateString() === end.toDateString()) {
-            // Single-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
-        } else {
-            // Multi-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
-        }
+    if (!startDate || !startTime) return "TBA";
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+    if (!end || start.toDateString() === end.toDateString()) {
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+    } else {
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
     }
-
-    function formatEventDateTime1(startDate, startTime, endDate, endTime) {
-        if (!startDate || !startTime) return "TBA";
-
-        const start = new Date(`${startDate}T${startTime}`);
-        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
-
-        const optionsDate = { year: "numeric", month: "numeric", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
-
-        if (!end || start.toDateString() === end.toDateString()) {
-            // Single-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
-        } else {
-            // Multi-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
-        }
-    }
-
-    function formatPurchaseDate(datetimeString) {
-  if (!datetimeString) return "TBA";
-
-  const date = new Date(datetimeString);
-
-  const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-  const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
-
-  return `${date.toLocaleDateString("en-US", optionsDate)} ${date.toLocaleTimeString("en-US", optionsTime)}`;
-}
-
-function formatEventDateRange(startDate, endDate) {
-  if (!startDate) return "TBA";
-
-  const start = new Date(startDate);
-  const end = endDate ? new Date(endDate) : null;
-
-  const options = { year: "numeric", month: "short", day: "numeric" };
-
-  if (!end || start.toDateString() === end.toDateString()) {
-    return start.toLocaleDateString("en-US", options); 
   }
-  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
-}
 
-function formatEventTimeRange(startTime, endTime) {
-  if (!startTime) return "TBA";
+  function formatEventDateTime1(startDate, startTime, endDate, endTime) {
+    if (!startDate || !startTime) return "TBA";
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+    const optionsDate = { year: "numeric", month: "numeric", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+    if (!end || start.toDateString() === end.toDateString()) {
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+    } else {
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+    }
+  }
 
-  const today = new Date().toISOString().split("T")[0]; // dummy date
-  const start = new Date(`${today}T${startTime}`);
-  const end = endTime ? new Date(`${today}T${endTime}`) : null;
+  function formatPurchaseDate(datetimeString) {
+    if (!datetimeString) return "TBA";
+    const date = new Date(datetimeString);
+    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+    return `${date.toLocaleDateString("en-US", optionsDate)} ${date.toLocaleTimeString("en-US", optionsTime)}`;
+  }
 
-  const options = { hour: "numeric", minute: "2-digit", hour12: true };
+  function formatEventDateRange(startDate, endDate) {
+    if (!startDate) return "TBA";
+    const start = new Date(startDate);
+    const end = endDate ? new Date(endDate) : null;
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    if (!end || start.toDateString() === end.toDateString()) {
+      return start.toLocaleDateString("en-US", options);
+    }
+    return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
+  }
 
-  return `${start.toLocaleTimeString("en-US", options)}${end ? ` - ${end.toLocaleTimeString("en-US", options)}` : ""}`;
-}
+  function formatEventTimeRange(startTime, endTime) {
+    if (!startTime) return "TBA";
+    const today = new Date().toISOString().split("T")[0]; // dummy date
+    const start = new Date(`${today}T${startTime}`);
+    const end = endTime ? new Date(`${today}T${endTime}`) : null;
+    const options = { hour: "numeric", minute: "2-digit", hour12: true };
+    return `${start.toLocaleTimeString("en-US", options)}${end ? ` - ${end.toLocaleTimeString("en-US", options)}` : ""}`;
+  }
+
+  const handleCheckIn = async () => {
+    try {
+      const response = await api.post(`/attendees/check-in/`, { attendee_code: attendeeCode, user_code: userCode });
+      console.log("Check-in response:", response.data);
+      toast.success('Check-in successful!');
+      setAttendanceDetails(response.data);
+    } catch (err) {
+      console.error("Error during check-in:", err);
+      toast.error('Check-in failed. Please try again.');
+    }
+  };
 
 
   return (
     <>
+      {scanning && (
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
+          <p className="text-white mb-4">Scan a QR Code</p>
+          <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
+            <Scanner onScan={handleDecode} onError={(err) => console.error("Scanner error:", err)} allowMultiple />            
+          </div>
+          <button
+            onClick={() => setScanning(false)}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
+
       <div className="min-h-screen bg-gray-100 flex flex-col items-center gap-6 p-4">
         {/* Logo Section */}
         <div className="w-full max-w-4xl flex justify-center mb-6 px-4 sm:px-0">
-          <div className="w-40 h-16 sm:w-48 sm:h-20 bg-gray-300 flex items-center justify-center rounded-lg">
-            <span className="text-gray-500 text-sm sm:text-base">Logo Placeholder</span>
+          <div className="flex flex-row w-full items-center justify-between rounded-lg">
+            <p className="text-gray-500 text-sm sm:text-base">Logo Placeholder</p>
+            <div className="flex items-center space-x-2">
+              {isOrganizer && (
+                <button
+                  onClick={handleCheckIn}
+                  disabled={attendanceDetails?.check_in_time}
+                  className={`px-4 py-2 rounded-lg font-outfit text-sm shadow 
+          ${attendanceDetails?.check_in_time
+                      ? "bg-gray-400 text-white cursor-not-allowed"
+                      : "bg-teal-600 text-white hover:bg-teal-700"}`}
+                >
+                  {attendanceDetails?.check_in_time
+                    ? `Checked in at ${new Date(attendanceDetails.check_in_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                    : "Check In"}
+                </button>
+              )}
+              <button onClick={() => setScanning(!scanning)} className="outline-none"><RiQrScan2Line className="text-secondary text-2xl cursor-pointer" /></button>
+            </div>
           </div>
         </div>
 
@@ -142,12 +196,11 @@ function formatEventTimeRange(startTime, endTime) {
                   {eventDetails?.title}
                 </h2>
                 <p className="text-xs sm:text-sm font-outfit text-gray-500">
-  {eventDetails?.category
-    ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
-    : ""}
-  {" "}Event
-</p>
-
+                  {eventDetails?.category
+                    ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
+                    : ""}
+                  {" "}Event
+                </p>
               </div>
               <div className="text-right mt-2 sm:mt-0">
                 <p className="text-[10px] font-outfit sm:text-xs uppercase tracking-wide text-gray-500">
@@ -210,7 +263,7 @@ function formatEventTimeRange(startTime, endTime) {
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium font-outfit text-gray-700">Venue:</span>
-                    <span className="text-right">{eventDetails?.venue_name}, {eventDetails?. venue_specific}</span>
+                    <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
@@ -250,7 +303,6 @@ function formatEventTimeRange(startTime, endTime) {
         </div>
       </div>
 
-
       {/* Printing page layout */}
       <div ref={componentRef} className="bg-white w-full items-center hidden justify-center p-6 print:flex flex-col">
         <div className="font-outfit grid grid-cols-3 w-[95%] font-semibold text-sm">
@@ -268,9 +320,9 @@ function formatEventTimeRange(startTime, endTime) {
                 {eventDetails?.title}
               </h2>
               <p className="text-xs sm:text-sm font-outfit text-gray-500">{eventDetails?.category
-    ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
-    : ""}
-  {" "}Event</p>
+                ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
+                : ""}
+                {" "}Event</p>
             </div>
             <div className="text-right mt-2 sm:mt-0 place-items-end self-end justify-self-end">
               <p className="text-[10px] font-outfit sm:text-xs uppercase tracking-wide text-gray-500">
@@ -284,7 +336,6 @@ function formatEventTimeRange(startTime, endTime) {
 
           {/* Event Details + QR */}
           <div className="flex flex-row border border-gray-500 rounded-xl font-outfit shadow-lg">
-
             {/* Left: Event Details */}
             <div className="flex flex-col w-1/2 p-4 border-dashed border-gray-400 border-r flex flex-col">
               <h3 className="text-center font-outfit text-lg font-semibold mb-3">
@@ -325,42 +376,36 @@ function formatEventTimeRange(startTime, endTime) {
                   <li>Don't lose this ticket</li>
                 </ul>
               </div>
-            </div>
 
-
-
-            {/* QR Section */}
-            <div className="flex flex-col items-center justify-center w-1/2 p-4">
-              <div className="flex flex-col items-center w-full justify-center">
-                <div className="w-[70%] aspect-square object-contain bg-gray-200 flex items-center justify-center rounded-lg">
-                  <img src={attendee?.ticket_qr_image} alt="" />
+              {/* QR Section */}
+              <div className="flex flex-col items-center justify-center w-1/2 p-4">
+                <div className="flex flex-col items-center w-full justify-center">
+                  <div className="w-[70%] aspect-square object-contain bg-gray-200 flex items-center justify-center rounded-lg">
+                    <img src={attendee?.ticket_qr_image} alt="" />
+                  </div>
+                  <p className="text-xs font-outfit text-gray-500 mt-3 text-center">
+                    Scan this code at Entrance Venue <br />
+                    <span className="inline-flex items-center space-x-1">
+                      <CiSaveDown2 size={14} className="text-gray-500" />
+                      <span>QR Scanner Required</span>
+                    </span>
+                  </p>
+                  <div className="w-full border-b border-dashed border-gray-400 mt-4"></div>
+                  <p className="text-xs font-outfit text-gray-400 mt-2">
+                    Purchased on {formatPurchaseDate(attendee?.created_at)}
+                  </p>
                 </div>
-                <p className="text-xs font-outfit text-gray-500 mt-3 text-center">
-                  Scan this code at Entrance Venue <br />
-                  <span className="inline-flex items-center space-x-1">
-                    <CiSaveDown2 size={14} className="text-gray-500" />
-                    <span>QR Scanner Required</span>
-                  </span>
-                </p>
-                <div className="w-full border-b border-dashed border-gray-400 mt-4"></div>
-                <p className="text-xs font-outfit text-gray-400 mt-2">
-                  Purchased on {formatPurchaseDate(attendee?.created_at)}
-                </p>
               </div>
             </div>
-
           </div>
-
-        </div>
-
-        <div className="font-outfit grid grid-cols-1 w-[95%] font-semibold text-sm">
-          <Link 
-  to={`/attendee/${attendee?.attendee_code}`} 
-  target="_blank"
->
-  {attendee?.ticket_qr_data}
-</Link>
-
+          <div className="font-outfit grid grid-cols-1 w-[95%] font-semibold text-sm">
+            <Link
+              to={`/attendee/${attendee?.attendee_code}`}
+              target="_blank"
+            >
+              {attendee?.ticket_qr_data}
+            </Link>
+          </div>
         </div>
       </div>
     </>

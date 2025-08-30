@@ -5,6 +5,7 @@ from io import BytesIO
 from django.utils import timezone
 import qrcode
 from django.db import transaction
+from django.conf import settings
 class Attendee(models.Model):
     STATUS_CHOICES = (
         ('registered', 'Registered'),
@@ -94,3 +95,18 @@ class Attendee_Response(models.Model):
 
     def __str__(self):
         return f"Response by {self.attendee.fullName} to '{self.question}'"
+
+
+class Event_Attendance(models.Model):
+    attendee = models.ForeignKey(Attendee, on_delete=models.CASCADE, related_name='attendance_records', to_field='attendee_code')
+    check_in_time = models.DateTimeField(auto_now_add=True)
+    checked_in_by_organizer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='checked_in_attendances',
+        to_field='user_code'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Attendance for {self.attendee.fullName} at {self.check_in_time}"

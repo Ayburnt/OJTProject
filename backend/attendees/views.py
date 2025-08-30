@@ -5,12 +5,17 @@ from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, generics
-from .models import Attendee
-from .serializers import AttendeeSerializer, OrganizerEventSerializer
+from .models import Attendee, Event_Attendance
+from .serializers import AttendeeSerializer, OrganizerEventSerializer, EventAttendanceSerializer
 from events.models import Event, Ticket_Type
 from rest_framework.generics import ListAPIView
 from django.db.models import Count
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class AttendeeCreateView(generics.CreateAPIView):
     queryset = Attendee.objects.all()
@@ -118,3 +123,43 @@ class EventAttendeesView(ListAPIView):
     def get_queryset(self):
         event_code = self.kwargs.get("eventcode")
         return Attendee.objects.filter(event__event_code=event_code)
+
+class EventAttendanceView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        print("🔍 Incoming request for attendee_code:", request.data)
+        attendee_code = request.data.get("attendee_code")
+        user_code = request.data.get("user_code")
+
+        if not attendee_code or not user_code:
+            return Response({"error": "attendee_code and user_code required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            attendee = Attendee.objects.get(attendee_code=attendee_code)
+        except Attendee.DoesNotExist:
+            return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            organizer = User.objects.get(user_code=user_code)
+        except User.DoesNotExist:
+            return Response({"error": "Organizer not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Prevent double check-in
+        existing = Event_Attendance.objects.filter(attendee=attendee).first()
+        if existing:
+            return Response(EventAttendanceSerializer(existing).data, status=status.HTTP_200_OK)
+
+        # Create attendance record
+        attendance = Event_Attendance.objects.create(
+            attendee=attendee,
+            checked_in_by_organizer=organizer
+        )
+
+        # Update attendee status
+        attendee.attendee_status = "checked-in"
+        attendee.save()
+
+        serializer = EventAttendanceSerializer(attendance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
