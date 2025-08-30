@@ -9,6 +9,8 @@ import { MdContentCopy } from "react-icons/md";
 import { GoUpload } from "react-icons/go";
 import { BsDownload } from "react-icons/bs";
 import api from "../api";
+import { RiQrScan2Line } from "react-icons/ri";
+import { Scanner } from '@yudiel/react-qr-scanner';
 
 const Attendees = () => {
   const { userCode } = useParams();
@@ -117,9 +119,33 @@ const Attendees = () => {
       a.fullName?.toLowerCase().includes(searchAttendees.toLowerCase()) ||
       a.email?.toLowerCase().includes(searchAttendees.toLowerCase())
   );
+  const [scanning, setScanning] = useState(false);
+
+  const handleDecode = (result) => {
+  if (result && result.length > 0) {
+    console.log("✅ Scanned:", result);
+    const scannedValue = result[0].rawValue; // Correctly access the rawValue property
+    setScanning(false);    
+    window.location.href = scannedValue;
+  }
+};
 
   return (
     <div className="bg-alice-blue min-h-screen font-outfit">
+      {scanning && (
+              <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
+                <p className="text-white mb-4">Scan a QR Code</p>
+                <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
+                  <Scanner onScan={handleDecode} onError={(err) => console.error("Scanner error:", err)} allowMultiple />            
+                </div>
+                <button
+                  onClick={() => setScanning(false)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
       <OrganizerNav />
 
       <div className="md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
@@ -193,9 +219,15 @@ const Attendees = () => {
             </div>
 
             <div className="p-5 md:p-8 lg:p-10 border border-gray-300 rounded-xl shadow bg-white w-full">
-              <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+              <div className="w-full grid grid-cols-1 md:grid-cols-3 mb-6">
+                <h1 className="text-2xl font-semibold text-gray-800 md:col-span-2">
                 {currentEvent.title || "Event Attendees"}
               </h1>
+
+              <div className="md:col-span-1 w-full md:place-items-end">
+                <button onClick={() => setScanning(!scanning)} className="font-semibold text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer">Scan QR <span><RiQrScan2Line /></span></button>
+              </div>
+              </div>              
 
               {/* Search + Upload/Download */}
               <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8 w-full">
@@ -344,8 +376,8 @@ const Attendees = () => {
                   <span className="text-gray-600">Ticket Link:</span>
                   <button
                     className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
-                    onClick={() =>
-                      window.open(`https://sari-sari.com/ticket/${selectedAttendee.id}`, "_blank")
+                    onClick={() =>                      
+                      window.open(selectedAttendee.ticket_qr_data)
                     }
                   >
                     <span>URL</span>

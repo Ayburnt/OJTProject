@@ -65,7 +65,7 @@ class Event(models.Model):
         related_name='events',
         to_field='user_code'
     )
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
     event_code= models.CharField(unique=True, blank=True, null=True)
     audience = models.CharField(max_length=20, choices=AUDIENCE_CHOICES, default='public')
