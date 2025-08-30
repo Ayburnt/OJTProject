@@ -121,6 +121,7 @@ function EventDetailPage() {
     const [agreeToTerms, setAgreeToTerms] = useState(false);
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
+    const [isPosterOpen, setIsPosterOpen] = useState(false);
 
     const navigate = useNavigate();
     const { eventcode } = useParams();
@@ -198,8 +199,16 @@ function EventDetailPage() {
 
     return (
         <div className="bg-gray-100 min-h-screen">
+            {isPosterOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer" onClick={() => setIsPosterOpen(false)}>
+                    <div className='w-[90%]'>
+                        <img src={eventDetails.event_poster} className='rounded-2xl'  alt="" />
+                    </div>                    
+                </div>
+            )}
+
             {/* Banner */}
-            <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden">
+            <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden cursor-pointer" onClick={() => setIsPosterOpen(true)}>
                 <img
                     src={eventDetails.event_poster}
                     alt={eventDetails.title}
