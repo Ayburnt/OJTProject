@@ -27,6 +27,7 @@ const Attendees = () => {
   const [searchAttendees, setSearchAttendees] = useState("");
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [loadingAttendees, setLoadingAttendees] = useState(false);
+  const [attendance, setAttendance] = useState(null);
 
   // --- Fetch events ---
   useEffect(() => {
@@ -53,7 +54,8 @@ const Attendees = () => {
       const attendeesData = Array.isArray(res.data)
         ? res.data
         : res.data.attendees || [];
-      setAttendees(attendeesData);
+      setAttendees(attendeesData); console.log(res.data)
+      setAttendance(res.data.attendance)
     } catch (err) {
       console.error("Error fetching attendees:", err);
       setAttendees([]);
@@ -122,30 +124,30 @@ const Attendees = () => {
   const [scanning, setScanning] = useState(false);
 
   const handleDecode = (result) => {
-  if (result && result.length > 0) {
-    console.log("✅ Scanned:", result);
-    const scannedValue = result[0].rawValue; // Correctly access the rawValue property
-    setScanning(false);    
-    window.location.href = scannedValue;
-  }
-};
+    if (result && result.length > 0) {
+      console.log("✅ Scanned:", result);
+      const scannedValue = result[0].rawValue; // Correctly access the rawValue property
+      setScanning(false);
+      window.location.href = scannedValue;
+    }
+  };
 
   return (
     <div className="bg-alice-blue min-h-screen font-outfit">
       {scanning && (
-              <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
-                <p className="text-white mb-4">Scan a QR Code</p>
-                <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
-                  <Scanner onScan={handleDecode} onError={(err) => console.error("Scanner error:", err)} allowMultiple />            
-                </div>
-                <button
-                  onClick={() => setScanning(false)}
-                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+        <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
+          <p className="text-white mb-4">Scan a QR Code</p>
+          <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
+            <Scanner onScan={handleDecode} onError={(err) => console.error("Scanner error:", err)} allowMultiple />
+          </div>
+          <button
+            onClick={() => setScanning(false)}
+            className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
       <OrganizerNav />
 
       <div className="md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
@@ -153,7 +155,7 @@ const Attendees = () => {
           <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
         </div>
 
-      
+
         {!currentEvent ? (
           // --- EVENTS LIST ---
           <div className="w-full max-w-6xl mx-auto">
@@ -221,13 +223,13 @@ const Attendees = () => {
             <div className="p-5 md:p-8 lg:p-10 border border-gray-300 rounded-xl shadow bg-white w-full">
               <div className="w-full grid grid-cols-1 md:grid-cols-3 mb-6">
                 <h1 className="text-2xl font-semibold text-gray-800 md:col-span-2">
-                {currentEvent.title || "Event Attendees"}
-              </h1>
+                  {currentEvent.title || "Event Attendees"}
+                </h1>
 
-              <div className="md:col-span-1 w-full md:place-items-end">
-                <button onClick={() => setScanning(!scanning)} className="font-semibold text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer">Scan QR <span><RiQrScan2Line /></span></button>
+                <div className="md:col-span-1 w-full md:place-items-end">
+                  <button onClick={() => setScanning(!scanning)} className="font-semibold text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer">Scan QR <span><RiQrScan2Line /></span></button>
+                </div>
               </div>
-              </div>              
 
               {/* Search + Upload/Download */}
               <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8 w-full">
@@ -279,6 +281,8 @@ const Attendees = () => {
                       <th className="py-3 px-4 font-medium border border-gray-300">Name</th>
                       <th className="py-3 px-4 font-medium border border-gray-300">Email</th>
                       <th className="py-3 px-4 font-medium border border-gray-300">Ticket Type</th>
+                      <th className="py-3 px-4 font-medium border border-gray-300">Check-in Time</th>
+
                     </tr>
                   </thead>
                   <tbody>
@@ -301,6 +305,12 @@ const Attendees = () => {
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.email}</td>
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
+                            {a.attendance?.check_in_time
+                              ? new Date(a.attendance.check_in_time).toLocaleString()
+                              : ''}
+                          </td>
+
                         </tr>
                       ))
                     ) : (
@@ -353,6 +363,14 @@ const Attendees = () => {
                     <span className="text-gray-500">Ticket Type</span>
                     <span className="text-gray-800 font-medium">{selectedAttendee.ticket_read?.ticket_name}</span>
                   </div>
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Check-in Time</span>
+                    <span className="text-gray-800 font-medium">
+                      {selectedAttendee.attendance?.check_in_time
+                        ? new Date(selectedAttendee.attendance.check_in_time).toLocaleString()
+                        : ''}
+                    </span>
+                  </div>
                 </div>
 
                 {selectedAttendee.responses?.length > 0 && (
@@ -376,7 +394,7 @@ const Attendees = () => {
                   <span className="text-gray-600">Ticket Link:</span>
                   <button
                     className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
-                    onClick={() =>                      
+                    onClick={() =>
                       window.open(selectedAttendee.ticket_qr_data)
                     }
                   >
