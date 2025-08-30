@@ -21,8 +21,8 @@ export default function Ticket() {
     api.get(`/attendees/booking-info/${attendeeCode}/`)
       .then(res => {
         setAttendee(res.data);
-        setEventDetails(res.data.event);
-        setTicketType(res.data.ticket_type);
+        setEventDetails(res.data.event_details);
+        setTicketType(res.data.ticket_read);
         console.log("Attendee data:", res.data);
       })
       .catch(err => console.error("Error fetching attendee:", err));

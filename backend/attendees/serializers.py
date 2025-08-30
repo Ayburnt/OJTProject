@@ -23,8 +23,14 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 # attendees/serializers.py
 class AttendeeSerializer(serializers.ModelSerializer):
     responses = AttendeeResponseSerializer(many=True, required=False)
-    event = EventSerializer(read_only=True)
-    ticket_type = TicketTypeSerializer(read_only=True)
+    event = serializers.SlugRelatedField(
+        slug_field="event_code", 
+        queryset=Event.objects.all(),
+        write_only=True
+    )
+    event_details = EventSerializer(source="event", read_only=True)
+    ticket_read = TicketTypeSerializer(source="ticket_type", read_only=True)
+    ticket_type = serializers.PrimaryKeyRelatedField(queryset=Ticket_Type.objects.all())
     class Meta:
         model = Attendee
         fields = [
@@ -32,7 +38,9 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "fullName",
             "email",
             "attendee_code",
-            "event",            
+            "event",
+            "event_details",
+            "ticket_read",
             "ticket_type",
             "ticket_quantity",
             "ticket_qr_data",
@@ -45,10 +53,11 @@ class AttendeeSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         responses_data = validated_data.pop("responses", [])
-        event_code = validated_data["event"].event_code  
+        event = validated_data["event"]
+        event_code = event.event_code  
 
-        # ✅ retry until unique attendee_code is found
-        for _ in range(5):  # small retry loop
+        # generate attendee_code
+        for _ in range(5):
             random_code = uuid.uuid4().hex[:8]
             attendee_code = f"{event_code}_{random_code}"
             validated_data["attendee_code"] = attendee_code
@@ -56,7 +65,7 @@ class AttendeeSerializer(serializers.ModelSerializer):
                 attendee = Attendee.objects.create(**validated_data)
                 break
             except IntegrityError:
-                continue  # try again if collision
+                continue
         else:
             raise serializers.ValidationError("Could not generate a unique ticket code.")
 
