@@ -235,7 +235,7 @@ function Header() {
               isLoggedIn && userRole === "client" ? "hidden" : "block"
             } text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
           >
-            Find my Tickets
+            Find my Ticket
           </Link>
           <button
             onClick={handleCreateEvent}
@@ -322,7 +322,7 @@ function Header() {
         to="/find-my-ticket"
         className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
       >
-        Find my Tickets
+        Find my Ticket
       </Link>
       <button
         onClick={handleCreateEvent}

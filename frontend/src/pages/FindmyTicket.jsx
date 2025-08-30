@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { IoIosArrowBack } from "react-icons/io";
+import { toast } from 'react-toastify';
+import api from '../api.js';
+import { useNavigate } from 'react-router-dom';
 
-const FindMyTicket = () => {
-  const [email, setEmail] = useState('');
+const FindMyTicket = () => {  
+  const [code, setCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleEmailChange = (event) => {
-    setEmail(event.target.value);
+  const handleCodeChange = (event) => {
+    setCode(event.target.value);
   };
 
   useEffect(() => {
@@ -14,30 +18,33 @@ const FindMyTicket = () => {
   }, []);
 
   const handleNextClick = async () => {
-    if (!email) {
-      alert('Please enter your email address.');
+    if (!code) {      
+      toast.error(`Please enter your reference code.`)
       return;
     }
 
     setIsLoading(true);
     // Simulate an API call
     try {
-      console.log(`Looking up tickets for: ${email}`);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Ticket found!');
+      const res = await api.get(`/attendees/booking-info/${code}/`);    
+      console.log('Ticket found!',res.data);
+      if(res.data)  {
+        navigate(`/attendee/${code}`);
+      }
     } catch (error) {
       console.error('Failed to find ticket:', error);
+      toast.error('Failed to find ticket. Please check your details and try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDontKnowClick = () => {
-    alert("Please contact customer support for assistance.");
+  const handleDontKnowClick = () => {    
+    toast.info("Please contact customer support for assistance.");
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans antialiased">
+    <div className="min-h-screen bg-gray-50 font-sans antialiased">      
       {/* Header component */}
       <header className="bg-white shadow-sm py-4 px-6 flex items-center justify-between border-b border-gray-200">
         {/* Left section: logo and Help Center */}
@@ -68,24 +75,23 @@ const FindMyTicket = () => {
           </div>
 
           <div className="mb-8 text-center">
-            <h1 className="text-4xl font-extrabold text-gray-800">Find Tickets</h1>
-            <p className="text-gray-500 mt-2 text-lg">Look up your ticket order with your attendee code</p>
+            <h1 className="text-4xl font-extrabold text-gray-800">Find a Ticket</h1>
+            <p className="text-gray-500 mt-2 text-lg">Look up your ticket order with your reference code</p>
           </div>
 
           {/* Form Section */}
           <div className="space-y-6">
             <div className="relative">
               <label
-                htmlFor="email"
+                htmlFor="code"
                 className="absolute -top-3 left-3 bg-white px-1 text-sm font-medium text-gray-700">
-                Email address <span className="text-red-500">*</span>
+                Reference Code <span className="text-red-500">*</span>
               </label>
               <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="e.g., yourname@example.com"
+                type="text"
+                id="code"
+                value={code}
+                onChange={handleCodeChange}                
                 required
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all duration-200 placeholder-gray-400"
               />

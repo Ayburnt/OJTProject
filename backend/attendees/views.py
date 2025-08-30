@@ -77,10 +77,14 @@ class ExportCSVView(APIView):
 
 class AttendeeDetailView(APIView):
     def get(self, request, attendee_code):
+        print("🔍 Incoming request for attendee_code:", attendee_code)
         try:
             attendee = Attendee.objects.get(attendee_code=attendee_code)
+            print("✅ Attendee object retrieved:", attendee)
         except Attendee.DoesNotExist:
-            return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)
-
+            print("❌ Attendee not found:", attendee_code)
+            return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)            
+        
         serializer = AttendeeSerializer(attendee, context={"request": request})
+        print("📦 Serialized data:", serializer.data)
         return Response(serializer.data)

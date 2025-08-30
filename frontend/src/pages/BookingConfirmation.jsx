@@ -213,8 +213,8 @@ function formatEventTimeRange(startTime, endTime) {
                     <span className="text-right">{eventDetails?.venue_name}, {eventDetails?. venue_specific}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
-                    <span className="font-medium font-outfit text-gray-700">Seat:</span>
-                    <span>{ticketType?.ticket_name} Seat</span>
+                    <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
+                    <span>{attendee?.attendee_code}</span>
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium text-gray-700">Ticket Holder:</span>
@@ -304,8 +304,8 @@ function formatEventTimeRange(startTime, endTime) {
                   <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium font-outfit text-gray-700">Seat:</span>
-                  <span>{ticketType?.ticket_name} Seat</span>
+                  <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
+                  <span>{attendee?.attendee_code}</span>
                 </div>
                 <div className="flex justify-between border-b pb-2">
                   <span className="font-medium text-gray-700">Ticket Holder:</span>

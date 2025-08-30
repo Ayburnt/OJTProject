@@ -84,6 +84,7 @@ function App() {
     // Check if the path starts with a dynamic route or is an exact match
     return (
       path.startsWith('/org/') || // Checks for paths like '/organizer/TAN07'
+      path.startsWith('/attendee/') || // for booking confirmation dynamic route
       excludedPaths.includes(path)
     );
   };
