@@ -304,110 +304,118 @@ export default function Ticket() {
       </div>
 
       {/* Printing page layout */}
-      <div ref={componentRef} className="bg-white w-full items-center hidden justify-center p-6 print:flex flex-col">
-        <div className="font-outfit grid grid-cols-3 w-[95%] font-semibold text-sm">
-          <p>{formatEventDateTime1(eventDetails?.start_date, eventDetails?.start_time, eventDetails?.end_date, eventDetails?.end_time)}</p>
-          <p className="cols-span-2">Ticket | {eventDetails?.title}</p>
-        </div>
-        <div className="flex flex-col border border-gray-300 shadow-sm py-5 px-3 w-[95%] rounded-lg overflow-hidden">
-          {/* Header Section */}
-          <div className="bg-gray-300 border border-gray-600 rounded-xl grid grid-cols-3 p-3">
-            <div className="aspect-video object-cover rounded-lg overflow-hidden col-span-1 flex items-center justify-start">
-              <img src={eventDetails?.event_poster} alt="" className="object-cover rounded-lg" />
-            </div>
-            <div className="ml-3">
-              <h2 className="text-md sm:text-lg font-outfit font-semibold text-gray-800">
-                {eventDetails?.title}
-              </h2>
-              <p className="text-xs sm:text-sm font-outfit text-gray-500">{eventDetails?.category
-                ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
-                : ""}
-                {" "}Event</p>
-            </div>
-            <div className="text-right mt-2 sm:mt-0 place-items-end self-end justify-self-end">
-              <p className="text-[10px] font-outfit sm:text-xs uppercase tracking-wide text-gray-500">
-                Ticket Confirmed
-              </p>
-              <p className="text-sm sm:text-lg font-outfit font-semibold text-secondary">
-                {ticketType?.ticket_name} Access
-              </p>
-            </div>
-          </div>
-
-          {/* Event Details + QR */}
-          <div className="flex flex-row border border-gray-500 rounded-xl font-outfit shadow-lg">
-            {/* Left: Event Details */}
-            <div className="flex flex-col w-1/2 p-4 border-dashed border-gray-400 border-r flex flex-col">
-              <h3 className="text-center font-outfit text-lg font-semibold mb-3">
-                Event Details
-              </h3>
-              <div className="space-y-4 text-xs">
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium font-outfit text-gray-700">Date:</span>
-                  <span>{formatEventDateRange(eventDetails?.start_date, eventDetails?.end_date)}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium font-outfit text-gray-700">Time:</span>
-                  <span>{formatEventTimeRange(eventDetails?.start_time, eventDetails?.end_time)}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium font-outfit text-gray-700">Venue:</span>
-                  <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
-                  <span>{attendee?.attendee_code}</span>
-                </div>
-                <div className="flex justify-between border-b pb-2">
-                  <span className="font-medium text-gray-700">Ticket Holder:</span>
-                  <span>{attendee?.fullName}</span>
-                </div>
-                <div className="flex flex-col border-b">
-                  <div className="w-full flex justify-between">
-                    <span className="font-medium font-outfit leading-none">Price:</span>
-                    <p className="text-gray-500 text-xs font-outfit">{ticketType?.ticket_name}</p>
-                  </div>
-                  <p className="font-semibold w-full text-right text-lg">{ticketType?.price === 0 || ticketType?.price === '0.00' ? 'Free' : ticketType?.price}</p>
-                </div>
-                {/* Rules */}
-                <ul className="pt-2 font-outfit text-gray-500 list-disc list-inside text-xs">
-                  <li>Present this ticket upon entry</li>
-                  <li>No refunds or exchange</li>
-                  <li>Don't lose this ticket</li>
-                </ul>
+            <div ref={componentRef} className="bg-white w-full items-center hidden justify-center p-6 print:flex flex-col">
+              <div className="font-outfit grid grid-cols-3 w-[95%] font-semibold text-sm">
+                <p className="col-span-1">{formatEventDateTime1(eventDetails?.start_date, eventDetails?.start_time, eventDetails?.end_date, eventDetails?.end_time)}</p>
+                <p className="col-span-2 w-full">Ticket | {eventDetails?.title}</p>
               </div>
 
-              {/* QR Section */}
-              <div className="flex flex-col items-center justify-center w-1/2 p-4">
-                <div className="flex flex-col items-center w-full justify-center">
-                  <div className="w-[70%] aspect-square object-contain bg-gray-200 flex items-center justify-center rounded-lg">
-                    <img src={attendee?.ticket_qr_image} alt="" />
+              <div className="flex flex-col border border-gray-300 shadow-sm py-5 px-3 w-[95%] rounded-lg overflow-hidden">
+                {/* Header Section */}
+                <div className="bg-gray-300 border border-gray-600 rounded-xl grid grid-cols-3 p-3">
+                  <div className="aspect-video object-cover rounded-lg overflow-hidden col-span-1 flex items-center justify-start">
+                    <img src={eventDetails?.event_poster} alt="" className="object-cover rounded-lg" />
                   </div>
-                  <p className="text-xs font-outfit text-gray-500 mt-3 text-center">
-                    Scan this code at Entrance Venue <br />
-                    <span className="inline-flex items-center space-x-1">
-                      <CiSaveDown2 size={14} className="text-gray-500" />
-                      <span>QR Scanner Required</span>
-                    </span>
-                  </p>
-                  <div className="w-full border-b border-dashed border-gray-400 mt-4"></div>
-                  <p className="text-xs font-outfit text-gray-400 mt-2">
-                    Purchased on {formatPurchaseDate(attendee?.created_at)}
-                  </p>
+                  <div className="ml-3">
+                    <h2 className="text-md sm:text-lg font-outfit font-semibold text-gray-800">
+                      {eventDetails?.title}
+                    </h2>
+                    <p className="text-xs sm:text-sm font-outfit text-gray-500">{eventDetails?.category
+          ? eventDetails.category.charAt(0).toUpperCase() + eventDetails.category.slice(1)
+          : ""}
+        {" "}Event</p>
+                  </div>
+                  <div className="text-right mt-2 sm:mt-0 place-items-end self-end justify-self-end">
+                    <p className="text-[10px] font-outfit sm:text-xs uppercase tracking-wide text-gray-500">
+                      Ticket Confirmed
+                    </p>
+                    <p className="text-sm sm:text-lg font-outfit font-semibold text-secondary">
+                      {ticketType?.ticket_name} Access
+                    </p>
+                  </div>
                 </div>
+      
+                {/* Event Details + QR */}
+                <div className="flex flex-row border border-gray-500 rounded-xl font-outfit shadow-lg">
+      
+                  {/* Left: Event Details */}
+                  <div className="flex flex-col w-1/2 p-4 border-dashed border-gray-400 border-r flex flex-col">
+                    <h3 className="text-center font-outfit text-lg font-semibold mb-3">
+                      Event Details
+                    </h3>
+                    <div className="space-y-4 text-xs">
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium font-outfit text-gray-700">Date:</span>
+                        <span>{formatEventDateRange(eventDetails?.start_date, eventDetails?.end_date)}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium font-outfit text-gray-700">Time:</span>
+                        <span>{formatEventTimeRange(eventDetails?.start_time, eventDetails?.end_time)}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium font-outfit text-gray-700">Venue:</span>
+                        <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
+                        <span>{attendee?.attendee_code}</span>
+                      </div>
+                      <div className="flex justify-between border-b pb-2">
+                        <span className="font-medium text-gray-700">Ticket Holder:</span>
+                        <span>{attendee?.fullName}</span>
+                      </div>
+                      <div className="flex flex-col border-b">
+                        <div className="w-full flex justify-between">
+                          <span className="font-medium font-outfit leading-none">Price:</span>
+                          <p className="text-gray-500 text-xs font-outfit">{ticketType?.ticket_name}</p>
+                        </div>
+                        <p className="font-semibold w-full text-right text-lg">{ticketType?.price === 0 || ticketType?.price === '0.00' ? 'Free' : ticketType?.price}</p>
+                      </div>
+                      {/* Rules */}
+                      <ul className="pt-2 font-outfit text-gray-500 list-disc list-inside text-xs">
+                        <li>Present this ticket upon entry</li>
+                        <li>No refunds or exchange</li>
+                        <li>Don't lose this ticket</li>
+                      </ul>
+                    </div>
+                  </div>
+      
+      
+      
+                  {/* QR Section */}
+                  <div className="flex flex-col items-center justify-center w-1/2 p-4">
+                    <div className="flex flex-col items-center w-full justify-center">
+                      <div className="w-[70%] aspect-square object-contain bg-gray-200 flex items-center justify-center rounded-lg">
+                        <img src={attendee?.ticket_qr_image} alt="" />
+                      </div>
+                      <p className="text-xs font-outfit text-gray-500 mt-3 text-center">
+                        Scan this code at Entrance Venue <br />
+                        <span className="inline-flex items-center space-x-1">
+                          <CiSaveDown2 size={14} className="text-gray-500" />
+                          <span>QR Scanner Required</span>
+                        </span>
+                      </p>
+                      <div className="w-full border-b border-dashed border-gray-400 mt-4"></div>
+                      <p className="text-xs font-outfit text-gray-400 mt-2">
+                        Purchased on {formatPurchaseDate(attendee?.created_at)}
+                      </p>
+                    </div>
+                  </div>
+      
+                </div>
+      
+              </div>
+      
+              <div className="font-outfit grid grid-cols-1 w-[95%] font-semibold text-sm">
+                <Link 
+        to={`/attendee/${attendee?.attendee_code}`} 
+        target="_blank"
+      >
+        {attendee?.ticket_qr_data}
+      </Link>
+      
               </div>
             </div>
-          </div>
-          <div className="font-outfit grid grid-cols-1 w-[95%] font-semibold text-sm">
-            <Link
-              to={`/attendee/${attendee?.attendee_code}`}
-              target="_blank"
-            >
-              {attendee?.ticket_qr_data}
-            </Link>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
