@@ -35,58 +35,49 @@ class AttendeeListView(generics.ListAPIView):
 
 
 class UploadCSVView(APIView):
-    def post(self, request, format=None):
-        csv_file = request.FILES.get("file")
+    def post(self, request, event_code):
+        file = request.FILES.get('file')
+        if not file:
+            return Response({'error': 'No file uploaded.'}, status=400)
 
-        if not csv_file or not csv_file.name.endswith(".csv"):
-            return Response({"error": "File is not CSV"}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            decoded_file = file.read().decode('utf-8')
+            io_string = io.StringIO(decoded_file)
+            reader = csv.DictReader(io_string)
 
-        file_data = TextIOWrapper(csv_file.file, encoding="utf-8")
-        reader = csv.reader(file_data)
-        next(reader, None)  # skip headers
+            for row in reader:
+                # adjust these fields to match your Attendee model
+                Attendee.objects.create(
+                    event=Event.objects.get(event_code=event_code),
+                    fullName=row.get('Name'),
+                    email=row.get('Email'),
+                    ticket_read=Ticket_Type.objects.filter(ticket_name=row.get('Ticket Type')).first()
+                )
 
-        created = []
-        for row in reader:
-            if len(row) < 5:
-                continue
-
-            event_code = row[2].strip()
-            ticket_name = row[4].strip()
-
-            try:
-                event = Event.objects.get(event_code=event_code)
-                ticket_type = Ticket_Type.objects.get(ticket_name=ticket_name, event=event)
-            except (Event.DoesNotExist, Ticket_Type.DoesNotExist):
-                continue  # skip if invalid
-
-            attendee = Attendee.objects.create(
-                name=row[0].strip(),
-                email=row[1].strip(),
-                event=event,
-                reg_date=row[3].strip(),
-                ticket_type=ticket_type,
-            )
-            created.append(attendee)
-
-        return Response({"message": f"{len(created)} attendees uploaded"}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'CSV uploaded successfully!'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 
 class ExportCSVView(APIView):
-    def get(self, request, format=None):
-        attendees = Attendee.objects.all()
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="attendees.csv"'
+    def get(self, request, event_code):
+        attendees = Attendee.objects.filter(event__event_code=event_code)
+
+        if not attendees.exists():
+            return Response({"error": "No attendees found for this event."}, status=400)
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{event_code}_attendees.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(["Name", "Email", "Event Code", "Registration Date", "Ticket Type"])
+        writer.writerow(['Registration Date', 'Full Name', 'Email', 'Ticket Type'])
 
         for a in attendees:
             writer.writerow([
-                a.name,
+                a.created_at.strftime("%Y-%m-%d"),
+                a.fullName,
                 a.email,
-                a.event.event_code if a.event else "",
-                a.reg_date,
-                a.ticket_type.ticket_name if a.ticket_type else "",
+                a.ticket_type.ticket_name if a.ticket_type else ""
             ])
 
         return response

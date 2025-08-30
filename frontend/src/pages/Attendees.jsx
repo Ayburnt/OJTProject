@@ -43,25 +43,22 @@ const Attendees = () => {
   }, [userCode]);
 
   // --- Fetch attendees ---
-const fetchAttendees = async (event) => {
-  setCurrentEvent(event);
-  setLoadingAttendees(true);
-  try {
-    const res = await api.get(`/attendees/${event.event_code}/`);
-    
-    // Use res.data directly if it's a list; fallback to res.data.attendees if wrapped
-    const attendeesData = Array.isArray(res.data)
-      ? res.data
-      : res.data.attendees || [];
-
-    setAttendees(attendeesData);
-  } catch (err) {
-    console.error("Error fetching attendees:", err);
-    setAttendees([]); // fallback
-  } finally {
-    setLoadingAttendees(false);
-  }
-};
+  const fetchAttendees = async (event) => {
+    setCurrentEvent(event);
+    setLoadingAttendees(true);
+    try {
+      const res = await api.get(`/attendees/${event.event_code}/`);
+      const attendeesData = Array.isArray(res.data)
+        ? res.data
+        : res.data.attendees || [];
+      setAttendees(attendeesData);
+    } catch (err) {
+      console.error("Error fetching attendees:", err);
+      setAttendees([]);
+    } finally {
+      setLoadingAttendees(false);
+    }
+  };
 
   // --- CSV upload/download ---
   const uploadCsv = () => fileInputRef.current.click();
@@ -106,6 +103,7 @@ const fetchAttendees = async (event) => {
       link.remove();
     } catch (err) {
       console.error("Error downloading CSV:", err);
+      alert("Failed to download CSV.");
     }
   };
 
@@ -244,50 +242,35 @@ const fetchAttendees = async (event) => {
                 <table className="w-full text-center border-collapse">
                   <thead>
                     <tr className="text-gray-600 text-sm bg-gray-100">
-                      <th className="py-3 px-4 font-medium border border-gray-300">
-                        Reg.date
-                      </th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">
-                        Name
-                      </th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">
-                        Email
-                      </th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">
-                        Ticket Type
-                      </th>
+                      <th className="py-3 px-4 font-medium border border-gray-300">Reg.date</th>
+                      <th className="py-3 px-4 font-medium border border-gray-300">Name</th>
+                      <th className="py-3 px-4 font-medium border border-gray-300">Email</th>
+                      <th className="py-3 px-4 font-medium border border-gray-300">Ticket Type</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredAttendees.length > 0 ? (
+                    {loadingAttendees ? (
+                      <tr>
+                        <td colSpan="5" className="py-6 text-center text-gray-500 border border-gray-300">
+                          Loading attendees...
+                        </td>
+                      </tr>
+                    ) : filteredAttendees.length > 0 ? (
                       filteredAttendees.map((a, idx) => (
                         <tr
                           key={a.id}
-                          className={`text-sm ${
-                            idx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                          } hover:bg-gray-100 transition cursor-pointer`}
+                          className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
                           onClick={() => setSelectedAttendee(a)}
                         >
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                            {new Date(a.created_at).toLocaleDateString()}
-                          </td>
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                            {a.fullName}
-                          </td>
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                            {a.email}
-                          </td>
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                            {a.ticket_read?.ticket_name}
-                          </td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{new Date(a.created_at).toLocaleDateString()}</td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.email}</td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td
-                          colSpan="5"
-                          className="py-6 text-center text-gray-500 border border-gray-300"
-                        >
+                        <td colSpan="5" className="py-6 text-center text-gray-500 border border-gray-300">
                           No attendees found.
                         </td>
                       </tr>
@@ -304,59 +287,37 @@ const fetchAttendees = async (event) => {
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] font-outfit lg:justify-end lg:items-start">
             <div className="bg-white rounded-lg shadow-lg w-[90%] max-w-md h-auto lg:h-screen">
               <div className="relative flex items-center justify-center px-4 py-3 border-b border-gray-200 bg-gray-500">
-                <h2 className="text-base font-semibold text-white">
-                  Attendee Information
-                </h2>
-                <button
-                  onClick={() => setSelectedAttendee(null)}
-                  className="absolute right-4 text-gray-200 hover:text-white"
-                >
-                  ✕
-                </button>
+                <h2 className="text-base font-semibold text-white">Attendee Information</h2>
+                <button onClick={() => setSelectedAttendee(null)} className="absolute right-4 text-gray-200 hover:text-white">✕</button>
               </div>
 
               <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
                 <div className="flex justify-between py-2">
                   <span className="text-gray-500">Registration Date</span>
-                  <span className="text-gray-800 font-medium">
-                    {new Date(selectedAttendee.created_at).toLocaleDateString()}
-                  </span>
+                  <span className="text-gray-800 font-medium">{new Date(selectedAttendee.created_at).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-500">Name</span>
-                  <span className="text-gray-800 font-medium">
-                    {selectedAttendee.fullName}
-                  </span>
+                  <span className="text-gray-800 font-medium">{selectedAttendee.fullName}</span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-500">Email</span>
-                  <span className="text-gray-800 font-medium">
-                    {selectedAttendee.email}
-                  </span>
+                  <span className="text-gray-800 font-medium">{selectedAttendee.email}</span>
                 </div>
                 <div className="flex justify-between py-2">
                   <span className="text-gray-500">Ticket Type</span>
-                  <span className="text-gray-800 font-medium">
-                    {selectedAttendee.ticket_read?.ticket_name}
-                  </span>
+                  <span className="text-gray-800 font-medium">{selectedAttendee.ticket_read?.ticket_name}</span>
                 </div>
               </div>
 
-              {/* Show responses */}
               {selectedAttendee.responses?.length > 0 && (
                 <div className="px-6 py-4">
-                  <h3 className="text-gray-700 font-semibold mb-2">
-                    Responses
-                  </h3>
+                  <h3 className="text-gray-700 font-semibold mb-2">Responses</h3>
                   <ul className="space-y-2">
                     {selectedAttendee.responses.map((resp, idx) => (
                       <li key={idx} className="border-b pb-2">
-                        <p className="text-gray-500 text-sm">
-                          {resp.question?.question_text}
-                        </p>
-                        <p className="text-gray-800 font-medium">
-                          {resp.response_value || "No response"}
-                        </p>
+                        <p className="text-gray-500 text-sm">{resp.question?.question_text}</p>
+                        <p className="text-gray-800 font-medium">{resp.response_value || "No response"}</p>
                       </li>
                     ))}
                   </ul>
@@ -367,12 +328,7 @@ const fetchAttendees = async (event) => {
                 <span className="text-gray-600">Ticket Link:</span>
                 <button
                   className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
-                  onClick={() =>
-                    window.open(
-                      `https://sari-sari.com/ticket/${selectedAttendee.id}`,
-                      "_blank"
-                    )
-                  }
+                  onClick={() => window.open(`https://sari-sari.com/ticket/${selectedAttendee.id}`, "_blank")}
                 >
                   <span>URL</span>
                   <MdContentCopy className="text-lg" />
