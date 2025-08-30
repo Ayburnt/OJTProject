@@ -46,22 +46,33 @@ class UploadCSVView(APIView):
             return Response({'error': 'No file uploaded.'}, status=400)
 
         try:
+            import io
+            from django.shortcuts import get_object_or_404
+
+            event = get_object_or_404(Event, event_code=event_code)
             decoded_file = file.read().decode('utf-8')
             io_string = io.StringIO(decoded_file)
             reader = csv.DictReader(io_string)
+            print("CSV headers:", reader.fieldnames)
 
             for row in reader:
-                # adjust these fields to match your Attendee model
+                row = {k.strip(): v.strip() for k, v in row.items()}
+                ticket = Ticket_Type.objects.filter(ticket_name=row.get('Ticket Type')).first()
+
                 Attendee.objects.create(
-                    event=Event.objects.get(event_code=event_code),
-                    fullName=row.get('Name'),
+                    event=event,
+                    fullName=row.get('Full Name'),
                     email=row.get('Email'),
-                    ticket_read=Ticket_Type.objects.filter(ticket_name=row.get('Ticket Type')).first()
+                    ticket_type=ticket
                 )
 
             return Response({'message': 'CSV uploaded successfully!'})
+
         except Exception as e:
+            print("CSV upload error:", e)
             return Response({'error': str(e)}, status=400)
+
+
 
 
 class ExportCSVView(APIView):
