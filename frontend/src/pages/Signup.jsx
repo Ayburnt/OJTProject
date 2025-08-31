@@ -661,11 +661,11 @@ function Signup({ onAuthSuccess }) {
                                     </div>
 
                                     <div className="mb-4 w-full">
-                                        <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">User Code</label>
+                                        <label htmlFor="user_code" className="block mb-2 pl-1 text-sm font-medium font-outfit">Organization Code</label>
                                         <input
                                             type="text" id="user_code" name="user_code" maxLength={25} required
                                             className="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                                            placeholder="e.g. JOHN-DOE2025"
+                                            placeholder="e.g. SARI-SARI"
                                             value={user_code}
                                             onChange={(e) =>
                                                 setUserCode(

@@ -4,6 +4,8 @@ import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
 import api from '../api.js';
 import { useNavigate, useParams } from 'react-router-dom';
+import useAuth from '../hooks/useAuth.js';
+
 
 // Back Button Component
 const BackButton = () => {
@@ -27,7 +29,7 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
         Loading profile...
       </div>
     );
-  }  
+  }
 
 
 
@@ -41,7 +43,7 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
           {profileData.first_name} {profileData.last_name}
           {profileData.verification_status === 'verified' && (
             <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
-          )}          
+          )}
         </h1>
         <p className="text-gray-500 font-outfit text-sm">{profileData.company_name}</p>
       </div>
@@ -107,7 +109,7 @@ const getEventCategory = (event) => {
 };
 
 // Event Card
-const EventCard = ({ event, onCardClick }) => {
+const EventCard = ({ event }) => {
   const category = getEventCategory(event);
 
   const getStatusColor = (category) => {
@@ -124,47 +126,59 @@ const EventCard = ({ event, onCardClick }) => {
   };
 
   const statusColorClass = getStatusColor(category);
-  const navigate = useNavigate();
 
   function formatEventDateTime(startDate, startTime, endDate, endTime) {
-        if (!startDate || !startTime) return "TBA";
+    if (!startDate || !startTime) return "TBA";
 
-        const start = new Date(`${startDate}T${startTime}`);
-        const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
+    const start = new Date(`${startDate}T${startTime}`);
+    const end = endDate && endTime ? new Date(`${endDate}T${endTime}`) : null;
 
-        const optionsDate = { year: "numeric", month: "long", day: "numeric" };
-        const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
+    const optionsDate = { year: "numeric", month: "long", day: "numeric" };
+    const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
 
-        if (!end || start.toDateString() === end.toDateString()) {
-            // Single-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
-        } else {
-            // Multi-day event
-            return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
-        }
+    if (!end || start.toDateString() === end.toDateString()) {
+      // Single-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+    } else {
+      // Multi-day event
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
     }
+  }
+
+  function formatToGoogleDate(dateStr, timeStr) {
+    const dt = new Date(`${dateStr}T${timeStr}`); // local time
+    return dt.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  }
+
+  const googleCalendarLink = (event) => {
+    const start = formatToGoogleDate(event.start_date, event.start_time);
+    const end = formatToGoogleDate(event.end_date, event.end_time);
+
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${start}/${end}&details=${encodeURIComponent(event.description)}&location=${encodeURIComponent(event.venue_name)}&sf=true&output=xml`;
+  };
+
 
   return (
     <div
-      className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:scale-[1.01] duration-200 ease-in-out text-left cursor-pointer"
-      // onClick={() => onCardClick(event)}
-      onClick={()=> navigate(`/events/${event.event_code}`)}
+      className="bg-white rounded-2xl shadow-lg overflow-hidden transition-transform transform hover:scale-[1.01] duration-200 ease-in-out text-left"
+    // onClick={() => onCardClick(event)}
+
     >
       <img
         src={event.event_poster}
         alt={`${event.title} Event`}
         className="w-full h-40 object-cover"
       />
-      
+
       <div className="p-4 sm:p-6 bg-teal-500 text-white">
         <div className="flex items-start justify-between mb-2">
-          <h2 className="text-xl font-bold">{event.title}</h2>          
+          <a className="text-xl font-bold cursor-pointer hover:underline" href={`/events/${event.event_code}`}>{event.title}</a>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold font-outfit text-white ${statusColorClass}`}>
             {category ? category.charAt(0).toUpperCase() + category.slice(1) : "Unknown"}
           </span>
         </div>
-        
-        <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 mb-2">
+
+        <div className="flex flex-col items-start sm:space-x-4 mb-2">
           <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0">
             <FiCalendar className="w-4 h-4" />
             <p>
@@ -173,7 +187,7 @@ const EventCard = ({ event, onCardClick }) => {
           </div>
           <div className="flex items-center font-outfit space-x-2 text-sm">
             <FiMapPin className="w-4 h-4" />
-            <p>{event.venue_name}</p>
+            <p>{event.venue_specific !== null || event.venue_specific !== '' ? event.venue_specific + ', ' : ''}{event.venue_name}</p>
           </div>
         </div>
 
@@ -181,13 +195,19 @@ const EventCard = ({ event, onCardClick }) => {
           <FiUsers className="w-4 h-4" />
           <p>{event.attendees} attendees</p>
         </div>
+
+        <a href={googleCalendarLink(event)} target="_blank" rel="noopener noreferrer">
+          <button className="border mt-2 font-outfit border-white p-2 text-sm z-200 rounded-lg cursor-pointer hover:bg-secondary/70">
+            Add to Google Calendar
+          </button>
+        </a>
       </div>
     </div>
   );
 };
 
 // Event Modal
-const EventModal = ({ event, onClose }) => {  
+const EventModal = ({ event, onClose }) => {
 
   if (!event) return null;
 
@@ -220,7 +240,7 @@ const EventModal = ({ event, onClose }) => {
             className="w-full h-40 object-cover"
           />
         </div>
-        
+
         <div className="p-6">
           <h2 className="text-2xl font-bold font-outfit text-gray-900 mb-2">
             {event.title}
@@ -252,23 +272,24 @@ const TimeLine = () => {
   const [eventData, setEventData] = useState([]);
 
   useEffect(() => {
-          document.title = "Timeline | Sari-Sari Events";
-        }, []);
+    document.title = "Timeline | Sari-Sari Events";
+  }, []);
 
   const fetchProfile = async () => {
     try {
       const res = await api.get(`/profile/${userCode}/`);
       const organizer = res.data.organizer;
-    const events = res.data.events.map(ev => {
-      // sum of all ticket types
-      const attendees = ev.ticket_types?.reduce((sum, t) => {
-        return sum + (t.quantity_total - t.quantity_available);
-      }, 0) || 0;
+      const events = res.data.events.map(ev => {
+        // sum of all ticket types
+        const attendees = ev.ticket_types?.reduce((sum, t) => {
+          return sum + (t.quantity_total - t.quantity_available);
+        }, 0) || 0;
 
-      return { ...ev, attendees };
-    });
+        return { ...ev, attendees };
+      });
       setProfileData(organizer);
       setEventData(events);
+      console.log(res.data)
     } catch (err) {
       console.error("Error fetching event:", err);
     }
@@ -289,7 +310,7 @@ const TimeLine = () => {
   return (
     <div className="min-h-screen bg-gray-100 antialiased text-gray-800 flex flex-col items-center">
       <main className="w-full max-w-screen-lg mx-auto p-4 sm:p-6 md:p-8">
-        
+
         <BackButton />
         <ProfileCard profileData={profileData} eventData={eventData}
           totalAttendees={eventData.reduce((sum, ev) => sum + (ev.attendees || 0), 0)}
