@@ -20,7 +20,7 @@ const BackButton = () => {
 
 
 // Organizer Profile Card
-const ProfileCard = ({ profileData, eventData }) => {
+const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
   if (!profileData || profileData.length === 0) {
     return (
       <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex items-center justify-center">
@@ -51,7 +51,7 @@ const ProfileCard = ({ profileData, eventData }) => {
           <span className="text-gray-500 text-sm font-outfit block">Events</span>
         </div>
         <div className="text-center">
-          <span className="text-xl font-bold font-outfit text-gray-900">2500+</span>
+          <span className="text-xl font-bold font-outfit text-gray-900">{totalAttendees.toLocaleString()}</span>
           <span className="text-gray-500 font-outfit text-sm block">Attendees</span>
         </div>
       </div>
@@ -258,9 +258,17 @@ const TimeLine = () => {
   const fetchProfile = async () => {
     try {
       const res = await api.get(`/profile/${userCode}/`);
-      setProfileData(res.data.organizer);
-      setEventData(res.data.events);
-      console.log(res.data.organizer, '\n', res.data.events)
+      const organizer = res.data.organizer;
+    const events = res.data.events.map(ev => {
+      // sum of all ticket types
+      const attendees = ev.ticket_types?.reduce((sum, t) => {
+        return sum + (t.quantity_total - t.quantity_available);
+      }, 0) || 0;
+
+      return { ...ev, attendees };
+    });
+      setProfileData(organizer);
+      setEventData(events);
     } catch (err) {
       console.error("Error fetching event:", err);
     }
@@ -283,7 +291,9 @@ const TimeLine = () => {
       <main className="w-full max-w-screen-lg mx-auto p-4 sm:p-6 md:p-8">
         
         <BackButton />
-        <ProfileCard profileData={profileData} eventData={eventData} />
+        <ProfileCard profileData={profileData} eventData={eventData}
+          totalAttendees={eventData.reduce((sum, ev) => sum + (ev.attendees || 0), 0)}
+        />
         <EventTabs activeTab={activeTab} onTabClick={setActiveTab} />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

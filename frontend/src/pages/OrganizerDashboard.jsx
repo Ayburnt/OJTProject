@@ -9,19 +9,62 @@ import api from '../api.js'
 function OrganizerDashboard() {
   const { isLoggedIn, userCode, userFirstName, userProfile } = useAuth();
   const [events, setEvents] = useState([]);
+  const [stats, setStats] = useState({
+  totalRevenue: 0,
+  totalAttendees: 0,
+  totalEvents: 0,
+  upcomingEvents: 0,
+});
+
 
   useEffect(() => {
     const fetchEventDetails = async () => {
+  try {
+    const res = await api.get(`/list-create/`);
+    const events = res.data;
 
-      try {
-        const res = await api.get(`/list-create/`);
-        console.log(res.data);
-        setEvents(res.data);
-      } catch (err) {
-        console.error("Error fetching events:", err);
+    // Compute stats
+    let totalRevenue = 0;
+    let totalAttendees = 0;
+    let upcomingEvents = 0;
 
+    events.forEach(event => {
+      // attendees = total - available for each ticket
+      const attendees = event.ticket_types.reduce(
+        (sum, t) => sum + (t.quantity_total - t.quantity_available),
+        0
+      );
+
+      // revenue = sum of (sold tickets × price)
+      const revenue = event.ticket_types.reduce(
+        (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
+        0
+      );
+
+      totalAttendees += attendees;
+      totalRevenue += revenue;
+
+      // Check upcoming events
+      const now = new Date();
+      const start = new Date(`${event.start_date}T${event.start_time}`);
+      if (event.status === "published" && now < start) {
+        upcomingEvents += 1;
       }
-    }
+    });
+
+    setStats({
+      totalRevenue,
+      totalAttendees,
+      totalEvents: events.length,
+      upcomingEvents,
+    });
+
+    setEvents(events);
+  } catch (err) {
+    console.error("Error fetching events:", err);
+  }
+};
+
 
     fetchEventDetails();
   }, []);
@@ -74,15 +117,32 @@ function OrganizerDashboard() {
 
         {/* Statistic Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {["Total Revenue", "Total Attendees", "Total Events Created", "Upcoming Events"].map((label, i) => (
-            <div
-              key={i}
-              className="bg-white p-6 rounded-xl shadow-md flex items-center justify-center text-center h-28"
-            >
-              <h3 className="text-base font-medium text-gray-700">{label}</h3>
-            </div>
-          ))}
-        </div>
+  <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center justify-center text-center h-28">
+    <h3 className="text-base font-medium text-gray-700">Total Revenue</h3>
+    <p className="text-2xl font-bold text-teal-600">
+      ₱{stats.totalRevenue.toLocaleString()}
+    </p>
+  </div>
+  <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center justify-center text-center h-28">
+    <h3 className="text-base font-medium text-gray-700">Total Attendees</h3>
+    <p className="text-2xl font-bold text-teal-600">
+      {stats.totalAttendees.toLocaleString()}
+    </p>
+  </div>
+  <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center justify-center text-center h-28">
+    <h3 className="text-base font-medium text-gray-700">Total Events Created</h3>
+    <p className="text-2xl font-bold text-teal-600">
+      {stats.totalEvents}
+    </p>
+  </div>
+  <div className="bg-white p-6 rounded-xl shadow-md flex flex-col items-center justify-center text-center h-28">
+    <h3 className="text-base font-medium text-gray-700">Upcoming Events</h3>
+    <p className="text-2xl font-bold text-teal-600">
+      {stats.upcomingEvents}
+    </p>
+  </div>
+</div>
+
 
         {/* Recent Events */}
         <section className="bg-white rounded-xl shadow-md p-6 mb-6 font-outfit">

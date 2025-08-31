@@ -11,10 +11,12 @@ import { BsDownload } from "react-icons/bs";
 import api from "../api";
 import { RiQrScan2Line } from "react-icons/ri";
 import { Scanner } from '@yudiel/react-qr-scanner';
+import useAuth from "../hooks/useAuth";
 
 const Attendees = () => {
   const { userCode } = useParams();
   const fileInputRef = useRef(null);
+  const { userProfile } = useAuth();
 
   // --- States ---
   const [events, setEvents] = useState([]);
@@ -151,8 +153,8 @@ const Attendees = () => {
       <OrganizerNav />
 
       <div className="md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
-        <div className="flex justify-end w-full mb-6">
-          <CgProfile className="hidden md:flex text-[2.5rem] text-gray-300 mr-10" />
+        <div className="flex justify-end w-full mb-6">          
+          <img src={userProfile} className="hidden rounded-full md:flex w-[2.5rem] mr-10" alt="" />
         </div>
 
 
@@ -345,6 +347,10 @@ const Attendees = () => {
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
                 <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
+                  <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Reference Code</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.attendee_code}</span>
+                  </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-500">Registration Date</span>
                     <span className="text-gray-800 font-medium">
