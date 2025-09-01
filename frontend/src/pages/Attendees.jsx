@@ -270,11 +270,11 @@ const Attendees = () => {
                 <table className="w-full text-center border-collapse rounded-md">
                   <thead>
                     <tr className="text-gray-600 text-sm bg-gray-100">
+                      <th className="py-3 px-4 border border-gray-300">Reference Code</th>
                       <th className="py-3 px-4 border border-gray-300">Reg.date</th>
                       <th className="py-3 px-4 border border-gray-300">Name</th>
                       <th className="py-3 px-4 border border-gray-300">Email</th>
-                      <th className="py-3 px-4 border border-gray-300">Ticket Type</th>
-                      <th className="py-3 px-4 border border-gray-300">Reference Code</th>
+                      <th className="py-3 px-4 border border-gray-300">Ticket Type</th>                      
                       <th className="py-3 px-4 border border-gray-300">Paid</th>
                       <th className="py-3 px-4 border border-gray-300">Check-in Time</th>
                     </tr>
@@ -294,6 +294,11 @@ const Attendees = () => {
                           className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
                           onClick={() => setSelectedAttendee(a)}
                         >
+                          {/* Reference Code */}
+                          <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border border-gray-300 text-gray-600">
+                            {a.attendee_code || "—"}
+                          </td>
+
                           {/* Reg.date */}
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">
                             {new Date(a.created_at).toLocaleDateString()}
@@ -315,16 +320,12 @@ const Attendees = () => {
                           </td>
 
                           {/* Ticket */}
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
-
-                          {/* Reference Code */}
-                          <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border border-gray-300 text-gray-600">
-                            {a.reference_code || "—"}
-                          </td>
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>                          
 
                           {/* Paid toggle */}
                           <td
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               if (!a.paid) {
                                 a.paid = "yes";
                               } else if (a.paid === "yes") {

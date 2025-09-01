@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Ticket Confirmation - Sari-Sari Events</title>
+  <style>
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+    .container {
+      max-width: 600px;
+      margin: 20px auto;
+      background-color: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+    .header {
+      background-color: #ffffff;
+      padding: 30px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 10px 0 0;
+      font-size: 26px;
+      font-weight: 700;
+      color: #009494;
+    }
+    .header img.logo {
+      max-width: 150px;
+      height: auto;
+    }
+    .banner {
+      width: 100%;
+      max-height: 300px;
+      object-fit: cover;
+    }
+    .content {
+      padding: 30px;
+      text-align: left;
+      color: #333333;
+    }
+    .content p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+    .ticket-box {
+      border: 2px solid #009494; 
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      font-size: 15px;
+      background-color: #ffffff;
+    }
+    .ticket-box strong {
+      color: #009494;
+    }
+    .qr-code {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .qr-code img {
+      max-width: 150px;
+      height: auto;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+    .footer {
+      background-color: #f0f0f0;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #888888;
+      border-top: 1px solid #eeeeee;
+    }
+    .footer a {
+      color: #1a73e8;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f4f4f4;">
+    <tr>
+      <td align="center" valign="top">
+        <table class="container" border="0" cellspacing="0" cellpadding="0">
+          <!-- Header -->
+          <tr>
+            <td class="header">
+              <img src="https://ik.imagekit.io/cafedejur/sari-sari-events/sari-sari-new.png" alt="Sari-Sari Events Logo" class="logo">
+              <h1>Your Ticket Confirmation</h1>
+            </td>
+          </tr>
+
+          <!-- Event Banner -->
+          {% if event_poster %}
+<tr>
+  <td>
+    <img src="{{ event_poster }}" alt="Event Banner" class="banner">
+  </td>
+</tr>
+{% endif %}
+
+
+          <!-- Content -->
+          <tr>
+            <td class="content">
+              <p>Hi {{ attendee.fullName }},</p>
+              <p>Thank you for booking with <strong>Sari-Sari Events</strong>! 🎉<br>
+              Your visitor ticket has been confirmed. Please find your details below:</p>
+              
+              <!-- Ticket Info -->
+              <div class="ticket-box">
+                <p><strong>Event:</strong> {{ event.title }}</p>
+                <p><strong>Date:</strong> {{ event.start_date }} – {{ event.end_date }}</p>
+                <p><strong>Time:</strong> {{ event.start_time }} – {{ event.end_time }}</p>
+                <p><strong>Venue:</strong> {{ event.venue_address }}</p>
+                <p><strong>Ticket Code:</strong> {{ attendee.attendee_code }}</p>
+              </div>
+
+              <!-- QR Code -->
+              <div class="qr-code">
+                <p><strong>Your QR Code:</strong></p>
+                {% if ticket_qr_image %}
+  <img src="{{ ticket_qr_image }}" alt="Ticket QR Code">
+{% endif %}
+
+                <p>Present this QR code at the registration counter to claim your badge.</p>
+              </div>
+
+              <!-- Extra Info -->
+              <p style="margin-top: 30px;"><strong>Plan Your Visit:</strong><br>
+                Explore exhibitors, connect with fellow attendees, and customize your schedule through the <em>Sari-Sari Events App</em>. A download link will be sent to your registered email.</p>
+
+              <p><strong>Need Assistance?</strong><br>
+                Reach out to our support team anytime for inquiries regarding your ticket or the event.</p>
+
+              <p>We look forward to welcoming you to <strong>{{ event.title }}</strong>!</p>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td class="footer">
+              <p>&copy; 2025 Sari-Sari Events. All rights reserved.</p>
+              <p><a href="mailto:info@sari-sari.com">Contact Support</a> | <a href="https://event.sari-sari.com/policy">Privacy Policy</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
