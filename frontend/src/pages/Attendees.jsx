@@ -302,7 +302,7 @@ const Attendees = () => {
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
 
                           {/* Email → Gmail */}
-                          <td className="py-3 px-4 border">
+                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
                             <a
                               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${a.email}`}
                               target="_blank"
@@ -318,19 +318,23 @@ const Attendees = () => {
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
 
                           {/* Reference Code */}
-                          <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border cursor-pointer">
+                          <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border border-gray-300 text-gray-600">
                             {a.reference_code || "—"}
                           </td>
 
                           {/* Paid toggle */}
                           <td
                             onClick={() => {
-                              if (!a.paid) a.paid = "yes";
-                              else if (a.paid === "yes") a.paid = "no";
-                              else a.paid = null;
-                              setAttendees([...attendees]);
+                              if (!a.paid) {
+                                a.paid = "yes";
+                              } else if (a.paid === "yes") {
+                                a.paid = "no";
+                              } else {
+                                a.paid = null;
+                              }
+                              setAttendees([...attendees]); // refresh UI
                             }}
-                            className="py-3 px-4 border cursor-pointer"
+                            className="py-3 px-4 border border-gray-300 text-gray-600"
                           >
                             {a.paid === "yes" ? (
                               <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Yes</span>
