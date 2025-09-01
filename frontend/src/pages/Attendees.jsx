@@ -2,16 +2,15 @@ import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import OrganizerNav from "../components/OrganizerNav";
 import { FiUsers } from "react-icons/fi";
-import { CgProfile } from "react-icons/cg";
 import { CiSearch } from "react-icons/ci";
 import { IoIosArrowBack } from "react-icons/io";
 import { MdContentCopy } from "react-icons/md";
 import { GoUpload } from "react-icons/go";
 import { BsDownload } from "react-icons/bs";
-import api from "../api";
 import { RiQrScan2Line } from "react-icons/ri";
-import { Scanner } from '@yudiel/react-qr-scanner';
+import { Scanner } from "@yudiel/react-qr-scanner";
 import useAuth from "../hooks/useAuth";
+import api from "../api";
 
 const Attendees = () => {
   const { userCode } = useParams();
@@ -31,7 +30,9 @@ const Attendees = () => {
   const [loadingAttendees, setLoadingAttendees] = useState(false);
   const [attendance, setAttendance] = useState(null);
 
-  // --- Fetch events ---
+  const [scanning, setScanning] = useState(false);
+
+  // --- Fetch events from backend ---
   useEffect(() => {
     const fetchOrganizerEvents = async () => {
       try {
@@ -56,8 +57,7 @@ const Attendees = () => {
       const attendeesData = Array.isArray(res.data)
         ? res.data
         : res.data.attendees || [];
-      setAttendees(attendeesData); console.log(res.data)
-      setAttendance(res.data.attendance)
+      setAttendees(attendeesData);
     } catch (err) {
       console.error("Error fetching attendees:", err);
       setAttendees([]);
@@ -123,8 +123,8 @@ const Attendees = () => {
       a.fullName?.toLowerCase().includes(searchAttendees.toLowerCase()) ||
       a.email?.toLowerCase().includes(searchAttendees.toLowerCase())
   );
-  const [scanning, setScanning] = useState(false);
 
+  // --- QR scanner ---
   const handleDecode = (result) => {
     if (result && result.length > 0) {
       console.log("✅ Scanned:", result);
@@ -135,12 +135,16 @@ const Attendees = () => {
   };
 
   return (
-    <div className="bg-alice-blue min-h-screen font-outfit">
+    <div className="bg-alice-blue min-h-screen font-outfit mt-12 lg:mt-0">
       {scanning && (
         <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
           <p className="text-white mb-4">Scan a QR Code</p>
           <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
-            <Scanner onScan={handleDecode} onError={(err) => console.error("Scanner error:", err)} allowMultiple />
+            <Scanner
+              onScan={handleDecode}
+              onError={(err) => console.error("Scanner error:", err)}
+              allowMultiple
+            />
           </div>
           <button
             onClick={() => setScanning(false)}
@@ -150,13 +154,13 @@ const Attendees = () => {
           </button>
         </div>
       )}
+
       <OrganizerNav />
 
       <div className="md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
-        <div className="flex justify-end w-full mb-6">          
+        <div className="flex justify-end w-full mb-6">
           <img src={userProfile} className="hidden rounded-full md:flex w-[2.5rem] mr-10" alt="" />
         </div>
-
 
         {!currentEvent ? (
           // --- EVENTS LIST ---
@@ -167,15 +171,10 @@ const Attendees = () => {
               <p className="text-red-500">{eventsError}</p>
             ) : (
               <div className="p-5 md:p-8 lg:p-10 border border-gray-300 rounded-xl shadow bg-white">
-                <h1 className="text-2xl font-semibold text-gray-800 mb-6">
-                  Manage Event Attendees
-                </h1>
+                <h1 className="text-2xl font-semibold text-gray-800 mb-6">Manage Event Attendees</h1>
 
                 <div className="relative mb-6 w-full lg:w-[75%]">
-                  <CiSearch
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary"
-                    size={18}
-                  />
+                  <CiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={18} />
                   <input
                     type="text"
                     placeholder="Search events"
@@ -193,12 +192,12 @@ const Attendees = () => {
                         onClick={() => fetchAttendees(event)}
                         className="flex justify-between items-center bg-gray-50 px-4 py-3 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-100 transition cursor-pointer"
                       >
-                        <span className="font-medium text-gray-700">
+                        <span className="font-medium text-gray-700 text-sm md:text-lg">
                           {event.title}
                         </span>
-                        <div className="flex items-center gap-3 text-gray-600">
+                        <div className="flex items-center gap-2 text-gray-600 text-xs md:text-sm">
                           <span>{event.attendees_count || 0} Attendees</span>
-                          <FiUsers className="text-lg" />
+                          <FiUsers className="text-base md:text-lg" />
                         </div>
                       </div>
                     ))
@@ -217,9 +216,7 @@ const Attendees = () => {
               onClick={() => setCurrentEvent(null)}
             >
               <IoIosArrowBack className="text-secondary text-xl" />
-              <span className="text-secondary text-sm font-medium font-outfit">
-                Back
-              </span>
+              <span className="text-secondary text-sm font-medium font-outfit">Back</span>
             </div>
 
             <div className="p-5 md:p-8 lg:p-10 border border-gray-300 rounded-xl shadow bg-white w-full">
@@ -227,19 +224,20 @@ const Attendees = () => {
                 <h1 className="text-2xl font-semibold text-gray-800 md:col-span-2">
                   {currentEvent.title || "Event Attendees"}
                 </h1>
-
                 <div className="md:col-span-1 w-full md:place-items-end">
-                  <button onClick={() => setScanning(!scanning)} className="font-semibold text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer">Scan QR <span><RiQrScan2Line /></span></button>
+                  <button
+                    onClick={() => setScanning(!scanning)}
+                    className="font-semibold text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer"
+                  >
+                    Scan QR <span><RiQrScan2Line /></span>
+                  </button>
                 </div>
               </div>
 
               {/* Search + Upload/Download */}
               <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8 w-full">
                 <div className="relative w-full lg:max-w-sm">
-                  <CiSearch
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary"
-                    size={18}
-                  />
+                  <CiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={18} />
                   <input
                     type="text"
                     placeholder="Search attendees"
@@ -259,18 +257,11 @@ const Attendees = () => {
 
                   <button
                     onClick={uploadCsv}
-                    className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-primary hover:bg-teal-700 text-secondary font-medium rounded-md transition-all flex justify-center items-center gap-2 cursor-pointer border border-secondary"
-                  >
+                    className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center gap-2 cursor-pointer"                  >
                     Upload CSV <GoUpload />
                   </button>
 
-                  <input
-                    type="file"
-                    accept=".csv"
-                    ref={fileInputRef}
-                    onChange={handleFileChange}
-                    className="hidden"
-                  />
+                  <input type="file" accept=".csv" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                 </div>
               </div>
 
@@ -279,20 +270,22 @@ const Attendees = () => {
                 <table className="w-full text-center border-collapse rounded-md">
                   <thead>
                     <tr className="text-gray-600 text-sm bg-gray-100">
-                      <th className="py-3 px-4 font-medium border border-gray-300">Reg.date</th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">Name</th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">Email</th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">Ticket Type</th>
-                      <th className="py-3 px-4 font-medium border border-gray-300">Check-in Time</th>
-
+                      <th className="py-3 px-4 border border-gray-300">Reg.date</th>
+                      <th className="py-3 px-4 border border-gray-300">Name</th>
+                      <th className="py-3 px-4 border border-gray-300">Email</th>
+                      <th className="py-3 px-4 border border-gray-300">Ticket Type</th>
+                      <th className="py-3 px-4 border border-gray-300">Reference Code</th>
+                      <th className="py-3 px-4 border border-gray-300">Paid</th>
+                      <th className="py-3 px-4 border border-gray-300">Check-in Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loadingAttendees ? (
                       <tr>
-                        <td colSpan="5" className="py-6 text-center text-gray-500 border border-gray-300">
+                        <td colSpan="7" className="py-6 text-center text-gray-500 border border-gray-300">
                           Loading attendees...
                         </td>
+
                       </tr>
                     ) : filteredAttendees.length > 0 ? (
                       filteredAttendees.map((a, idx) => (
@@ -301,25 +294,64 @@ const Attendees = () => {
                           className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
                           onClick={() => setSelectedAttendee(a)}
                         >
+                          {/* Reg.date */}
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">
                             {new Date(a.created_at).toLocaleDateString()}
                           </td>
+                          {/* Name */}
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.email}</td>
+
+                          {/* Email → Gmail */}
+                          <td className="py-3 px-4 border">
+                            <a
+                              href={`https://mail.google.com/mail/?view=cm&fs=1&to=${a.email}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-secondary hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {a.email}
+                            </a>
+                          </td>
+
+                          {/* Ticket */}
                           <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
-                          <td className="py-3 px-4 border border-gray-300 text-gray-600">
+
+                          {/* Reference Code */}
+                          <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border cursor-pointer">
+                            {a.reference_code || "—"}
+                          </td>
+
+                          {/* Paid toggle */}
+                          <td
+                            onClick={() => {
+                              if (!a.paid) a.paid = "yes";
+                              else if (a.paid === "yes") a.paid = "no";
+                              else a.paid = null;
+                              setAttendees([...attendees]);
+                            }}
+                            className="py-3 px-4 border cursor-pointer"
+                          >
+                            {a.paid === "yes" ? (
+                              <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Yes</span>
+                            ) : a.paid === "no" ? (
+                              <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">No</span>
+                            ) : (
+                              <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-400 text-xs">—</span>
+                            )}
+                          </td>
+
+                          {/* Check-in */}
+                        <td className="py-3 px-4 border border-gray-300 text-gray-600">
                             {a.attendance?.check_in_time
                               ? new Date(a.attendance.check_in_time).toLocaleString()
                               : ''}
                           </td>
-
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="5" className="py-6 text-center text-gray-500 border border-gray-300">
-                          No attendees found.
-                        </td>
+                        <td colSpan="7" className="py-6 text-gray-500 border">No attendees found.</td>
                       </tr>
                     )}
                   </tbody>
@@ -417,5 +449,5 @@ const Attendees = () => {
     </div>
   );
 };
-
 export default Attendees;
+
