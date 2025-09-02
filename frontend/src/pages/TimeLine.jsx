@@ -40,7 +40,7 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
       </div>
       <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
         <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
-          {profileData.first_name} {profileData.last_name}
+          {profileData.company_name}
           {profileData.verification_status === 'verified' && (
             <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
           )}

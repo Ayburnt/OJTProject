@@ -26,6 +26,7 @@ function Header() {
   const [eventResults, setEventResults] = useState([]);
   const [organizerResults, setOrganizerResults] = useState([]);
   const [allEvents, setAllEvents] = useState([]);
+  const [allOrganizers, setAllOrganizers] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
   const toggleMobileMenu = () => {
@@ -60,43 +61,44 @@ function Header() {
     fetchEvents();
   }, []);
 
-  // ✅ Fetch organizers when searching
+  // ✅ Fetch all organizers once
   useEffect(() => {
     const fetchOrganizers = async () => {
-      if (!searchTerm.trim()) {
-        setOrganizerResults([]);
-        return;
-      }
       try {
-        const res = await api.get(`/organizers/`, {
-          params: { search: searchTerm },
-        });
-        setOrganizerResults(res.data || []);
+        const res = await api.get(`/organizers/`);
+        setAllOrganizers(res.data || []);
       } catch (err) {
         console.error("API Fetch Error (organizers):", err);
-        setOrganizerResults([]);
+        setAllOrganizers([]);
       }
     };
-
     fetchOrganizers();
-  }, [searchTerm]);
+  }, []);
 
-  // ✅ Filter events locally
+  // ✅ Filter events and organizers by search term
   useEffect(() => {
-    if (searchTerm.trim() === "") {
+    if (!searchTerm.trim()) {
       setEventResults([]);
+      setOrganizerResults([]);
       return;
     }
 
-    const filtered = (allEvents || []).filter(
+    // Filter events by title or venue
+    const filteredEvents = (allEvents || []).filter(
       (event) =>
         event.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         event.venue_place?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    setEventResults(filteredEvents);
 
-    setEventResults(filtered);
+    // Filter organizers by company_name only
+    const filteredOrganizers = (allOrganizers || []).filter((org) =>
+      org.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setOrganizerResults(filteredOrganizers);
+
     setShowResults(true);
-  }, [searchTerm, allEvents]);
+  }, [searchTerm, allEvents, allOrganizers]);
 
   // ✅ Truncate helper
   const truncate = (text, length = 40) =>
@@ -122,7 +124,7 @@ function Header() {
           <CiSearch className="text-gray-500 text-xl mr-2" />
           <input
             type="text"
-            placeholder="Search events or organizers..."
+            placeholder="Search events or company name..."
             className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-500 text-base"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -176,12 +178,12 @@ function Header() {
                 {organizerResults.length > 0 && (
                   <>
                     <p className="px-4 pt-2 text-xs font-semibold text-gray-500">
-                      Organizers
+                      Companies
                     </p>
                     {organizerResults.map((org, i) => (
                       <Link
                         key={`org-${i}`}
-                        to={`/org/${org.user_code}`} // ✅ FIXED to match your TimeLine route
+                        to={`/org/${org.user_code}`}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-gray-100 text-gray-700 transition"
                         onClick={() => {
                           setSearchTerm("");
@@ -190,24 +192,22 @@ function Header() {
                       >
                         <img
                           src={org.profile_picture || "/placeholder.png"}
-                          alt={org.first_name}
+                          alt={org.company_name}
                           className="w-12 h-12 rounded-full object-cover"
                         />
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900 flex items-center gap-1">
-                            {org.first_name} {org.last_name}
+                            {org.company_name}
                             {org.verification_status === "verified" && (
                               <FaCheckCircle className="text-green-500 text-sm" />
                             )}
                           </span>
-                          {org.company_name && (
+                          {org.company_address && (
                             <span className="text-xs text-gray-500">
-                              {org.company_name}
+                              {org.company_address}
                             </span>
                           )}
-                          <span className="text-xs text-gray-500">
-                            {org.email}
-                          </span>
+                          <span className="text-xs text-gray-500">{org.email}</span>
                         </div>
                       </Link>
                     ))}
@@ -290,7 +290,7 @@ function Header() {
           )}
         </nav>
 
-                {/* Mobile Menu Icon */}
+        {/* Mobile Menu Icon */}
         <div className="lg:hidden">
           <button
             onClick={toggleMobileMenu}
@@ -314,50 +314,49 @@ function Header() {
         </div>
       </div>
 
-      {/* ✅ Missing Mobile Menu */}
-{isMobileMenuOpen && (
-<div className="lg:hidden absolute left-1/2 -translate-x-1/2 top-full z-20 bg-white border border-gray-300 w-full rounded-md flex shadow-md">
-  <nav className="flex flex-col items-center text-center space-y-2 p-4 w-full">
-      <Link
-        to="/find-my-ticket"
-        className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-      >
-        Find my Ticket
-      </Link>
-      <button
-        onClick={handleCreateEvent}
-        className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-      >
-        Create Event
-      </button>
-      {isLoggedIn ? (
-        <>
-          <button
-            onClick={() => navigate(`/org/${userCode}/dashboard`)}
-            className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-          >
-            Dashboard
-          </button>
-          <button
-            onClick={logout}
-            className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-          >
-            Log out
-          </button>
-        </>
-      ) : (
-        <Link
-          to="/login"
-          className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-        >
-          Login
-        </Link>
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden absolute left-1/2 -translate-x-1/2 top-full z-20 bg-white border border-gray-300 w-full rounded-md flex shadow-md">
+          <nav className="flex flex-col items-center text-center space-y-2 p-4 w-full">
+            <Link
+              to="/find-my-ticket"
+              className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+            >
+              Find my Ticket
+            </Link>
+            <button
+              onClick={handleCreateEvent}
+              className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+            >
+              Create Event
+            </button>
+            {isLoggedIn ? (
+              <>
+                <button
+                  onClick={() => navigate(`/org/${userCode}/dashboard`)}
+                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={logout}
+                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+              >
+                Login
+              </Link>
+            )}
+          </nav>
+        </div>
       )}
-    </nav>
-  </div>
-)}
     </header>
-
   );
 }
 
