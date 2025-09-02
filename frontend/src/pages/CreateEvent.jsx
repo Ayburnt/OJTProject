@@ -9,6 +9,8 @@ import useAuth from '../hooks/useAuth.js';
 import { IoIosArrowBack } from "react-icons/io";
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import ReCAPTCHA from "react-google-recaptcha";
+
 
 
 // A helper function to create a new, empty ticket object
@@ -78,6 +80,8 @@ const CreateEventForm = () => {
   const [isPosterErr, setIsPosterErr] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: '' });
+  const [captchaToken, setCaptchaToken] = useState(null);
+
 
   // Separate state for seating map
   const [isSeatingMapErr, setIsSeatingMapErr] = useState(false);
@@ -170,6 +174,8 @@ const CreateEventForm = () => {
     }
   };
 
+  
+
 
   const handleCheckboxChange = (e) => {
     const { name, checked } = e.target;
@@ -229,8 +235,17 @@ const CreateEventForm = () => {
   const handleSubmit = async (e, forceDraft = false, redirectTo = null) => {
     if (e) e.preventDefault();
 
+    if (!captchaToken) {
+      alert("Please complete the captcha before submitting.");
+      return;
+    }
+
 
     const form = new FormData();
+
+    // add captcha token along with other form fields
+    form.append("captcha", captchaToken);
+
     setIsLoading(true);
 
     // === Append files only if valid ===
@@ -377,10 +392,15 @@ const CreateEventForm = () => {
         const errorData = err.response.data;
         let errorMsg = "Error creating event:\n";
 
-        Object.entries(errorData).forEach(([field, messages]) => {
-          errorMsg += `${messages.join(", ")}\n`;
-        });
-
+  Object.entries(errorData).forEach(([field, messages]) => {
+    if (Array.isArray(messages)) {
+      errorMsg += `${field}: ${messages.join(", ")}\n`;
+    } else if (typeof messages === "string") {
+      errorMsg += `${field}: ${messages}\n`;
+    } else {
+      errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
+    }
+  });
         // REPLACED: alert(errorMsg);
         setAlert({ show: true, message: errorMsg });
       } else {
@@ -449,9 +469,9 @@ const CreateEventForm = () => {
 
   const [isVerifiedConfirm, setIsVerifiedConfirm] = useState(false);
 
-   useEffect(() => {
-      document.title = "Create Event | Sari-Sari Events";
-    }, []);
+  useEffect(() => {
+    document.title = "Create Event | Sari-Sari Events";
+  }, []);
 
 
   return (
@@ -590,6 +610,16 @@ const CreateEventForm = () => {
             {step === 4 && (
               <CEStep4 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} />
             )}
+
+            {step === totalSteps && (
+              <div className="flex justify-center my-4">
+                <ReCAPTCHA
+                  sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                  onChange={(token) => setCaptchaToken(token)}
+                />
+              </div>
+            )}
+
 
             {/* Buttons Section */}
             <div className="flex justify-between items-center mt-8">

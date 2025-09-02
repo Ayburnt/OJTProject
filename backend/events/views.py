@@ -16,6 +16,12 @@ from .parsers import NestedMultiPartParser
 from django.db.models import Q
 from api.models import CustomUser
 from rest_framework.decorators import api_view, permission_classes
+from django.conf import settings
+import requests
+import os
+from django.conf import settings
+
+
 
 @api_view(["PATCH"])
 @permission_classes([IsAuthenticated])
@@ -81,7 +87,6 @@ class EventPublicView(APIView):
 
 
 class EventListCreateAPIView(APIView):
-    # Use the new custom parser
     parser_classes = [NestedMultiPartParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -92,22 +97,53 @@ class EventListCreateAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, *args, **kwargs):
-        
-        print("FILES:", request.FILES)
-        print("DATA:", request)
+        # ✅ 1. Get captcha token
+        captcha_token = request.data.get("captcha")
+        print("📌 Captcha token from frontend:", captcha_token)  # Debug
 
-        # The custom parser will handle the nested data reconstruction
-        
+        if not captcha_token:
+            return Response(
+                {"error": "Captcha token missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ 2. Verify with Google
+        secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
+        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
+
+        verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {"secret": secret_key, "response": captcha_token}
+
+        try:
+            r = requests.post(verify_url, data=payload)
+            result = r.json()
+            print("📌 Google verification result:", result)  # Debug
+
+            if not result.get("success"):
+                return Response(
+                    {
+                        "error": "Invalid reCAPTCHA. Please try again.",
+                        "details": result,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Error verifying reCAPTCHA: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # ✅ 3. Proceed with saving event if captcha is valid
         serializer = EventSerializer(
             data=request.data,
-            context={'request': request},
+            context={"request": request},
         )
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(created_by=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print("SERIALIZER ERRORS:", serializer.errors)  # <-- Add this
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+        print("📌 Serializer errors:", serializer.errors)  # Debug
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventRetrieveUpdateDestroyAPIView(APIView):
     parser_classes = [NestedMultiPartParser]
@@ -165,3 +201,26 @@ class EventDetailView(APIView):
 
         serializer = EventSerializer(event, context={"request": request})
         return Response(serializer.data)
+    
+def verify_captcha(token: str) -> dict:
+    """
+    Verify Google reCAPTCHA token with Google's API
+    Returns the full response dict.
+    """
+    secret_key = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+
+    if not secret_key:
+        return {"success": False, "error": "Missing secret key"}
+
+    url = "https://www.google.com/recaptcha/api/siteverify"
+    payload = {
+        "secret": secret_key,
+        "response": token
+    }
+
+    try:
+        response = requests.post(url, data=payload, timeout=5)
+        result = response.json()
+        return result
+    except requests.RequestException as e:
+        return {"success": False, "error": str(e)}
