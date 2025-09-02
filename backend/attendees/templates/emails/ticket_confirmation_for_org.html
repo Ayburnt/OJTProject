@@ -128,7 +128,7 @@
   {% else %}
     N/A
   {% endif %}</p>
-                <p><strong>Registration Date:</strong> {{ attendee.created_at|date:"M. d, Y h:i a" }}</p>
+                <p><strong>Registration Date:</strong> {{ attendee.created_at|timezone:"Asia/Manila"|date:"M. d, Y h:i a" }}</p>
                 <p><strong>Ticket Code:</strong> {{ attendee.attendee_code }}</p>
               </div>
               
