@@ -16,7 +16,7 @@ export default function Ticket() {
 
   // Corrected handleDecode function to properly handle the result object
   const handleDecode = (result) => {
-    if (result && result.length > 0) {      
+    if (result && result.length > 0) {
       const scannedValue = result[0].rawValue; // Correctly access the rawValue property
       setScanning(false);
       window.location.href = scannedValue;
@@ -37,7 +37,7 @@ export default function Ticket() {
   const { isLoggedIn, userCode, userRole } = useAuth();
 
   useEffect(() => {
-    if (isLoggedIn && userRole === 'organizer' && eventDetails?.created_by === userCode) {      
+    if (isLoggedIn && userRole === 'organizer' && eventDetails?.created_by === userCode) {
       setIsOrganizer(true);
     } else {
       setIsOrganizer(false);
@@ -142,24 +142,24 @@ export default function Ticket() {
       <div className="min-h-screen bg-gray-100 flex flex-col items-center gap-6 p-4">
         {/* Logo Section */}
         <div className="w-full max-w-4xl flex justify-center mb-6 px-4 sm:px-0">
-          <div className="flex flex-row w-full items-center justify-between rounded-lg">            
+          <div className="flex flex-row w-full items-center justify-between rounded-lg">
             <img className="w-[30%] md:w-[20%] cursor-pointer" onClick={() => navigate(`/`)} src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909" alt="" />
             <div className="flex items-center space-x-2">
               {isOrganizer && (
                 <>
-                <button
-                  onClick={handleCheckIn}
-                  disabled={attendanceDetails?.check_in_time}
-                  className={`px-4 py-2 rounded-lg font-outfit text-sm shadow 
+                  <button
+                    onClick={handleCheckIn}
+                    disabled={attendanceDetails?.check_in_time}
+                    className={`px-4 py-2 rounded-lg font-outfit text-sm shadow 
           ${attendanceDetails?.check_in_time
-                      ? "bg-gray-400 text-white cursor-not-allowed"
-                      : "bg-teal-600 text-white hover:bg-teal-700"}`}
-                >
-                  {attendanceDetails?.check_in_time
-                    ? `Checked in at ${new Date(attendanceDetails.check_in_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
-                    : "Check In"}
-                </button>
-                <button onClick={() => setScanning(!scanning)} className="outline-none"><RiQrScan2Line className="text-secondary text-2xl cursor-pointer" /></button>
+                        ? "bg-gray-400 text-white cursor-not-allowed"
+                        : "bg-teal-600 text-white hover:bg-teal-700"}`}
+                  >
+                    {attendanceDetails?.check_in_time
+                      ? `Checked in at ${new Date(attendanceDetails.check_in_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`
+                      : "Check In"}
+                  </button>
+                  <button onClick={() => setScanning(!scanning)} className="outline-none"><RiQrScan2Line className="text-secondary text-2xl cursor-pointer" /></button>
                 </>
               )}
             </div>
@@ -184,15 +184,15 @@ export default function Ticket() {
 
             {eventDetails?.event_type !== 'virtual' ? (
               <div className="flex items-center text-xs font-outfit sm:text-sm text-gray-500 space-x-2 mt-1">
-              <IoLocationOutline size={16} />              
-              <span>{eventDetails?.venue_specific !== null && eventDetails?.venue_specific !== '' ? eventDetails?.venue_specific + ', ' : ''}{eventDetails?.venue_address}</span>
-            </div>
+                <IoLocationOutline size={16} />
+                <span>{eventDetails?.venue_specific !== null && eventDetails?.venue_specific !== '' ? eventDetails?.venue_specific + ', ' : ''}{eventDetails?.venue_address}</span>
+              </div>
             ) : (
               <div className="flex items-center text-xs font-outfit sm:text-sm text-gray-500 space-x-2 mt-1">
-              <IoLink size={16} />              
-              <span>{eventDetails?.meeting_platform} - {eventDetails?.meeting_link}</span>
-            </div>
-            )}            
+                <IoLink size={16} />
+                <span>{eventDetails?.meeting_platform} - {eventDetails?.meeting_link}</span>
+              </div>
+            )}
           </div>
 
           {/* Right Card: Event Confirmation / Ticket */}
@@ -269,10 +269,12 @@ export default function Ticket() {
                     <span className="font-medium font-outfit text-gray-700">Time:</span>
                     <span>{formatEventTimeRange(eventDetails?.start_time, eventDetails?.end_time)}</span>
                   </div>
-                  <div className="flex justify-between border-b pb-2">
-                    <span className="font-medium font-outfit text-gray-700">Venue:</span>
-                    <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
-                  </div>
+                  {eventDetails?.event_type !== 'virtual' && (
+                    <div className="flex justify-between border-b pb-2">
+                      <span className="font-medium font-outfit text-gray-700">Venue:</span>
+                      <span className="text-right">{eventDetails?.venue_name}, {eventDetails?.venue_specific}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium font-outfit text-gray-700">Reference Code:</span>
                     <span>{attendee?.attendee_code}</span>
