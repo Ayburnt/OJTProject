@@ -174,7 +174,7 @@ const CreateEventForm = () => {
     }
   };
 
-  
+
 
 
   const handleCheckboxChange = (e) => {
@@ -392,15 +392,15 @@ const CreateEventForm = () => {
         const errorData = err.response.data;
         let errorMsg = "Error creating event:\n";
 
-  Object.entries(errorData).forEach(([field, messages]) => {
-    if (Array.isArray(messages)) {
-      errorMsg += `${field}: ${messages.join(", ")}\n`;
-    } else if (typeof messages === "string") {
-      errorMsg += `${field}: ${messages}\n`;
-    } else {
-      errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
-    }
-  });
+        Object.entries(errorData).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            errorMsg += `${field}: ${messages.join(", ")}\n`;
+          } else if (typeof messages === "string") {
+            errorMsg += `${field}: ${messages}\n`;
+          } else {
+            errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
+          }
+        });
         // REPLACED: alert(errorMsg);
         setAlert({ show: true, message: errorMsg });
       } else {
@@ -572,18 +572,29 @@ const CreateEventForm = () => {
             <p className="text-gray-600 mt-2">Fill out the form below to publish your event.</p>
           </div>
 
+
           {/* Step Indicator */}
           <div className="flex justify-center items-start mb-12 w-full">
             {[1, 2, 3, 4].map(s => (
               <button
                 key={s}
                 type="button"
-                onClick={() => setStep(s)}
+                onClick={() => {
+                  const form = document.querySelector("form");
+
+                  // ✅ only allow step change if form is valid
+                  if (form && form.checkValidity()) {
+                    setStep(s);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  } else {
+                    form.reportValidity(); // shows built-in validation messages
+                  }
+                }}
                 className="flex-1 flex flex-col items-center focus:outline-none"
               >
                 <div
                   className={`w-10 h-10 flex items-center justify-center rounded-full font-bold transition-all duration-300
-                  ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
+      ${step === s ? 'bg-teal-500 text-white shadow-lg' : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}`}
                 >
                   {s}
                 </div>
@@ -594,6 +605,7 @@ const CreateEventForm = () => {
                   {s === 4 && "Registration Form"}
                 </span>
               </button>
+
             ))}
           </div>
 
@@ -635,10 +647,15 @@ const CreateEventForm = () => {
                   <button
                     type="button"
                     onClick={() => {
-                      handleNext();
-                      window.scrollTo({ top: 0, behavior: "smooth" }); // 👈 force scroll top
+                      const form = document.querySelector("form");
+                      if (form && form.checkValidity()) {
+                        handleNext();
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      } else {
+                        form.reportValidity(); // shows browser validation
+                      }
                     }}
-                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+                    className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl transition-colors duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

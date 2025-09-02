@@ -13,7 +13,7 @@ const InputField = ({ label, inputType, inputName, inputValue, inputOnChange, in
   <div className='flex flex-col w-full gap-2'>
     <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
     <input className="w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3"
-      type={inputType} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} />
+      type={inputType} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} required/>
   </div>
 )
 
@@ -21,14 +21,14 @@ const EventCodeInput = ({ label, inputType, inputName, inputValue, inputOnChange
   <div className='flex flex-col w-full gap-2'>
     <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
     <input className={`${disabled ? 'cursor-not-allowed bg-gray-100' : 'bg-white'} w-full border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-3`}
-      type={inputType} maxLength={maxLength} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} disabled={disabled} />
+      type={inputType} maxLength={maxLength} name={inputName} value={inputValue} placeholder={inputPlaceholder} onChange={inputOnChange} required disabled={disabled} />
   </div>
 )
 
 const EventDescInput = ({ label, inputName, inputValue, inputOnChange, inputPlaceholder }) => (
   <div className='flex flex-col w-full gap-2'>
     <label htmlFor="" className='font-outfit text-sm leading-none m-0 text-gray-700'>{label}</label>
-    <textarea rows={4} name={inputName} value={inputValue} onChange={inputOnChange} placeholder={inputPlaceholder}
+    <textarea rows={4} name={inputName} value={inputValue} onChange={inputOnChange} placeholder={inputPlaceholder} required
       className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
     ></textarea>
   </div>
@@ -61,7 +61,7 @@ function CEStep1({
           <label htmlFor="category" className="font-outfit text-sm leading-none m-0 text-gray-700">Event Category</label>
           <select id="category" name="category"
             value={formData.category}
-            onChange={handleEventChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer">
+            onChange={handleEventChange} required className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer">
             <option value="">Select</option>
             <option value='corporate'>Corporate Event</option>
             <option value='social'>Social Event</option>
@@ -76,7 +76,7 @@ function CEStep1({
         <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4`}>
           <div>
             <label htmlFor="event_type" className="font-outfit text-sm leading-none m-0 text-gray-700">Event Type</label>
-            <select id="event_type" name="event_type" value={formData.event_type} onChange={handleEventChange} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4  cursor-pointer">
+            <select id="event_type" name="event_type" value={formData.event_type} onChange={handleEventChange} required className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4  cursor-pointer">
               <option value="">Select</option>
               <option value='virtual'>Virtual</option>
               <option value='in-person'>In-person</option>
@@ -91,7 +91,7 @@ function CEStep1({
           {formData.event_type === 'virtual' && (
             <div className='sm:col-span-2'>
               <label htmlFor="event_type" className={`block text-sm text-gray-700`}>Meeting Link</label>
-              <input type="url" name='meeting_link' value={formData.meeting_link} disabled={formData.event_type !== 'virtual'} onChange={handleEventChange} className={`border-gray-300 block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
+              <input type="url" name='meeting_link' value={formData.meeting_link} disabled={formData.event_type !== 'virtual'} onChange={handleEventChange} required={formData.event_type === "virtual"} className={`border-gray-300 block w-full bg-white border-b-2 focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`} />
             </div>
           )}
           
@@ -144,6 +144,7 @@ function CEStep1({
             <InputField label='Event Private Code' inputType='text' inputName='private_code'
               inputValue={formData.private_code} inputOnChange={handleEventChange}
               inputPlaceholder='e.g., my-event-password'
+              required={formData.audience === "private"}
             />
 
             <div className="col-span-2">
@@ -193,7 +194,8 @@ function CEStep1({
           
       </FormSection>
 
-      <FormSection title="EVENT IMAGE / POSTER">
+      <FormSection title={ <>  EVENT IMAGE / POSTER{" "}
+      <span className="text-red-500">*</span> </>}>
         <p className="text-sm text-gray-500 mb-4">Recommended size: 16:9 ratio (JPG or PNG)</p>
         <div className={`flex justify-center items-center aspect-16/9 border-2 ${isPosterErr ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-xl relative overflow-hidden`}>
           {formData.event_poster ? (
@@ -214,7 +216,7 @@ function CEStep1({
             <span className="text-gray-500">Upload an image here</span>
           )}
 
-          <input id="event_poster" name="event_poster" type="file" accept="image/*" onChange={handleEventChange} className="hidden" />
+          <input id="event_poster" name="event_poster" type="file" accept="image/*" onChange={handleEventChange} className="hidden" required/>
           <button type="button" onClick={() => document.getElementById('event_poster').click()} className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer">
             Upload
           </button>
