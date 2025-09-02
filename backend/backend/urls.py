@@ -15,6 +15,7 @@ urlpatterns = [
     path('', include('verification.urls')),
     
     path("api/attendees/", include("attendees.urls")),
+    path("api/transactions/", include("transactions.urls")),
 
 
 

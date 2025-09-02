@@ -126,7 +126,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'verification',
     'storages',
-    'attendees'
+    'attendees',
+    'transactions'
 ]
 
 MIDDLEWARE = [

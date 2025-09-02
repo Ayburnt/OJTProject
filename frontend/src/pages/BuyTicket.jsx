@@ -4,9 +4,11 @@ import RegisterSuccess from "../components/RegisterSucess.jsx";
 import api from "../api.js";
 import { toast } from "react-toastify";
 import LoadingScreen from "../components/LoadingScreen.jsx";
+import ReCAPTCHA from "react-google-recaptcha";
 
 function BuyTicket() {
   const { eventcode } = useParams();
+  const [captchaToken, setCaptchaToken] = useState(null);
 
   useEffect(() => {
     document.title = "Buy Ticket | Sari-Sari Events";
@@ -20,6 +22,7 @@ function BuyTicket() {
   const [privateCodeInput, setPrivateCodeInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [ticketLinks, setTicketLinks] = useState([]);
+  const [transacCode, setTransactCode] = useState();
 
 
   const navigate = useNavigate();
@@ -77,69 +80,85 @@ function BuyTicket() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    if (!formData.agree) {
-      toast.error("You must agree to the Terms & Conditions.");
+  if (!captchaToken) {      
+      toast.error("Please complete the captcha before submitting.");
       setIsLoading(false);
       return;
     }
 
-    const forceSingle = Number(formData.ticket_quantity) <= 5;
-    let newTicketLinks = [];
+  if (!formData.agree) {
+    toast.error("You must agree to the Terms & Conditions.");
+    setIsLoading(false);
+    return;
+  }
 
-    try {
-      // Buyer (main attendee)
-      const mainAttendee = {
-        fullName: formData.fullName,
-        email: formData.email,
+  let newTicketLinks = [];
+
+  try {        
+    // 1. Create the transaction first
+    const resTransaction = await api.post("/transactions/create/", {
+      event: eventDetails.event_code,
+      amount: totalPrice,
+      transaction_type: 'TicketPurchase',
+      status: "pending",
+      captcha: captchaToken,
+    });
+    console.log("Transaction response:", resTransaction.data.transaction.payment_ref);
+
+    setTransactCode(resTransaction.data.transaction.payment_ref);
+    const transactionId = resTransaction.data.transaction.payment_ref;  // 👈 use this for attendees
+
+    // 2. Buyer (main attendee)
+    const mainAttendee = {
+      fullName: formData.fullName,
+      email: formData.email,
+      event: eventDetails.event_code,
+      ticket_type: formData.ticketType, 
+      ticket_quantity: 1,
+      transaction: transactionId,   // 👈 link FK here
+      responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
+        question: qId,
+        response_value: Array.isArray(value) ? value.join(", ") : value,
+      })),
+    };
+
+    const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
+    newTicketLinks.push(resMain.data.attendee_code);
+
+    // 3. Other ticket holders
+    for (const holder of ticketHolders) {
+      const extraAttendee = {
+        fullName: holder.fullName || "Guest",
+        email: holder.email,
         event: eventDetails.event_code,
-        ticket_type: formData.ticketType, // must be ticket_type.id
-        ticket_quantity: forceSingle ? 1 : formData.ticket_quantity,
-        price_at_purchase: formData.price,
-        responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
-          question: qId,
-          response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ convert array -> string
-        })),
+        ticket_type: formData.ticketType,
+        ticket_quantity: 1,
+        transaction: transactionId,  // 👈 same FK
+        responses: [],
       };
-
-      const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
-      console.log("resMain.data:", resMain.data);
-      newTicketLinks.push(resMain.data.attendee_code);
-
-
-
-      // Other ticket holders
-      for (const holder of ticketHolders) {
-        const extraAttendee = {
-          fullName: holder.fullName || "Guest",
-          email: holder.email,
-          event: eventDetails.event_code,
-          ticket_type: formData.ticketType,
-          ticket_quantity: 1,
-          price_at_purchase: formData.price,
-          responses: holder.questions
-            ? Object.entries(holder.questions).map(([qId, value]) => ({
-              question: qId,
-              response_value: Array.isArray(value) ? value.join(", ") : value,  // ✅ here too
-            }))
-            : [],
-        };
-        const resExtra = await api.post("/attendees/buy-ticket/", extraAttendee);
-        console.log("resExtra.data:", resExtra.data);
-        newTicketLinks.push(resExtra.data.attendee_code);
-      }
-
-      setTicketLinks(newTicketLinks);
-      setIsLoading(false);
-      setIsModalOpen(true);
-    } catch (err) {
-      setIsLoading(false);
-      toast.error("Something went wrong while booking. Please try again.");
-      console.error("Error submitting:", err.response?.data || err.message);
+      const resExtra = await api.post("/attendees/buy-ticket/", extraAttendee);
+      newTicketLinks.push(resExtra.data.attendee_code);
     }
-  };
+
+    // Done ✅
+    setTicketLinks(newTicketLinks);
+    setIsLoading(false);
+    setIsModalOpen(true);
+    console.log("resmain", resMain.data)
+    console.log("mainAttendee", mainAttendee.data)
+    console.log("resTransaction", resTransaction.data)
+  } catch (err) {
+    setIsLoading(false);
+    toast.error("Something went wrong while booking. Please try again.");
+    console.error("Error submitting:", err.response?.data || err.message);
+  } finally{
+    setIsLoading(false);
+  }
+};
+
 
 
 
@@ -242,7 +261,7 @@ function BuyTicket() {
   return (
     <> 
       {isLoading && <LoadingScreen isLoading={isLoading} />}
-      {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} ticketLinks={ticketLinks} />}
+      {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} transacCode={transacCode} ticketLinks={ticketLinks} />}
       <div className="max-w-lg mx-4 mt-5 mb-5 min-h-screen shadow-lg rounded-3xl bg-white overflow-hidden px-10 font-outfit md:mx-auto lg:max-w-2xl 2xl:max-w-4xl">
         {/* Private Event Modal */}
         {isPrivate && (
@@ -562,6 +581,13 @@ function BuyTicket() {
               .
             </p>
           </div>
+
+          <div className="flex justify-center my-4">
+                          <ReCAPTCHA
+                            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                            onChange={(token) => setCaptchaToken(token)}
+                          />
+                        </div>
 
           {/* Submit */}
           <button

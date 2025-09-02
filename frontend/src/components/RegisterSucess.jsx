@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function RegisterSuccess({ setIsModalOpen, ticketLinks }) {
+function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
   const navigate = useNavigate();
 
   return (
@@ -32,6 +32,16 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks }) {
             );
           })}
         </ul>
+
+        <div>
+          <p>Transaction Link: </p>
+          <a
+          href={`/transaction/${transacCode}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline cursor-pointer hover:text-blue-800 font-outfit"
+          >{transacCode}</a>
+        </div>
 
         <div className="flex justify-center mt-4">
           <button

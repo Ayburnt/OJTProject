@@ -2,8 +2,14 @@
 from rest_framework import serializers
 from .models import Attendee, Attendee_Response, Event_Attendance
 from events.models import Reg_Form_Question, Question_Option, Event, Ticket_Type
+from transactions.models import Transaction
 import uuid
 from django.db import IntegrityError
+
+class TransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaction
+        fields = "__all__"
 
 class AttendeeResponseSerializer(serializers.ModelSerializer):
     class Meta:
@@ -35,16 +41,24 @@ class EventAttendanceSerializer(serializers.ModelSerializer):
 
 class AttendeeSerializer(serializers.ModelSerializer):
     responses = AttendeeResponseSerializer(many=True, required=False)
+
     event = serializers.SlugRelatedField(
-        slug_field="event_code", 
+        slug_field="event_code",
         queryset=Event.objects.all(),
         write_only=True
     )
+
+    transaction = serializers.SlugRelatedField(
+        slug_field="payment_ref",
+        queryset=Transaction.objects.all(),
+        write_only=True   # 👈 ensures it won’t show in output
+    )
+
     event_details = EventSerializer(source="event", read_only=True)
+    transaction_read = TransactionSerializer(source="transaction", read_only=True)
     ticket_read = TicketTypeSerializer(source="ticket_type", read_only=True)
     ticket_type = serializers.PrimaryKeyRelatedField(queryset=Ticket_Type.objects.all())
 
-    # ✅ embed attendance
     attendance = serializers.SerializerMethodField()
 
     class Meta:
@@ -64,7 +78,9 @@ class AttendeeSerializer(serializers.ModelSerializer):
             "price_at_purchase",
             "attendee_status",
             "responses",
-            "attendance",        # 👈 added
+            "attendance",
+            "transaction",        # write-only: expects payment_ref
+            "transaction_read",   # read-only: full transaction details
             "created_at",
         ]
 
@@ -96,6 +112,7 @@ class AttendeeSerializer(serializers.ModelSerializer):
             Attendee_Response.objects.create(attendee=attendee, **resp)
 
         return attendee
+
 
 class OrganizerEventSerializer(serializers.ModelSerializer):
     attendees_count = serializers.IntegerField()

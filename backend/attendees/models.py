@@ -1,3 +1,4 @@
+#attendees/models.py
 import os
 from django.db import models
 from django.core.files import File
@@ -12,6 +13,13 @@ class Attendee(models.Model):
         ('paid', 'Paid'),
         ('cancelled', 'Cancelled'),
         ('checked-in', 'Checked-in'),
+    )
+    
+    transaction = models.ForeignKey(
+        "transactions.Transaction",
+        on_delete=models.CASCADE,
+        to_field='payment_ref',
+        related_name="attendees"
     )
 
     fullName = models.CharField(max_length=255)
