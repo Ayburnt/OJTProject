@@ -123,7 +123,7 @@
                 <p><strong>Date:</strong> {{ event.start_date }} – {{ event.end_date }}</p>
                 <p><strong>Time:</strong> {{ event.start_time }} – {{ event.end_time }}</p>
                 <p><strong>Venue:</strong> {{ event.venue_address }}</p>
-                <p><strong>Ticket Code:</strong> {{ attendee.attendee_code }}</p>
+                <p><strong>Ticket Link:</strong> <a href="https://event.sari-sari.com/attendee/{{ attendee.attendee_code }}">https://event.sari-sari.com/attendee/{{ attendee.attendee_code }}</a></p>
               </div>
 
               <!-- QR Code -->
