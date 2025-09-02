@@ -167,35 +167,33 @@ const EventCard = ({ event }) => {
       <img
         src={event.event_poster}
         alt={`${event.title} Event`}
-        className="w-full h-full object-cover"
+        className="w-full h-40 object-cover"
       />
 
-      <div className="p-4 sm:p-6 bg-teal-500 text-white flex flex-col flex-grow justify-between">
-          <div>
-         <div className="flex items-start justify-between mb-2">
+      <div className="p-4 sm:p-6 bg-teal-500 text-white">
+        <div className="flex items-start justify-between mb-2">
           <a className="text-xl font-bold cursor-pointer hover:underline" href={`/events/${event.event_code}`}>{event.title}</a>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold font-outfit text-white ${statusColorClass}`}>
             {category ? category.charAt(0).toUpperCase() + category.slice(1) : "Unknown"}
           </span>
         </div>
-           </div>
 
-          {/* Bottom Section (always grouped & aligned) */}
-          <div className="flex flex-col gap-2 mt-2">
-            <div className="flex items-center text-sm">
-            <FiCalendar className="mr-2" />
+        <div className="flex flex-col items-start sm:space-x-4 mb-2">
+          <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0">
+            <FiCalendar className="w-4 h-4" />
             <p>
               {formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
             </p>
           </div>
-          <div className="flex items-center text-sm">
-            <FiMapPin className="mr-2" />
+          <div className="flex items-center font-outfit space-x-2 text-sm">
+            <FiMapPin className="w-4 h-4" />
             <p>{event.venue_specific !== null || event.venue_specific !== '' ? event.venue_specific + ', ' : ''}{event.venue_name}</p>
           </div>
-       <div className="flex items-center text-sm">
-          <FiUsers className="mr-2" />
-          <p>{event.attendees} attendees</p>
         </div>
+
+        <div className="flex items-center font-outfit space-x-2 text-sm">
+          <FiUsers className="w-4 h-4" />
+          <p>{event.attendees} attendees</p>
         </div>
 
         <a href={googleCalendarLink(event)} target="_blank" rel="noopener noreferrer">
