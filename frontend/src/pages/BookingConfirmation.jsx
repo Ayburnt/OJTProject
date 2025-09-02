@@ -376,7 +376,6 @@ export default function Ticket() {
         </p>
       </div>
 
-                <p className="text-xs font-outfit text-gray-400 mt-2">
       {/* Attendee Details */}
       <div className="px-4">
         <p className="font-semibold font-outfit text-gray-800">
