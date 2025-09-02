@@ -66,8 +66,8 @@ function CEStep1({
             <option value='corporate'>Corporate Event</option>
             <option value='social'>Social Event</option>
             <option value='cultural'>Cultural Event</option>
-            <option value='sports'>Sports & Recreational Event</option>
-            <option value='government'>Political & Government Event</option>
+            <option value='sports & Recreational'>Sports & Recreational Event</option>
+            <option value='political & Government'>Political & Government Event</option>
             <option value='educational'>Educational Event</option>
             <option value="fundraising">Fundraising Event</option>
           </select>

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { CiSaveDown2 } from "react-icons/ci";
-import { IoCalendarClearOutline, IoLocationOutline } from "react-icons/io5";
+import { IoCalendarClearOutline, IoLocationOutline, IoLink } from "react-icons/io5";
 import { useReactToPrint } from "react-to-print";
 import api from "../api.js";
 import { useParams, Link, useNavigate } from "react-router-dom";
@@ -51,6 +51,7 @@ export default function Ticket() {
         setEventDetails(res.data.event_details);
         setTicketType(res.data.ticket_read);
         setAttendanceDetails(res.data.attendance);
+        console.log(res.data)
       })
       .catch(err => console.error("Error fetching attendee:", err));
   }, [attendeeCode]);
@@ -180,10 +181,18 @@ export default function Ticket() {
               <IoCalendarClearOutline size={16} />
               <span>{formatEventDateTime(eventDetails?.start_date, eventDetails?.start_time, eventDetails?.end_date, eventDetails?.end_time)}</span>
             </div>
-            <div className="flex items-center text-xs font-outfit sm:text-sm text-gray-500 space-x-2 mt-1">
-              <IoLocationOutline size={16} />
+
+            {eventDetails?.event_type !== 'virtual' ? (
+              <div className="flex items-center text-xs font-outfit sm:text-sm text-gray-500 space-x-2 mt-1">
+              <IoLocationOutline size={16} />              
               <span>{eventDetails?.venue_specific !== null && eventDetails?.venue_specific !== '' ? eventDetails?.venue_specific + ', ' : ''}{eventDetails?.venue_address}</span>
             </div>
+            ) : (
+              <div className="flex items-center text-xs font-outfit sm:text-sm text-gray-500 space-x-2 mt-1">
+              <IoLink size={16} />              
+              <span>{eventDetails?.meeting_platform} - {eventDetails?.meeting_link}</span>
+            </div>
+            )}            
           </div>
 
           {/* Right Card: Event Confirmation / Ticket */}

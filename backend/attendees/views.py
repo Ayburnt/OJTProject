@@ -22,6 +22,7 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 # Configure AWS SES client using settings from settings.py
 try:
     ses_client = boto3.client(
@@ -44,10 +45,14 @@ class AttendeeCreateView(generics.CreateAPIView):
         attendee = serializer.save()
 
         if attendee.email:
-            subject = f"Your Ticket Confirmation - {attendee.event.title}"
+            sender_email = settings.DEFAULT_FROM_EMAIL
 
-            # Prepare context for email
-            context = {
+            # -------------------------------
+            # 🎟️ 1. Send Ticket Confirmation to Attendee
+            # -------------------------------
+            subject_attendee = f"Your Ticket Confirmation - {attendee.event.title}"
+
+            context_attendee = {
                 "attendee": attendee,
                 "event": attendee.event,
                 "ticket_type": attendee.ticket_type,
@@ -55,34 +60,76 @@ class AttendeeCreateView(generics.CreateAPIView):
                 "event_poster": attendee.event.event_poster.url if getattr(attendee.event, "event_poster", None) else None,
             }
 
-            # Render HTML + Text bodies
-            html_body = render_to_string("emails/ticket_confirmation.html", context)
-            text_body = strip_tags(html_body)
+            html_body_attendee = render_to_string("emails/ticket_confirmation.html", context_attendee)
+            text_body_attendee = strip_tags(html_body_attendee)
 
-            sender_email = settings.DEFAULT_FROM_EMAIL
-
-            if ses_client:  # ✅ same style as your registration view
-                try:
+            try:
+                if ses_client:
                     ses_client.send_email(
                         Source=sender_email,
-                        Destination={
-                            'ToAddresses': [attendee.email],
-                        },
+                        Destination={'ToAddresses': [attendee.email]},
                         Message={
-                            'Subject': {'Data': subject},
+                            'Subject': {'Data': subject_attendee},
                             'Body': {
-                                'Html': {'Data': html_body},
-                                'Text': {'Data': text_body},
+                                'Html': {'Data': html_body_attendee},
+                                'Text': {'Data': text_body_attendee},
                             },
                         }
                     )
                     print(f"🎟️ Ticket confirmation email sent to {attendee.email}")
-                except ClientError as e:
-                    print(f"SES Error sending ticket email: {e.response['Error']['Message']}")
+            except Exception as e:
+                print(f"❌ Error sending attendee email: {e}")
+
+            # -------------------------------
+            # 👤 2. Send New Attendee Notification to Event Creator
+            # -------------------------------
+            # 👤 2. Send New Attendee Notification to Event Creator
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+
+            creator = None
+            if attendee.event.created_by:  # FK reference
+                try:
+                    creator = User.objects.get(user_code=attendee.event.created_by)
+                except User.DoesNotExist:
+                    creator = None
+
+            # 👤 2. Send New Attendee Notification to Event Creator
+            creator = attendee.event.created_by  # already a User object
+
+            if creator and creator.email:
+                subject_creator = f"New Attendee Registered - {attendee.event.title}"
+
+                context_creator = {
+                    "attendee": attendee,
+                    "event": attendee.event,
+                    "ticket_type": attendee.ticket_type,
+                    "organizer": creator,
+                }
+
+                html_body_creator = render_to_string("emails/ticket_confirmation_for_org.html", context_creator)
+                text_body_creator = strip_tags(html_body_creator)
+
+                try:
+                    if ses_client:
+                        ses_client.send_email(
+                            Source=sender_email,
+                            Destination={'ToAddresses': [creator.email]},
+                            Message={
+                                'Subject': {'Data': subject_creator},
+                                'Body': {
+                                    'Html': {'Data': html_body_creator},
+                                    'Text': {'Data': text_body_creator},
+                                },
+                            }
+                        )
+                        print(f"📩 Notification email sent to organizer {creator.email}")
                 except Exception as e:
-                    print(f"General Error sending ticket email: {e}")
+                    print(f"❌ Error sending organizer email: {e}")
             else:
-                print("SES client not initialized. Cannot send ticket confirmation email.")
+                print("⚠️ Organizer has no valid email, skipping organizer notification.")
+
+
 
 
 from rest_framework import generics

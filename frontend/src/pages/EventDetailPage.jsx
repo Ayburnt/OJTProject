@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, FaCheckCircle, FaCheckSquare } from 'react-icons/fa';
+import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, FaCheckCircle, FaCheckSquare, FaLaptop } from 'react-icons/fa';
 import { FaRegUser } from "react-icons/fa";
 import api from '../api.js';
 
@@ -136,6 +136,7 @@ function EventDetailPage() {
             try {
                 const res = await api.get(`/events/${eventcode}/`);
                 setEventDetails(res.data);
+                console.log(res.data);
             } catch (err) {
                 console.error("Error fetching event:", err);
             }
@@ -248,9 +249,9 @@ function EventDetailPage() {
 
                                 </div>
                             </div>
-
-                            {/* Location */}
+                            {eventDetails.event_type !== 'virtual' ? (                                
                             <div>
+                                {/* Location */}
                                 <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
 
                                 {/* Venue Details */}
@@ -273,6 +274,20 @@ function EventDetailPage() {
                                     ></iframe>
                                 </div>
                             </div>
+                            ):(
+                            <div>
+                                {/* Meeting */}
+                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Virtual</h3>
+
+                                {/* Venue Details */}
+                                <div className="flex items-start space-x-3">
+                                    <FaLaptop className="text-teal-600 text-lg mt-1" />
+                                    <span className="text-gray-700">
+                                        {eventDetails.meeting_platform}
+                                    </span>
+                                </div>
+                            </div>
+                            )}                            
 
                             {/* Age Restriction */}
                             {eventDetails.age_restriction && (
@@ -392,7 +407,9 @@ function EventDetailPage() {
                                     {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 &&
                                         eventDetails.ticket_types[0].is_selling === false ? (
                                         <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
-                                    ) : (
+                                    ) : eventDetails.ticket_types.some(ticket => ticket.quantity_available === 0 || ticket.quantity_available === '0') ? (
+                                        <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Sold out</p>
+                                    ) :(
                                         <div className="mt-8 pt-6 border-t border-gray-200">
                                             <label className="flex items-start cursor-pointer">
                                                 <input

@@ -21,7 +21,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks }) {
             return (
               <li key={idx}>
                 <a
-                  onClick={() => navigate(`/attendee/${cleanLink}`)}
+                  href={`/attendee/${cleanLink}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 underline cursor-pointer hover:text-blue-800 font-outfit"

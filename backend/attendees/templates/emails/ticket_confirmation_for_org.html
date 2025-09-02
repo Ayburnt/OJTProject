@@ -96,7 +96,7 @@
           <tr>
             <td class="header">
               <img src="https://ik.imagekit.io/cafedejur/sari-sari-events/sari-sari-new.png" alt="Sari-Sari Events Logo" class="logo">
-              <h1>Your Ticket Confirmation</h1>
+              <h1>New Attendee Registered for {{ event.title }}</h1>
             </td>
           </tr>
 
@@ -113,37 +113,27 @@
           <!-- Content -->
           <tr>
             <td class="content">
-              <p>Hi {{ attendee.fullName }},</p>
-              <p>Thank you for booking with <strong>Sari-Sari Events</strong>! 🎉<br>
-              Your visitor ticket has been confirmed. Please find your details below:</p>
+              <p>Hello {{ organizer.first_name }},</p>
+              <p>A new attendee has registered for your event:</p>
               
               <!-- Ticket Info -->
               <div class="ticket-box">
-                <p><strong>Event:</strong> {{ event.title }}</p>
-                <p><strong>Date:</strong> {{ event.start_date }} – {{ event.end_date }}</p>
-                <p><strong>Time:</strong> {{ event.start_time }} – {{ event.end_time }}</p>
-                <p><strong>Venue:</strong> {{ event.venue_address }}</p>
+                <p><strong>Name:</strong> {{ attendee.fullName }}</p>
+                {% if attendee.email %}
+                <p><strong>Email:</strong> {{ attendee.email }}</p>
+                {% endif %}
+                <p><strong>Ticket Type:</strong> {% if ticket_type %}
+    {{ ticket_type.ticket_name }}
+  {% else %}
+    N/A
+  {% endif %}</p>
+                <p><strong>Registration Date:</strong> {{ attendee.created_at|date:"M. d, Y h:i a" }}</p>
                 <p><strong>Ticket Code:</strong> {{ attendee.attendee_code }}</p>
               </div>
-
-              <!-- QR Code -->
-              <div class="qr-code">
-                <p><strong>Your QR Code:</strong></p>
-                {% if ticket_qr_image %}
-  <img src="{{ ticket_qr_image }}" alt="Ticket QR Code">
-{% endif %}
-
-                <p>Present this QR code at the registration counter to claim your badge.</p>
-              </div>
+              
 
               <!-- Extra Info -->
-              <p style="margin-top: 30px;"><strong>Plan Your Visit:</strong><br>
-                Explore exhibitors, connect with fellow attendees, and customize your schedule through the <em>Sari-Sari Events App</em>. A download link will be sent to your registered email.</p>
-
-              <p><strong>Need Assistance?</strong><br>
-                Reach out to our support team anytime for inquiries regarding your ticket or the event.</p>
-
-              <p>We look forward to welcoming you to <strong>{{ event.title }}</strong>!</p>
+              <p style="margin-top: 30px;">You can check your dashboard for full details.</p>
             </td>
           </tr>
           <!-- Footer -->
