@@ -73,13 +73,15 @@ class TransactionCreateView(generics.CreateAPIView):
             
             # Create Transaction
             # The 'event' key is also popped, so it won't be passed to create().
-            tx = Transaction.objects.create(**data)
+            # Create Transaction
+            tx = Transaction.objects.create(event=event, **data)
+
 
             # Create Attendees under this Transaction
             attendee_objs = []
             for att_data in attendees_data:
                 responses_data = att_data.pop("responses", [])
-                attendee_code = f"{tx.related_event.event_code}_{uuid.uuid4().hex[:8]}"
+                attendee_code = f"{tx.event.event_code}_{uuid.uuid4().hex[:8]}"
                 att = Attendee.objects.create(
                     attendee_code=attendee_code,
                     transaction=tx,
