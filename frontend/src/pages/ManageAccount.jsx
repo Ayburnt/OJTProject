@@ -4,7 +4,7 @@
   import { Link } from 'react-router-dom';
   import api from '../api';
   import useAuth from '../hooks/useAuth';
-
+  
   // Modal for success/error messages
   const MessageModal = ({ message, onClose }) => {
     return (
@@ -287,6 +287,31 @@
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization</label>
+                    <input
+                      type="text"
+                      value={userData.company_name || ''}
+                      onChange={(e) => setUserData({ ...userData, company_name: e.target.value })}
+                      disabled={!isEditing}
+                      className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
+                          ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                          : 'border-gray-200 bg-gray-50'
+                        } focus:outline-none`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization Email Address</label>
+                    <input
+                      type="text"
+                      value={userData.company_website || ''}
+                      onChange={(e) => setUserData({ ...userData, company_website: e.target.value })}
+                      disabled={!isEditing}
+                      className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
+                          ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                          : 'border-gray-200 bg-gray-50'
+                        } focus:outline-none`}
+                    />
+                  </div>
                   <div>
                     <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">First Name</label>
                     <input
@@ -313,7 +338,7 @@
                         } focus:outline-none`}
                     />
                   </div>
-                  <div className="sm:col-span-2">
+                    <div>
                     <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Email</label>
                     <input
                       type="email"
@@ -335,33 +360,6 @@
                         } focus:outline-none`}
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company</label>
-                    <input
-                      type="text"
-                      value={userData.company_name || ''}
-                      onChange={(e) => setUserData({ ...userData, company_name: e.target.value })}
-                      disabled={!isEditing}
-                      className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
-                          ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                          : 'border-gray-200 bg-gray-50'
-                        } focus:outline-none`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Company website</label>
-                    <input
-                      type="text"
-                      value={userData.company_website || ''}
-                      onChange={(e) => setUserData({ ...userData, company_website: e.target.value })}
-                      disabled={!isEditing}
-                      className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
-                          ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                          : 'border-gray-200 bg-gray-50'
-                        } focus:outline-none`}
-                    />
-                  </div>
-                </div>
               </div>
 
               {/* Notification Preferences */}
