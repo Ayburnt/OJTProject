@@ -20,7 +20,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView
-
+import requests
 
 
 # Import all necessary serializers
@@ -75,6 +75,46 @@ class UserRegistrationView(APIView):
     permission_classes = [] # No permissions needed for registration
 
     def post(self, request):
+        # ✅ 1. Get captcha token
+        captcha_token = request.data.get("captcha")
+        print("📌 Captcha token from frontend:", captcha_token)  # Debug
+
+        if not captcha_token:
+            return Response(
+                {"error": "Captcha token missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ 2. Verify with Google
+        secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
+        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
+
+        verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {"secret": secret_key, "response": captcha_token}
+
+        try:
+            r = requests.post(verify_url, data=payload)
+            result = r.json()
+            print("📌 Google verification result:", result)  # Debug
+
+            if not result.get("success"):
+                return Response(
+                    {
+                        "error": "Invalid reCAPTCHA. Please try again.",
+                        "details": result,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Error verifying reCAPTCHA: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+        data = request.data.copy()
+        if 'captcha' in data:
+            data.pop('captcha')
+        
         serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             try:
@@ -208,6 +248,46 @@ class GoogleAuthRegisterView(APIView):
     permission_classes = []
 
     def post(self, request):
+        # ✅ 1. Get captcha token
+        captcha_token = request.data.get("captcha")
+        print("📌 Captcha token from frontend:", captcha_token)  # Debug
+
+        if not captcha_token:
+            return Response(
+                {"error": "Captcha token missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ 2. Verify with Google
+        secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
+        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
+
+        verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {"secret": secret_key, "response": captcha_token}
+
+        try:
+            r = requests.post(verify_url, data=payload)
+            result = r.json()
+            print("📌 Google verification result:", result)  # Debug
+
+            if not result.get("success"):
+                return Response(
+                    {
+                        "error": "Invalid reCAPTCHA. Please try again.",
+                        "details": result,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Error verifying reCAPTCHA: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+        data = request.data.copy()
+        if 'captcha' in data:
+            data.pop('captcha')
+
         serializer = GoogleRegisterSerializer(data=request.data) # Use GoogleRegisterSerializer
         if serializer.is_valid():
             google_user_info = serializer.get_user_info()

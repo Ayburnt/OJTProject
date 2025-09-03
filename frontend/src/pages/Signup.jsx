@@ -6,6 +6,8 @@ import { HiOutlineIdentification } from "react-icons/hi";
 import { HiMail } from 'react-icons/hi';
 import { IoIosArrowBack } from "react-icons/io";
 import api, { ACCESS_TOKEN } from '../api.js';
+import { toast } from 'react-toastify';
+import ReCAPTCHA from "react-google-recaptcha";
 
 function Signup({ onAuthSuccess }) {
     useEffect(() => {
@@ -107,6 +109,7 @@ function Signup({ onAuthSuccess }) {
     const [isLoading, setIsLoading] = useState(false);
     const [message, setMessage] = useState("");
     const [roleMsg, setRoleMsg] = useState("");
+    const [captchaToken, setCaptchaToken] = useState(null);
 
     // New state for email specific error
     const [emailError, setEmailError] = useState("");
@@ -121,6 +124,11 @@ function Signup({ onAuthSuccess }) {
         setEmailError("");
         setMessage(""); // Clear general message
 
+        if (!captchaToken) {
+            toast.error("Please complete the captcha before submitting.");
+            return;
+        }
+
         if (!email || !password || !confirmPassword) {
             setStep2Err("Please fill in all fields.");
             return;
@@ -134,7 +142,10 @@ function Signup({ onAuthSuccess }) {
 
         try {
             // Step 1: Check if email exists
-            const emailCheckResponse = await api.post('/auth/email-check/', { email }); // Corrected endpoint
+            const emailCheckResponse = await api.post('/auth/email-check/', {
+                email: email,
+                captcha: captchaToken
+            }); // Corrected endpoint
             if (emailCheckResponse.data.exists) {
                 setEmailError("This email is already registered. Please use a different email or sign in.");
                 setIsLoading(false);
@@ -198,6 +209,7 @@ function Signup({ onAuthSuccess }) {
                     company_name: null,
                     company_website: null,
                     user_code: null,
+                    captcha: captchaToken,
                 });
 
                 const data = registrationResponse.data;
@@ -329,6 +341,7 @@ function Signup({ onAuthSuccess }) {
             window.google.accounts.id.initialize({
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Ensure this is correctly configured in your .env
                 callback: (response) => handleGoogleSignUp(response, selectedRoleRef.current),
+                captcha: captchaToken,
             });
 
             // Render the Google Sign-Up button directly
@@ -348,6 +361,11 @@ function Signup({ onAuthSuccess }) {
     // Modified handleGoogleSignUp to accept 'currentRole' from the ref
     const handleGoogleSignUp = async (response, currentRole) => {
 
+        if (!captchaToken) {
+            toast.error("Please complete the captcha before submitting.");
+            return;
+        }
+
         setIsLoading(true);
         setMessage('');
         try {
@@ -355,6 +373,7 @@ function Signup({ onAuthSuccess }) {
             const backendResponse = await api.post('/auth/google/register/', {
                 token: response.credential,
                 role: currentRole, // Use the currentRole passed from the ref
+                captcha: captchaToken
             });
 
             const data = backendResponse.data;
@@ -399,7 +418,7 @@ function Signup({ onAuthSuccess }) {
 
 
     return (
-        <div className="flex items-center justify-center md:py-10 bg-white md:bg-gray-100"> {/* Light background like in the image */}
+        <div className="flex items-center justify-center md:py-10 bg-white md:bg-gray-100 2xl:min-h-screen"> {/* Light background like in the image */}
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
@@ -488,16 +507,16 @@ function Signup({ onAuthSuccess }) {
                                 <input
                                     type="password" id="password" name="password"
                                     className={`w-full px-4 py-1 border rounded border-grey rounded outline-none focus:ring-2 ${password && password.length < 8 ? `border-red-500 focus:ring-red-500` : password && password.length >= 8
-                                            ? "border-secondary focus:ring-secondary" : `focus:ring-secondary`}`}
+                                        ? "border-secondary focus:ring-secondary" : `focus:ring-secondary`}`}
                                     value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-                                      {/* alert if password too short */}
-                                    {password && password.length < 8 && (
-                                        <p className="text-xs text-red-500 pl-1 mt-1">
+                                {/* alert if password too short */}
+                                {password && password.length < 8 && (
+                                    <p className="text-xs text-red-500 pl-1 mt-1">
                                         Password must be at minimum of 8 characters in length
-                                        </p>
-                                         )}
-                                   </div>
+                                    </p>
+                                )}
+                            </div>
 
                             <div className="mb-4 w-full">
                                 <label htmlFor="confirmPassword" className="block mb-2 pl-1 text-sm font-outfit font-medium leading-none">Confirm Password</label>
@@ -508,7 +527,7 @@ function Signup({ onAuthSuccess }) {
                                 {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
                             </div>
                             <button
-                              className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
                                 disabled={isLoading || password.length < 8 || password !== confirmPassword} // Disable button while loading
                             >
@@ -525,6 +544,13 @@ function Signup({ onAuthSuccess }) {
                             <div id="google-sign-up-button" className="flex justify-center">
                                 {/* Google button will appear here */}
                             </div>
+                        </div>
+
+                        <div className="flex justify-center my-4">
+                            <ReCAPTCHA
+                                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                                onChange={(token) => setCaptchaToken(token)}
+                            />
                         </div>
 
                         <p className="text-grey font-outfit mt-10 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
@@ -683,7 +709,7 @@ function Signup({ onAuthSuccess }) {
 
                         <div className="flex flex-row items-start mb-4 w-[80%]">
                             <input
-                              required
+                                required
                                 type="checkbox" id="authorized" className="mr-2 h-4 w-4"
                                 checked={authorized} onChange={(e) => setAuthorized(e.target.checked)} />
                             <p className="font-outfit text-sm">
@@ -693,7 +719,7 @@ function Signup({ onAuthSuccess }) {
 
                         <div className="flex flex-row items-start mb-4 w-[80%]">
                             <input
-                              required
+                                required
                                 type="checkbox" id="agree" className="mr-2 h-4 w-4"
                                 checked={agree} onChange={(e) => setAgree(e.target.checked)} />
                             <p className="font-outfit text-sm">
