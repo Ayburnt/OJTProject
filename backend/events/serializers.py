@@ -51,9 +51,25 @@ class TicketTypeSerializer(serializers.ModelSerializer):
         
         
 class userserializer(serializers.ModelSerializer):
+    org_logo = serializers.SerializerMethodField()
+    qr_code_image = serializers.SerializerMethodField()
     class Meta:
         model= CustomUser
-        fields = ["first_name", "last_name", "email", "profile_picture", "company_name", "company_website", "user_code", "qr_code_image", "verification_status"] 
+        fields = ["first_name", "last_name", "email", "profile_picture", "org_logo", "company_name", "company_website", "user_code", "qr_code_image", "verification_status"] 
+    
+    def get_org_logo(self, obj):
+        request = self.context.get("request")
+        if obj.org_logo:
+            url = obj.org_logo.url
+            return request.build_absolute_uri(url) if request else url
+        return None
+
+    def get_qr_code_image(self, obj):
+        request = self.context.get("request")
+        if obj.qr_code_image:
+            url = obj.qr_code_image.url
+            return request.build_absolute_uri(url) if request else url
+        return None
 
 
 class EventSerializer(serializers.ModelSerializer):

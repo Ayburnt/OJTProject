@@ -7,7 +7,7 @@ import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 import api from '../api.js'
 
 function OrganizerDashboard() {  
-  const { isLoggedIn, userCode, userFirstName, userProfile } = useAuth();
+  const { isLoggedIn, userCode, userFirstName, userProfile, orgLogo } = useAuth();
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -109,7 +109,7 @@ function OrganizerDashboard() {
 
           {isLoggedIn ? (
             <>
-              {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 lg:w-10 lg:h-10 hidden md:flex aspect-square rounded-full object-cover" />}
+              {orgLogo && <img src={orgLogo} alt="User Profile" className="h-8 w-8 lg:w-10 lg:h-10 hidden md:flex aspect-square rounded-full object-cover" />}
             </>
           ) : (
             <CgProfile className='hidden md:flex text-[2rem]' />

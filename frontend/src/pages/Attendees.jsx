@@ -15,7 +15,7 @@ import api from "../api";
 const Attendees = () => {
   const { userCode } = useParams();
   const fileInputRef = useRef(null);
-  const { userProfile } = useAuth();
+  const { orgLogo } = useAuth();
 
   // --- States ---
   const [events, setEvents] = useState([]);
@@ -159,7 +159,7 @@ const Attendees = () => {
 
       <div className="md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
         <div className="flex justify-end w-full mb-6">
-          <img src={userProfile} className="hidden rounded-full md:flex w-[2.5rem] mr-10" alt="" />
+          <img src={orgLogo} className="hidden rounded-full md:flex w-[2.5rem] mr-10" alt="" />
         </div>
 
         {!currentEvent ? (

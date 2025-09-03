@@ -10,7 +10,7 @@ const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { userCode } = useAuth();
+  const { userCode, orgLogo } = useAuth();
 
   const fetchEventDetails = async () => {
     try {
@@ -93,6 +93,9 @@ const OrganizerEvent = () => {
 
       <div className="pt-23 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
         {/* Header */}
+        <div className="flex justify-end w-full">
+          <img src={orgLogo} className="hidden rounded-full md:flex w-[2.5rem] mr-10" alt="" />
+        </div>
         <div className="justify-center mb-5 hidden md:flex">
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-light font-outfit text-gray-800">
             Event Overview

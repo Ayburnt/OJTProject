@@ -62,13 +62,13 @@ class OrganizerProfilePublicView(APIView):
         )
 
         # Step 3: Serialize user + events
-        user_data = userserializer(user).data
+        user_data = userserializer(user, context={"request": request}).data
         event_data = EventSerializer(events, many=True, context={"request": request}).data
 
         return Response(
             {
                 "organizer": user_data,
-                "events": event_data
+                "events": event_data,
             },
             status=status.HTTP_200_OK
         )

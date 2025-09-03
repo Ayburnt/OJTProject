@@ -177,7 +177,7 @@ const ManageAccount = () => {
               <div className="flex space-x-4 items-center">
                 <div className="relative w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
                   <img
-                    src={userData.profile_picture}
+                    src={userData.org_logo}
                     className="rounded-full border-2 border-gray-500 w-full h-full object-cover"
                     alt="Profile"
                   />
@@ -199,9 +199,9 @@ const ManageAccount = () => {
                 </div>
                 <div>
                   <h4 className="font-semibold font-outfit text-gray-800 text-3xl">
-                    {userData.first_name} {userData.last_name}
+                    {userData.company_name}
                   </h4>
-                  <p className="text-lg font-outfit text-gray-500">Event Organizer</p>
+                  <p className="text-lg font-outfit text-gray-500">{userData.first_name} {userData.last_name}</p>
                 </div>
               </div>
             </div>

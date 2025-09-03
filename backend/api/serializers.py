@@ -229,6 +229,7 @@ class UserSerializer(serializers.ModelSerializer):
             'profile_picture',
             'role',
             'phone_number',
+            'org_logo',
             'birthday',
             'gender',
             'company_name',

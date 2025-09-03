@@ -20,6 +20,7 @@ function Signup({ onAuthSuccess }) {
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
         localStorage.setItem('userEmail', userData.email);
+        localStorage.setItem('orgLogo', userData.org_logo);
 
         // Store other user data received from backend
         localStorage.setItem('userFirstName', userData.first_name || '');
@@ -110,6 +111,7 @@ function Signup({ onAuthSuccess }) {
     const [message, setMessage] = useState("");
     const [roleMsg, setRoleMsg] = useState("");
     const [captchaToken, setCaptchaToken] = useState(null);
+    const recaptchaRef = useRef();
 
     // New state for email specific error
     const [emailError, setEmailError] = useState("");
@@ -125,9 +127,10 @@ function Signup({ onAuthSuccess }) {
         setMessage(""); // Clear general message
 
         if (!captchaToken) {
-            toast.error("Please complete the captcha before submitting.");
-            return;
-        }
+        toast.error("Please complete the captcha before submitting.");
+        recaptchaRef.current.reset(); // Reset the captcha here
+        return;
+    }
 
         if (!email || !password || !confirmPassword) {
             setStep2Err("Please fill in all fields.");
@@ -157,6 +160,7 @@ function Signup({ onAuthSuccess }) {
             if (otpSendResponse.status === 200) {
                 setMessage("");
                 setStep(3); // Proceed to OTP verification step
+                recaptchaRef.current.reset();
             } else {
                 setMessage(otpSendResponse.data.detail || "Failed to send verification code. Please try again.");
             }
@@ -274,6 +278,7 @@ function Signup({ onAuthSuccess }) {
                 localStorage.setItem('userRole', data.user.role); // Ensure role is consistent
                 localStorage.setItem('isLoggedIn', true);
                 localStorage.setItem('userCode', data.user.user_code);
+                localStorage.setItem('orgLogo', data.org_logo);
 
                 // Final redirect after profile completion
                 const userCodePath = data.user.user_code;
@@ -356,15 +361,17 @@ function Signup({ onAuthSuccess }) {
                 console.error("Google Sign-Up button container not found!");
             }
         }
-    }, [googleScriptLoaded, step]); // Re-run when script loads or step changes
+
+        if (captchaToken === null && googleGsiInitialized.current) {
+            googleGsiInitialized.current = false; // Reset the flag so it can re-initialize
+            console.log("Captcha token reset, GSI initialization flag cleared.");
+        }
+    }, [googleScriptLoaded, step, captchaToken]); // Re-run when script loads or step changes
 
     // Modified handleGoogleSignUp to accept 'currentRole' from the ref
     const handleGoogleSignUp = async (response, currentRole) => {
 
-        if (!captchaToken) {
-            toast.error("Please complete the captcha before submitting.");
-            return;
-        }
+        
 
         setIsLoading(true);
         setMessage('');
@@ -548,6 +555,7 @@ function Signup({ onAuthSuccess }) {
 
                         <div className="flex justify-center my-4">
                             <ReCAPTCHA
+                                ref={recaptchaRef} 
                                 sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
                                 onChange={(token) => setCaptchaToken(token)}
                             />

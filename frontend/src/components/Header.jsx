@@ -13,10 +13,11 @@ function Header() {
     isLoggedIn,
     userRole,
     userLastName,
-    userFirstName,
-    userProfile,
+    userFirstName,    
     logout,
     userCode,
+    orgLogo,
+    verificationStatus,
   } = useAuth();
 
   const [isAccDD, setIsAccDD] = useState(false);
@@ -66,7 +67,7 @@ function Header() {
     const fetchOrganizers = async () => {
       try {
         const res = await api.get(`/organizers/`);
-        setAllOrganizers(res.data || []);
+        setAllOrganizers(res.data || []);        
       } catch (err) {
         console.error("API Fetch Error (organizers):", err);
         setAllOrganizers([]);
@@ -93,7 +94,8 @@ function Header() {
 
     // Filter organizers by company_name only
     const filteredOrganizers = (allOrganizers || []).filter((org) =>
-      org.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
+      org.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      org.email?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setOrganizerResults(filteredOrganizers);
 
@@ -191,7 +193,7 @@ function Header() {
                         }}
                       >
                         <img
-                          src={org.profile_picture || "/placeholder.png"}
+                          src={org.org_logo || "/placeholder.png"}
                           alt={org.company_name}
                           className="w-12 h-12 rounded-full object-cover"
                         />
@@ -247,9 +249,9 @@ function Header() {
           </button>
           {isLoggedIn ? (
             <>
-              {userProfile && (
+              {orgLogo && (
                 <img
-                  src={userProfile}
+                  src={orgLogo}
                   alt="User Profile"
                   className="h-8 w-8 rounded-full object-cover cursor-pointer"
                   onClick={() => setIsAccDD(!isAccDD)}
@@ -262,7 +264,7 @@ function Header() {
               >
                 <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
                   {userFirstName} {userLastName}
-                  {userProfile?.verification_status === "verified" && (
+                  {verificationStatus === "verified" && (
                     <FaCheckCircle className="text-green-400" />
                   )}
                 </p>

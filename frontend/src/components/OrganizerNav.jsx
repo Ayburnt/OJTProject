@@ -11,7 +11,7 @@ function OrganizerNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { isLoggedIn, userProfile, logout } = useAuth();
+  const { isLoggedIn, orgLogo, logout } = useAuth();
 
   let title;
 
@@ -79,7 +79,7 @@ function OrganizerNav() {
 
         {isLoggedIn ? (
           <>
-            {userProfile && <img src={userProfile} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
+            {orgLogo && <img src={orgLogo} alt="User Profile" className="h-8 w-8 rounded-full object-cover" />}
           </>
         ) : (
           <CgProfile className="text-4xl sm:text-5xl text-gray-600" />

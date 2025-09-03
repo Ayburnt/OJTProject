@@ -36,7 +36,7 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
       <div className="rounded-full overflow-hidden bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
-        <img src={profileData.profile_picture} alt="" className='w-full object-contain' />
+        <img src={profileData.org_logo} alt="" className='w-full object-contain' />
       </div>
       <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
         <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
@@ -288,8 +288,7 @@ const TimeLine = () => {
         return { ...ev, attendees };
       });
       setProfileData(organizer);
-      setEventData(events);
-      console.log(res.data)
+      setEventData(events);    
     } catch (err) {
       console.error("Error fetching event:", err);
     }

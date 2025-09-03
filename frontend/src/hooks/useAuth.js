@@ -21,6 +21,7 @@ export const useAuth = () => {
   const [userFirstName, setUserFirstName] = useState('');
   const [userLastName, setUserLastName] = useState('');
   const [userProfile, setUserProfile] = useState('');
+  const [orgLogo, setOrgLogo] = useState('');
   const [verificationStatus, setVerificationStatus] = useState('');
   const navigate = useNavigate();
 
@@ -34,6 +35,7 @@ export const useAuth = () => {
     const lastName = localStorage.getItem(USER_LAST_NAME);
     const profile = localStorage.getItem(USER_PROFILE);
     const verificationStatus = localStorage.getItem(IS_VERIFIED);
+    const orgLogo = localStorage.getItem('orgLogo');
 
     if (accessToken && refreshToken && role && email) {
       setIsLoggedIn(true);
@@ -44,6 +46,7 @@ export const useAuth = () => {
       setUserProfile(profile || '');
       setUserLastName(lastName || '');
       setVerificationStatus(verificationStatus || '');
+      setOrgLogo(orgLogo);
     } else {
       clearAuthData();
     }
@@ -60,6 +63,7 @@ export const useAuth = () => {
     localStorage.setItem(USER_PROFILE, user.profile_picture || '');
     localStorage.setItem(IS_LOGGED_IN, 'true');
     localStorage.setItem(IS_VERIFIED, user.verification_status || '');
+    localStorage.setItem('orgLogo', user.org_logo);
 
     setIsLoggedIn(true);
     setUserRole(user.role);
@@ -69,6 +73,7 @@ export const useAuth = () => {
     setUserLastName(user.last_name || '');
     setUserProfile(user.profile_picture || '');
     setVerificationStatus(user.verification_status || '');
+    setOrgLogo(user.org_logo);
   };
 
   const clearAuthData = () => {
@@ -82,6 +87,7 @@ export const useAuth = () => {
     setUserLastName('');
     setUserProfile('');
     setVerificationStatus('');
+    setOrgLogo('');
   };
 
   const login = (tokens, user) => {
@@ -110,6 +116,7 @@ export const useAuth = () => {
     userLastName,    
     userProfile,
     verificationStatus,
+    orgLogo,
     login,
     logout
   };
