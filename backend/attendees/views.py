@@ -223,6 +223,20 @@ class AttendeeDetailView(APIView):
         print("📦 Serialized data:", serializer.data)
         return Response(serializer.data)
 
+class TransactionDetailView(APIView):
+    def get(self, request, payment_ref):
+        print("🔍 Incoming request for payment_ref:", payment_ref)
+        try:
+            attendee = Attendee.objects.filter(transaction__payment_ref=payment_ref)
+            print("✅ Transaction object retrieved:", attendee)
+        except Attendee.DoesNotExist:
+            print("❌ Transaction not found:", payment_ref)
+            return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)            
+        
+        serializer = AttendeeSerializer(attendee, many=True, context={"request": request})
+        print("📦 Serialized data:", serializer.data)
+        return Response(serializer.data)
+
 
 class OrganizerEventsView(APIView):
     def get(self, request, userCode):

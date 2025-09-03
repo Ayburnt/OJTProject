@@ -8,6 +8,7 @@ from .views import (
     AttendeeDetailView,
     OrganizerEventsView,
     EventAttendanceView,
+    TransactionDetailView,
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path("check-in/", EventAttendanceView.as_view(), name="check-in"),
     path('<str:event_code>/', AttendeeListView.as_view(), name='attendee-list'),    
     path("booking-info/<str:attendee_code>/", AttendeeDetailView.as_view(), name="attendee-detail"),  # ✅ fixed
+    path("transaction-info/<str:payment_ref>/", TransactionDetailView.as_view(), name="transaction-detail"),  # ✅ fixed
 ]

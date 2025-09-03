@@ -28,6 +28,7 @@ import EditEvent from './pages/EditEvent.jsx';
 import BuyTicket from './pages/BuyTicket.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 import BookingConfirmation from './pages/BookingConfirmation.jsx';
+import TransactionConfirmation from './pages/TransactionConfirmation.jsx';
 
 import Q1 from './footer/Q1.jsx';
 import Q2 from './footer/Q2.jsx';
@@ -85,6 +86,7 @@ function App() {
     return (
       path.startsWith('/org/') || // Checks for paths like '/organizer/TAN07'
       path.startsWith('/attendee/') || // for booking confirmation dynamic route
+      path.startsWith('/transaction/') ||
       excludedPaths.includes(path)
     );
   };
@@ -136,6 +138,7 @@ function App() {
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
           <Route path="/attendees/:eventcode" element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
           <Route path="/attendee/:attendeeCode" element={<BookingConfirmation />} /> 
+          <Route path="/transaction/:transactCode" element={<TransactionConfirmation />} /> 
 
           <Route path="/q1" element={<Q1 />} />
           <Route path="/q2" element={<Q2 />} />

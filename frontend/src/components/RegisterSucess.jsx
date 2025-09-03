@@ -6,7 +6,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] font-outfit">
-      <div className="bg-white p-6 rounded-lg max-w-md w-full text-center shadow-lg">
+      <div className="bg-white p-6 rounded-lg max-w-md w-full text-center items-center flex flex-col shadow-lg">
         <h2 className="text-xl font-bold mb-4">Registration Complete 🎉</h2>
         <p className="mb-2">
           Thank you for registering! Keep your ticket links safe — you’ll need
@@ -14,7 +14,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
         </p>
         <p className="mb-4">Here are your ticket(s):</p>
 
-        <ul className="space-y-2 mb-4">
+        <ul className="grid grid-cols-2 space-y-3 w-3/4">
           {ticketLinks.map((link, idx) => {
             const cleanLink = link?.trim();
             console.log(`Ticket ${idx + 1} link:`, cleanLink);

@@ -34,8 +34,9 @@ class Transaction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        if not self.payment_ref:
-            self.payment_ref = uuid.uuid4().hex[:10].upper()
+        if not self.payment_ref:    
+            event_code = self.event.event_code if self.event else "NOEVENT"       
+            self.payment_ref = f"{event_code}_{uuid.uuid4().hex[:10].upper()}"
         super().save(*args, **kwargs)
 
     def __str__(self):

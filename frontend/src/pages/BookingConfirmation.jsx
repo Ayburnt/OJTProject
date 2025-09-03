@@ -51,7 +51,6 @@ export default function Ticket() {
         setEventDetails(res.data.event_details);
         setTicketType(res.data.ticket_read);
         setAttendanceDetails(res.data.attendance);
-        console.log(res.data)
       })
       .catch(err => console.error("Error fetching attendee:", err));
   }, [attendeeCode]);
@@ -167,11 +166,11 @@ export default function Ticket() {
         </div>
 
         {/* Main Content */}
-        <div className="flex flex-col lg:flex-row items-start justify-center gap-6 w-full max-w-6xl px-4 sm:px-0">
+        <div className="flex flex-col lg:flex-row items-start justify-center gap-6 w-full max-w-6xl px-4 pb-10">
           {/* Left Card: Event Banner */}
-          <div className="bg-white rounded-2xl shadow-lg w-full lg:w-1/3 p-4 sm:p-6">
-            <div className="w-full aspect-video sm:h-44 bg-gray-200 flex items-center justify-center object-cover rounded-lg mb-4">
-              <img src={eventDetails?.event_poster} className="w-full" alt="" />
+          <div className="bg-white rounded-2xl shadow-lg w-full lg:w-1/3 p-4 sm:p-6 lg:sticky md:top-4">
+            <div className="w-full aspect-video bg-gray-200 flex items-center justify-center rounded-lg mb-4 overflow-hidden">
+              <img src={eventDetails?.event_poster} className="w-full object-contain" alt="" />
             </div>
             <h2 className="text-lg sm:text-xl font-outfit font-semibold mb-2">{eventDetails?.title}</h2>
             <p className="text-gray-600 mb-4 font-outfit text-sm sm:text-base">
@@ -260,7 +259,7 @@ export default function Ticket() {
                 <h3 className="text-center font-outfit text-xl sm:text-2xl font-semibold mb-6">
                   Event Details
                 </h3>
-                <div className="space-y-6 sm:space-y-10 text-xs sm:text-sm">
+                <div className="space-y-3 md:space-y-4 text-xs sm:text-sm">
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium font-outfit text-gray-700">Date:</span>
                     <span>{formatEventDateRange(eventDetails?.start_date, eventDetails?.end_date)}</span>
@@ -284,10 +283,12 @@ export default function Ticket() {
                     <span>{attendee?.fullName}</span>
                   </div>
                   <div className="flex flex-col border-b pb-3">
-                    <span className="font-medium font-outfit">Price:</span>
-                    <div className="text-right">
+                    <div className="flex flex-row justify-between">
+                      <span className="font-medium font-outfit">Price:</span>
                       <p className="text-gray-500 text-xs font-outfit sm:text-sm">Standard</p>
-                      <p className="font-semibold">{ticketType?.price === 0 || ticketType?.price === '0.00' ? 'Free' : ticketType?.price}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-semibold text-lg">{ticketType?.price === 0 || ticketType?.price === '0.00' ? 'Free' : ticketType?.price}</p>
                     </div>
                   </div>
                   {/* Rules */}
@@ -313,93 +314,77 @@ export default function Ticket() {
         </div>
       </div>
 
-{/* Printing page layout (vertical ticket style) */}
-<div
-  ref={componentRef}
-  className="bg-white w-full hidden print:flex justify-start items-start p-4 font-outfit"
->
-  {/* Outer Dashed Border for Cut-out */}
-  <div className="p-6 border-2 border-dashed border-[#D9D9D9] rounded-xl inline-block">
-  
-    {/* Ticket Wrapper */}
-    <div className="w-[280px] border-2 border-[#D9D9D9] rounded-lg shadow-md overflow-hidden text-center font-outfit">
-      {/* Header: Poster + Logo */}
-      <div className="bg-Dark-grayish-blue p-3 flex justify-between items-center">
-        {/* Event Poster */}
-        <img
-          src={eventDetails?.event_poster}
-          alt="Event Poster"
-          className="w-28 h-16 object-cover rounded"
-        />
+      {/* Printing page layout (vertical ticket style) */}
+      {/* Printing page layout (vertical ticket style) */}
+            <div
+                ref={componentRef}
+                className="bg-white w-full p-[5px] hidden print:grid grid-cols-2 grid-rows-2 place-items-center space-y-2 font-outfit h-screen justify-center items-center"
+            >                
+                            {/* Outer Dashed Border for Cut-out */}
+                            <div className="w-[93%] border-2 border-dashed border-[#D9D9D9] rounded-xl">
 
-        {/* Logo Placeholder */}
-        <div className="w-12 h-12 flex items-center justify-center border rounded bg-white">
-          <img
-            src="https://placehold.co/48x48/png"
-            alt="Logo Placeholder"
-            className="w-8 h-8 object-contain"
-          />
-        </div>
-      </div>
+                                {/* Ticket Wrapper */}
+                                <div className="border-2 border-[#D9D9D9] rounded-lg shadow-md overflow-hidden text-center font-outfit w-full">
+                                    {/* Header: Poster + Logo */}
+                                    <div className="bg-Dark-grayish-blue p-1 flex justify-between items-center">
+                                        {/* Event Poster */}
+                                        <img
+                                            src={eventDetails?.event_poster}
+                                            alt="Event Poster"
+                                            className="w-20 aspect-video object-cover rounded"
+                                        />
 
-      {/* Event Title Bar */}
-      <div className="bg-Dark-grayish-blue text-white py-3 border-t border-dashed border-white">
-        <h2 className="text-sm font-outfit font-bold text-center">
-          {eventDetails?.title}
-        </h2>
-        <p className="text-[15px] font-outfit text-center">
-          {eventDetails?.category
-            ? eventDetails.category.charAt(0).toUpperCase() +
-              eventDetails.category.slice(1)
-            : ""}{" "}
-          1st PVHAI Golf Tournament
-        </p>
+                                        {/* Logo Placeholder */}
+                                        <div className="w-10 h-10 flex items-center justify-center border rounded bg-white">
+                                            <img
+                                                src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909"
+                                                alt="Logo Placeholder"
+                                                className="w-8 h-8 object-contain"
+                                            />
+                                        </div>
+                                    </div>
 
-        {/* Broken Line Separator */}
-        <div className="border-t border-dashed border-white my-2 w-full"></div>
-      </div>
+                                    {/* Event Title Bar */}
+                                    <div className="bg-Dark-grayish-blue text-white py-1 border-t border-dashed border-white">
+                                        <h2 className="text-[13px] font-outfit font-bold text-center leading-none mt-3">
+                                            {eventDetails?.title}
+                                        </h2>
+                                        <p className="text-[9px] font-outfit text-center leading-none mb-3">
+                                            {eventDetails?.category
+                                                ? eventDetails.category.charAt(0).toUpperCase() +
+                                                eventDetails.category.slice(1)
+                                                : ""} {"Event"}
+                                        </p>
 
-      {/* QR Code */}
-      <div className="flex flex-col items-center p-4">
-        <div className="w-40 h-40 bg-gray-100 flex items-center justify-center">
-          <img
-            src={attendee?.ticket_qr_image}
-            alt="QR Code"
-            className="w-full"
-          />
-        </div>
-        <p className="text-[10px] text-gray-500 mt-2">
-          {attendee?.attendee_code}
-        </p>
-        <p className="text-[10px] text-gray-900 mt-1">
-          {formatPurchaseDate(attendee?.created_at)}
-        </p>
-      </div>
+                                        {/* Broken Line Separator */}
+                                        <div className="border-t border-dashed border-white w-full"></div>
+                                    </div>
 
-      {/* Attendee Details */}
-      <div className="px-4">
-        <p className="font-semibold font-outfit text-gray-800">
-          {attendee?.fullName}
-        </p>
-        <p className="text-[50px] text-gray-500">
-          {ticketType?.ticket_name} Access
-        </p>
-      </div>
+                                    {/* QR Code */}
+                                    <div className="flex flex-col items-center p-4">
+                                        <div className="w-[50%] aspect-square bg-gray-100 flex items-center justify-center">
+                                            <img
+                                                src={attendee?.ticket_qr_image}y
+                                                alt="QR Code"
+                                                className="w-full"
+                                            />
+                                        </div>
+                                        <p className="text-[9px] text-gray-500 leading-none">
+                                            {attendee?.attendee_code}
+                                        </p>
+                                        <p className="font-semibold font-outfit text-gray-800 text-[13px]">
+                                            {attendee?.fullName}
+                                        </p>     
+                                    </div>
 
-      {/* Footer (same as top color) */}
-      <div className="bg-Dark-grayish-blue font-outfit text-white text-[20px] py-2 mt-3">
-        <p>{eventDetails?.sub_event || "Event Category Here"}</p>
-      </div>
-    </div>
-  </div>
+                                    {/* Footer (same as top color) */}
+                                    <div className="bg-Dark-grayish-blue font-semibold font-outfit text-white text-[15px] py-1">
+                                        <p>{attendee?.ticket_read.ticket_name}</p>
+                                    </div>
+                                </div>
+                            </div>                        
 
-  {/* Footer: QR Data Link */}
-  <div className="mt-2 text-xs text-gray-500">
-    <Link to={`/attendee/${attendee?.attendee_code}`} target="_blank">
-      {attendee?.ticket_qr_data}
-    </Link>
-  </div>
-</div>
+            </div>
 
 
     </>
