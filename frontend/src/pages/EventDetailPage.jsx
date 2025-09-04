@@ -200,102 +200,232 @@ function EventDetailPage() {
 
     return (
         <div className="bg-gray-100 min-h-screen">
+            {/* Poster Lightbox */}
             {isPosterOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer" onClick={() => setIsPosterOpen(false)}>
-                    <div className='w-[90%]'>
-                        <img src={eventDetails.event_poster} className='rounded-2xl'  alt="" />
-                    </div>                    
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 cursor-pointer"
+                    onClick={() => setIsPosterOpen(false)}
+                >
+                    <div className="w-[90%]">
+                        <img
+                            src={eventDetails.event_poster}
+                            className="rounded-2xl"
+                            alt=""
+                        />
+                    </div>
                 </div>
             )}
 
-            {/* Banner */}
-            <section className="relative w-full h-[400px] md:h-[550px] lg:h-[650px] overflow-hidden cursor-pointer" onClick={() => setIsPosterOpen(true)}>
-                <img
-                    src={eventDetails.event_poster}
-                    alt={eventDetails.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                />
-            </section>
+            {/* Main Grid Layout */}
+            <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left Section (Poster + Nav + Description + Tickets) */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Poster */}
+                    <div
+                        className="relative w-full h-64 sm:h-80 md:h-[400px] overflow-hidden rounded-2xl cursor-pointer"
+                        onClick={() => setIsPosterOpen(true)}
+                    >
+                        <img
+                            src={eventDetails.event_poster}
+                            alt={eventDetails.title}
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
 
-            <div className="relative z-10 -mt-40 md:-mt-56 lg:-mt-80 container mx-auto px-4">
-                <div className="flex flex-col lg:flex-row lg:gap-8">
-                    {/* Sidebar */}
-                    <div className="lg:w-1/3 order-first lg:order-last mb-8 lg:mb-0">
-                        <div className="bg-white rounded-lg shadow-xl p-6 md:p-8 sticky lg:top-28 space-y-6">
-                            {/* Title */}
-                            <h1 className="text-2xl md:text-3xl font-extrabold text-gray-800 leading-tight text-center mb-5">
-                                {eventDetails.title}
-                            </h1>
+                    {/* Navigation Tabs */}
+                    <div className="bg-white rounded-lg shadow-md">
+                        <nav className="flex justify-around items-center py-3 px-4">
+                            <a
+                                href="#description-section"
+                                className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                            >
+                                Description
+                            </a>
+                            <a
+                                href="#tickets-section"
+                                className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                            >
+                                Tickets
+                            </a>
+                        </nav>
+                    </div>
 
-                            {/* Organizer */}
-                            <div>
-                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Organized by</h3>
-                                <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate(`/org/${eventDetails.created_by.user_code}`)}>
-                                    <FaRegUser className="text-teal-600 text-lg" />
-                                    <span className="text-gray-800 font-medium">
-                                        {eventDetails.created_by.company_name}
-                                    </span>
+                    {/* Description Section */}
+                    <div
+                        id="description-section"
+                         className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8" >
+                        <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
+                            Description
+                        </h2>
+                        <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                            {eventDetails.description}
+                        </p>
+                    </div>
+
+                    {/* Tickets Section */}
+                    <div
+                        id="tickets-section"
+                       className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
+                         <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200 flex items-center">
+                            <FaCheckSquare className="text-teal-600 mr-2" />
+                            Tickets
+                        </h2>
+
+                        {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 ? (
+                            <div className="space-y-4">
+                                {eventDetails.ticket_types.map((ticket, index) => (
+                                    <div
+                                        key={index}
+                                        className="bg-gray-50 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm"
+                                    >
+                                        <div className="mb-2 md:mb-0">
+                                            <h4 className="text-lg font-semibold text-gray-800">
+                                                {ticket.ticket_name}
+                                            </h4>
+                                            <p className="text-sm text-gray-500">
+                                                Available: {ticket.quantity_available}
+                                            </p>
+                                        </div>
+                                        <span className="text-2xl font-bold text-orange-600">
+                                            {Number(ticket.price) === 0 ? 'Free' : `$${Number(ticket.price).toFixed(2)}`}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-gray-600">
+                                No tickets available at this time.
+                            </p>
+                        )}
+
+                        {/* Registration Confirmation / Button */}
+                        {isRegistered ? (
+                            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+                                <p className="text-lg text-green-600 font-semibold flex items-center justify-center">
+                                    <FaCheckCircle className="mr-2 text-xl" /> You are now
+                                    registered!
+                                </p>
+                                <p className="text-gray-600 mt-2">
+                                    Check your email for confirmation.
+                                </p>
+                            </div>
+                        ) : (
+                            <>
+                                {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 &&
+                                    eventDetails.ticket_types[0].is_selling === false ? (
+                                    <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
+                                ) : eventDetails.ticket_types.some(ticket => ticket.quantity_available === 0 || ticket.quantity_available === '0') ? (
+                                    <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Sold out</p>
+                                ) : (
+                                    <div className="mt-8 pt-6 border-t border-gray-200">
+                                        <label className="flex items-start cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                className="form-checkbox h-5 w-5 text-teal-600 rounded focus:ring-teal-500 mt-1"
+                                                checked={agreeToTerms}
+                                                onChange={(e) => setAgreeToTerms(e.target.checked)}
+                                            />
+                                            <span className="ml-3 text-sm text-gray-700 leading-relaxed">
+                                                By checking this box, I hereby agree that my information will be shared to our Event Organizer.
+                                            </span>
+                                        </label>
+                                    </div>
+                                )}
+
+                                <div className="mt-6">
+                                    <button
+                                        className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${agreeToTerms
+                                            ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
+                                            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                            }`}
+                                        disabled={!agreeToTerms || (eventDetails.ticket_types && eventDetails.ticket_types.length > 0 && eventDetails.ticket_types[0].is_selling === false)}
+                                        onClick={() => navigate(`/events/${eventDetails.event_code}/checkout`)}
+                                    >
+                                        Register
+                                    </button>
                                 </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right Sidebar */}
+                <div className="space-y-6">
+                    <div className="bg-white rounded-lg shadow-md p-6 sticky top-24 space-y-6">
+                        {/* Title */}
+                        <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">
+                            {eventDetails.title}
+                        </h1>
+
+                        {/* Organizer */}
+                        <div>
+                            <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
+                                Organized by
+                            </h3>
+                            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => navigate(`/org/${eventDetails.created_by.user_code}`)}>
+                                <FaRegUser className="text-teal-600 text-lg" />
+                                <span className="text-gray-800 font-medium">
+                                    {eventDetails.created_by.company_name}
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Date & Time */}
+                        <div>
+                            <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
+                                Date & Time
+                            </h3>
+                            <div className="flex items-start space-x-3">
+                                <FaCalendarAlt className="text-teal-600 text-lg mt-1" />
+                                <span className="text-gray-700">
+                                    {formatEventDateTime(eventDetails.start_date, eventDetails.start_time, eventDetails.end_date, eventDetails.end_time)}
+                                </span>
                             </div>
 
-                            {/* Date & Time */}
-                            <div>
-                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Date & Time</h3>
-                                <div className="flex items-start space-x-3">
-                                    <FaCalendarAlt className="text-teal-600 text-lg mt-1" />
-                                    <span className="text-gray-700">
-                                        {formatEventDateTime(eventDetails.start_date, eventDetails.start_time, eventDetails.end_date, eventDetails.end_time)}
-                                    </span>
-
+                            {/* Location / Virtual */}
+                            {eventDetails.event_type !== 'virtual' ? (
+                                <div>
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
+                                        Location
+                                    </h3>
+                                    <div className="flex items-start space-x-2">
+                                        <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
+                                        <span className="text-gray-700">
+                                            {eventDetails.venue_specific !== null && eventDetails.venue_specific !== '' ? eventDetails.venue_specific + ', ' : ''}{eventDetails.venue_address}
+                                        </span>
+                                    </div>
+                                    <div className="mt-3">
+                                        <iframe
+                                            className="rounded-xl shadow-md w-full h-64"
+                                            loading="lazy"
+                                            allowFullScreen
+                                            src={`https://www.google.com/maps?q=${encodeURIComponent(
+                                                eventDetails.venue_address
+                                            )}&output=embed`}
+                                        ></iframe>
+                                    </div>
                                 </div>
-                            </div>
-                            {eventDetails.event_type !== 'virtual' ? (                                
-                            <div>
-                                {/* Location */}
-                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Location</h3>
-
-                                {/* Venue Details */}
-                                <div className="flex items-start space-x-3">
-                                    <FaMapMarkerAlt className="text-teal-600 text-lg mt-1" />
-                                    <span className="text-gray-700">
-                                        {eventDetails.venue_specific !== null && eventDetails.venue_specific !== '' ? eventDetails.venue_specific + ', ' : ''}{eventDetails.venue_address}
-                                    </span>
+                            ) : (
+                                <div>
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
+                                        Virtual
+                                    </h3>
+                                    <div className="flex items-start space-x-2">
+                                        <FaLaptop className="text-teal-600 text-lg mt-1" />
+                                        <span className="text-gray-700">
+                                            {eventDetails.meeting_platform}
+                                        </span>
+                                    </div>
                                 </div>
-
-                                {/* Map Preview */}
-                                <div className="mt-3">
-                                    <iframe
-                                        className="rounded-xl shadow-md w-full h-64"
-                                        loading="lazy"
-                                        allowFullScreen
-                                        src={`https://www.google.com/maps?q=${encodeURIComponent(
-                                            eventDetails.venue_address
-                                        )}&output=embed`}
-                                    ></iframe>
-                                </div>
-                            </div>
-                            ):(
-                            <div>
-                                {/* Meeting */}
-                                <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Virtual</h3>
-
-                                {/* Venue Details */}
-                                <div className="flex items-start space-x-3">
-                                    <FaLaptop className="text-teal-600 text-lg mt-1" />
-                                    <span className="text-gray-700">
-                                        {eventDetails.meeting_platform}
-                                    </span>
-                                </div>
-                            </div>
-                            )}                            
+                            )}
 
                             {/* Age Restriction */}
                             {eventDetails.age_restriction && (
                                 <div>
-                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
                                         Age Restriction
                                     </h3>
-                                    <div className="flex items-center space-x-3">
+                                    <div className="flex items-center space-x-2">
                                         <FaUserLock className="text-teal-600 text-lg" />
                                         <span className="text-gray-800">
                                             {formatAgeRestriction(eventDetails.age_restriction, eventDetails.age_allowed)}
@@ -304,11 +434,13 @@ function EventDetailPage() {
                                 </div>
                             )}
 
-                            {/* Parking (only if NOT virtual) */}
+                            {/* Parking */}
                             {eventDetails.parking && eventDetails.event_type?.toLowerCase() !== "virtual" && (
                                 <div>
-                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-2">Parking</h3>
-                                    <div className="flex items-center space-x-3">
+                                    <h3 className="text-sm uppercase text-gray-500 font-semibold mb-1">
+                                        Parking
+                                    </h3>
+                                    <div className="flex items-center space-x-2">
                                         <FaCar className="text-teal-600 text-lg" />
                                         <span className="text-gray-800">{eventDetails.parking}</span>
                                     </div>
@@ -330,133 +462,22 @@ function EventDetailPage() {
                             </div>
                         </div>
                     </div>
-
-                    {/* Main Content */}
-                    <div className="lg:w-2/3">
-                        {/* Nav */}
-                        <div className="sticky top-20 bg-white shadow-md rounded-lg mb-8 z-20 overflow-hidden">
-                            <nav className="flex justify-around items-center border-b border-gray-200 py-3 px-4">
-                                <a
-                                    href="#description-section"
-                                    className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
-                                >
-                                    Description
-                                </a>
-                                <a
-                                    href="#tickets-section"
-                                    className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
-                                >
-                                    Tickets
-                                </a>
-                            </nav>
-                        </div>
-
-                        {/* Description */}
-                        <div id="description-section" className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8"
-                        >
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
-                                Description
-                            </h2>
-                            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                                {eventDetails.description}
-                            </p>
-                        </div>
-
-                        {/* Tickets */}
-                        <div id="tickets-section" className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
-                            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200 flex items-center">
-                                <FaCheckSquare className="text-teal-600 mr-3" />
-                                Tickets
-                            </h2>
-                            {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 ? (
-                                <div className="space-y-4">
-                                    {eventDetails.ticket_types.map((ticket, index) => (
-                                        <div
-                                            key={index}
-                                            className="bg-gray-50 rounded-lg p-4 flex flex-col md:flex-row justify-between items-start md:items-center shadow-sm"
-                                        >
-                                            <div className="mb-2 md:mb-0">
-                                                <h4 className="text-lg font-semibold text-gray-800">{ticket.ticket_name}</h4>
-                                                <p className="text-sm text-gray-500">
-                                                    Available: {ticket.quantity_available}
-                                                </p>
-                                            </div>
-                                            <span className="text-2xl font-bold text-orange-600">
-                                                {Number(ticket.price) === 0 ? 'Free' : `$${Number(ticket.price).toFixed(2)}`}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-center text-gray-600">
-                                    No tickets available at this time.
-                                </p>
-                            )}
-
-
-                            {/* Registration confirmation/button */}
-                            {isRegistered ? (
-                                <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-                                    <p className="text-lg text-green-600 font-semibold flex items-center justify-center">
-                                        <FaCheckCircle className="mr-2 text-xl" /> You are now registered!
-                                    </p>
-                                    <p className="text-gray-600 mt-2">Check your email for confirmation.</p>
-                                </div>
-                            ) : (
-                                <>
-                                    {eventDetails.ticket_types && eventDetails.ticket_types.length > 0 &&
-                                        eventDetails.ticket_types[0].is_selling === false ? (
-                                        <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Ticket selling will open soon</p>
-                                    ) : eventDetails.ticket_types.some(ticket => ticket.quantity_available === 0 || ticket.quantity_available === '0') ? (
-                                        <p className='font-outfit mt-4 text-gray-400 w-full text-center'>Sold out</p>
-                                    ) :(
-                                        <div className="mt-8 pt-6 border-t border-gray-200">
-                                            <label className="flex items-start cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-checkbox h-5 w-5 text-teal-600 rounded focus:ring-teal-500 mt-1"
-                                                    checked={agreeToTerms}
-                                                    onChange={(e) => setAgreeToTerms(e.target.checked)}
-                                                />
-                                                <span className="ml-3 text-sm text-gray-700 leading-relaxed">
-                                                    By checking this box, I hereby agree that my information will be shared to our Event Organizer.
-                                                </span>
-                                            </label>
-                                        </div>
-                                    )
-                                    }
-
-                                    {/* Register Button */}
-                                    <div className="mt-6">
-                                        <button
-                                            className={`w-full py-4 rounded-full text-xl font-bold transition-all duration-200 shadow-lg ${agreeToTerms
-                                                ? "bg-orange-500 hover:bg-orange-600 text-white cursor-pointer"
-                                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                                }`}
-                                            disabled={!agreeToTerms || (eventDetails.ticket_types && eventDetails.ticket_types.length > 0 && eventDetails.ticket_types[0].is_selling === false)}
-                                            onClick={() => navigate(`/events/${eventDetails.event_code}/checkout`)}
-                                        >
-                                            Register
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
                 </div>
-            </div>
 
-            {/* Share Modal */}
-            <ShareModal
-                isOpen={isShareOpen}
-                onClose={() => setIsShareOpen(false)}
-                shareUrl={shareUrl}
-                qrUrl={qrUrl}
-                title={eventDetails.title}
-            />
-            <div className="mb-20"></div>
-        </div>
-    );
+                {/* Share Modal */}
+                <ShareModal
+                    isOpen={isShareOpen}
+                    onClose={() => setIsShareOpen(false)}
+                    shareUrl={shareUrl}
+                    qrUrl={qrUrl}
+                    title={eventDetails.title}
+                />
+
+                <div className="mb-20"></div>
+            </div>
+            </div>
+            );
+
 }
 
-export default EventDetailPage;
+            export default EventDetailPage;
