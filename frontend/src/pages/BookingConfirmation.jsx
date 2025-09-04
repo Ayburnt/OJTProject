@@ -318,7 +318,7 @@ export default function Ticket() {
       {/* Printing page layout (vertical ticket style) */}
             <div
                 ref={componentRef}
-                className="bg-white w-full p-[5px] hidden print:grid grid-cols-2 grid-rows-2 place-items-center space-y-2 font-outfit h-screen justify-center items-center"
+                className="bg-white w-full h-[29.7cm] p-[5px] hidden print:grid grid-cols-2 grid-rows-2 place-items-center space-y-2 font-outfit h-screen justify-center items-center"
             >                
                             {/* Outer Dashed Border for Cut-out */}
                             <div className="w-[93%] border-2 border-dashed border-[#D9D9D9] rounded-xl">
@@ -326,30 +326,30 @@ export default function Ticket() {
                                 {/* Ticket Wrapper */}
                                 <div className="border-2 border-[#D9D9D9] rounded-lg shadow-md overflow-hidden text-center font-outfit w-full">
                                     {/* Header: Poster + Logo */}
-                                    <div className="bg-Dark-grayish-blue p-1 flex justify-between items-center">
+                                    <div className="bg-Dark-grayish-blue p-3 flex justify-between items-center">
                                         {/* Event Poster */}
                                         <img
                                             src={eventDetails?.event_poster}
                                             alt="Event Poster"
-                                            className="w-20 aspect-video object-cover rounded"
+                                            className="w-[40%] aspect-video object-cover rounded"
                                         />
 
                                         {/* Logo Placeholder */}
-                                        <div className="w-10 h-10 flex items-center justify-center border rounded bg-white">
+                                        <div className="w-[20%] aspect-square flex items-center justify-center border rounded bg-white">
                                             <img
                                                 src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909"
                                                 alt="Logo Placeholder"
-                                                className="w-8 h-8 object-contain"
+                                                className="w-full object-contain"
                                             />
                                         </div>
                                     </div>
 
                                     {/* Event Title Bar */}
-                                    <div className="bg-Dark-grayish-blue text-white py-1 border-t border-dashed border-white">
-                                        <h2 className="text-[13px] font-outfit font-bold text-center leading-none mt-3">
+                                    <div className="bg-Dark-grayish-blue text-white py-1 border-t items-center flex flex-col border-dashed border-white">
+                                        <h2 className="text-2xl font-outfit font-bold w-[95%] text-center leading-none mt-2">
                                             {eventDetails?.title}
                                         </h2>
-                                        <p className="text-[9px] font-outfit text-center leading-none mb-3">
+                                        <p className="text-sm font-outfit text-center leading-none mb-3">
                                             {eventDetails?.category
                                                 ? eventDetails.category.charAt(0).toUpperCase() +
                                                 eventDetails.category.slice(1)
@@ -357,7 +357,7 @@ export default function Ticket() {
                                         </p>
 
                                         {/* Broken Line Separator */}
-                                        <div className="border-t border-dashed border-white w-full"></div>
+                                        <div className="border-t border-dashed border-white w-full mb-3"></div>
                                     </div>
 
                                     {/* QR Code */}
@@ -369,16 +369,16 @@ export default function Ticket() {
                                                 className="w-full"
                                             />
                                         </div>
-                                        <p className="text-[9px] text-gray-500 leading-none">
+                                        <p className="text-sm text-gray-500 leading-none">
                                             {attendee?.attendee_code}
                                         </p>
-                                        <p className="font-semibold font-outfit text-gray-800 text-[13px]">
+                                        <p className="font-semibold font-outfit text-gray-800 text-2xl">
                                             {attendee?.fullName}
                                         </p>     
                                     </div>
 
                                     {/* Footer (same as top color) */}
-                                    <div className="bg-Dark-grayish-blue font-semibold font-outfit text-white text-[15px] py-1">
+                                    <div className="bg-Dark-grayish-blue font-semibold font-outfit text-white text-xl py-3">
                                         <p>{attendee?.ticket_read.ticket_name}</p>
                                     </div>
                                 </div>
