@@ -65,6 +65,7 @@ function CEStep2({
             name="start_date"
             value={formData.start_date}
             onChange={handleEventChange}
+            required
           />
 
           {formData.duration_type === 'multiple' && (
@@ -74,6 +75,7 @@ function CEStep2({
               name="end_date"
               value={formData.end_date}
               onChange={handleEventChange}
+              required
             />
           )}
 
@@ -92,24 +94,27 @@ function CEStep2({
                 maxLength={2}
                 min={1}
                 max={12}
+                required
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <span>:</span>
               <input
                 type="number"
                 name="startMinute"
-                value={formData.startMinute}
+                value={formData.startMinute || "00" }
                 onChange={(e) => handleTimeChange("start", "minute", e.target.value)}
                 placeholder="00"
                 maxLength={2}
                 min={0}
                 max={59}
+                required
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <div className="flex space-x-2">
                 <button
                   type="button"
                   onClick={() => handleTimeChange("start", "period", "AM")}
+                  required
                   className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.startPeriod === "AM"
                       ? "bg-teal-500 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -120,6 +125,7 @@ function CEStep2({
                 <button
                   type="button"
                   onClick={() => handleTimeChange("start", "period", "PM")}
+                  required
                   className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.startPeriod === "PM"
                       ? "bg-teal-500 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -144,24 +150,26 @@ function CEStep2({
                 maxLength={2}
                 min={1}
                 max={12}
+                required
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <span>:</span>
               <input
                 type="number"
                 name="endMinute"
-                value={formData.endMinute}
+                value={formData.endMinute || "00"}
                 onChange={(e) => handleTimeChange("end", "minute", e.target.value)}
-                placeholder="00"
                 maxLength={2}
                 min={0}
                 max={59}
+                required
                 className="w-12 text-center bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2"
               />
               <div className="flex space-x-2">
                 <button
                   type="button"
                   onClick={() => handleTimeChange("end", "period", "AM")}
+                  required
                   className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.endPeriod === "AM"
                       ? "bg-teal-500 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -172,6 +180,7 @@ function CEStep2({
                 <button
                   type="button"
                   onClick={() => handleTimeChange("end", "period", "PM")}
+                  required
                   className={`px-4 py-2 rounded-xl font-semibold transition-colors duration-200 cursor-pointer ${formData.endPeriod === "PM"
                       ? "bg-teal-500 text-white"
                       : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -187,7 +196,12 @@ function CEStep2({
         </div>
 
         <div className="mt-4 py-2 rounded-xl">
-
+          <input
+    type="hidden"
+    name="venue_address"
+    value={formData.venue_address || ""}
+    required
+  />
           <LocationPicker
             value={{
               lat: formData.venue_lat ?? 14.5995,
@@ -197,7 +211,6 @@ function CEStep2({
             }}
             formData={formData}
             handleEventChange={handleEventChange}
-
             handleLocationChange={handleLocationChange}
           />
 
@@ -231,6 +244,7 @@ function CEStep2({
             value="restricted"
             checked={formData.age_restriction === "restricted"}
             onChange={handleEventChange}
+            required
             className="hidden peer/restricted"
           />
           <label
@@ -261,12 +275,29 @@ function CEStep2({
 
         {formData.age_restriction === "restricted" && (
           <>
-            <label className="block text-sm font-medium text-gray-700 mb-2 ">What age is allowed</label>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {['12+', '13+', '14+', '15+', '16+', '17+', '18+', '19+', '20+', '21+'].map((age, index) => (
-                <RadioBox key={index} id={`age-${age}`} name="age_allowed" value={age} label={age} checkedValue={formData.age_allowed} onChange={handleEventChange} />
-              ))}
-            </div>
+           <label className="block text-sm font-medium text-gray-700 mb-2 mt-2">
+  What age is allowed?
+</label>
+
+<div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mb-4">
+  {['12+', '13+', '14+', '15+', '16+', '17+', '18+', '19+', '20+', '21+'].map(
+    (age, index) => (
+      <RadioBox
+        key={index}
+        id={`age-${age}`}
+        name="age_allowed"
+        value={age}
+        label={age}
+        checkedValue={formData.age_allowed}
+        onChange={handleEventChange}
+        required ={formData.age_restriction === 'restricted'}
+        className="px-2 py-1 text-xs rounded-md" // 👈 makes them smaller
+      />
+    )
+  )}
+</div>
+
+
           </>
         )}
         {formData.event_type !== 'virtual' && (
@@ -287,6 +318,7 @@ function CEStep2({
                       name="parking"
                       value={option}
                       checked={isChecked}
+                      required={formData.parking.length === 0}
                       onChange={(e) => {
                         const { value, checked } = e.target;
                         let selected = formData.parking
@@ -363,9 +395,10 @@ const FormSection = ({ title, children }) => (
 //   );
 // });
 
-const CustomDateInput = memo(({ label, id, name, value, onChange }) => {
+const CustomDateInput = memo(({ label, id, name, value, onChange, required = false }) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
+  const [error, setError] = useState("");
   const inputRef = useRef(null);
   const calendarRef = useRef(null);
 
@@ -383,7 +416,26 @@ const CustomDateInput = memo(({ label, id, name, value, onChange }) => {
     const newDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
     onChange({ target: { name: name, value: formatDate(newDate) } });
     setIsCalendarOpen(false);
+    setError("");
   };
+
+   // This will be called from the parent form before submit
+  const validate = () => {
+    if (required && !value) {
+      setError("This field is required");
+      return false;
+    }
+    setError("");
+    return true;
+  };
+
+  // expose validate method to parent via ref (so parent can call it on submit)
+  useEffect(() => {
+    if (onChange) {
+      onChange.validate = validate;
+    }
+  }, [value]);
+
 
   const renderCalendarDays = () => {
     const year = currentDate.getFullYear();
@@ -410,11 +462,13 @@ const CustomDateInput = memo(({ label, id, name, value, onChange }) => {
     <div className="relative z-100">
       <label htmlFor={id} className="block text-sm font-medium text-gray-700">{label}</label>
       <div className="relative">
-        <input type="text" id={id} ref={inputRef} value={value} readOnly onFocus={() => setIsCalendarOpen(true)} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />
+        <input type="text" id={id} ref={inputRef} value={value} readOnly required={required} onFocus={() => setIsCalendarOpen(true)} className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4" />
         <button type="button" onClick={() => setIsCalendarOpen(!isCalendarOpen)} className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-calendar-days"><path d="M8 2v4" /><path d="M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" /><path d="M8 14h.01" /><path d="M12 14h.01" /><path d="M16 14h.01" /><path d="M8 18h.01" /><path d="M12 18h.01" /><path d="M16 18h.01" /></svg>
         </button>
       </div>
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+        
       <div ref={calendarRef} className={`absolute z-10 mt-2 p-4 bg-white rounded-xl shadow-lg border border-gray-200 transition-opacity duration-200 ${isCalendarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
         <div className="flex justify-between items-center mb-4">
           <button type="button" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1))} className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-200">
@@ -449,7 +503,7 @@ const LocationInput = memo(({ initialValue, onBlurCallback }) => {
 });
 
 // Helper components (RadioBox, Checkbox, etc.) remain the same
-const RadioBox = memo(({ id, name, value, label, checkedValue, onChange }) => (
+const RadioBox = memo(({ id, name, value, label, checkedValue, onChange, required }) => (
   <div className="flex-1 min-w-0">
     <input
       type="radio"
@@ -458,6 +512,7 @@ const RadioBox = memo(({ id, name, value, label, checkedValue, onChange }) => (
       value={value}
       checked={checkedValue === value}
       onChange={onChange}
+      required
       className="hidden peer"
     />
     <label

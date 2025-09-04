@@ -648,6 +648,13 @@ const CreateEventForm = () => {
                     type="button"
                     onClick={() => {
                       const form = document.querySelector("form");
+                      if(step === 2 && formData.duration_type === 'single' && !formData.start_date){
+                        console.log('fill upan mo - single')
+                        return;
+                      } else if(step === 2 && formData.duration_type === 'multiple' && (!formData.start_date || !formData.end_date)){
+                        console.log('fill upan mo - multiple')
+                        return;
+                      }
                       if (form && form.checkValidity()) {
                         handleNext();
                         window.scrollTo({ top: 0, behavior: "smooth" });

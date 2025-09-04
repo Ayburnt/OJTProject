@@ -120,7 +120,7 @@ function CEStep1({
                 <span className="text-sm font-medium">Public</span>
               </label>
 
-              {/* Multi-day event */}
+              {/* set audience */}
               <input
                 type="radio"
                 id="audience_private"
