@@ -216,7 +216,9 @@ function CEStep1({
             <span className="text-gray-500">Upload an image here</span>
           )}
 
-          <input id="event_poster" name="event_poster" type="file" accept="image/*" onChange={handleEventChange} className="hidden" required/>
+          <input id="event_poster" name="event_poster" type="file" accept="image/*" onChange={handleEventChange} className="hidden" required={!formData.event_poster} 
+          />
+          
           <button type="button" onClick={() => document.getElementById('event_poster').click()} className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer">
             Upload
           </button>

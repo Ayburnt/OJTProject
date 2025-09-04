@@ -96,6 +96,7 @@ function CEStep3({
           accept="image/*"
           onChange={handleEventChange}
           className="hidden"
+          required={hasSeatingMap === true}
         />
         <button
           type="button"
