@@ -63,7 +63,7 @@ export const useAuth = () => {
     localStorage.setItem(USER_PROFILE, user.profile_picture || '');
     localStorage.setItem(IS_LOGGED_IN, 'true');
     localStorage.setItem(IS_VERIFIED, user.verification_status || '');
-    localStorage.setItem('orgLogo', user.org_logo);
+    localStorage.setItem('orgLogo', user.org_logo || '');
 
     setIsLoggedIn(true);
     setUserRole(user.role);
