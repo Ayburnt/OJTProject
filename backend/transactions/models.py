@@ -13,7 +13,8 @@ class Transaction(models.Model):
 
     STATUS_CHOICES = (
         ('Pending', 'Pending'),
-        ('Success', 'Success'),
+        ('Paid', 'Paid'),
+        ('Cancelled', 'Cancelled'),
         ('Failed', 'Failed'),
     )    
     payer_code = models.CharField(max_length=100)
@@ -37,6 +38,9 @@ class Transaction(models.Model):
         if not self.payment_ref:    
             event_code = self.event.event_code if self.event else "NOEVENT"       
             self.payment_ref = f"{event_code}_{uuid.uuid4().hex[:10].upper()}"
+        
+        if self.amount == 0 or self.amount == 0.00:
+            self.status = "Paid"
         super().save(*args, **kwargs)
 
     def __str__(self):

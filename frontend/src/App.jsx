@@ -118,7 +118,7 @@ function App() {
           <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/org/:userCode/my-event' element={<PrivateRoute requiredRole={'organizer'}><OrganizerEvent /></PrivateRoute>} />
-          <Route path='/org/:userCode/attendees' element={<PrivateRoute requiredRole={'organizer'}><Attendees /></PrivateRoute>} />
+          {/* <Route path='/org/:userCode/attendees' element={<PrivateRoute requiredRole={'organizer'}><Attendees /></PrivateRoute>} /> */}
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
           <Route path="/org/:userCode" element={<TimeLine />} />
           {/* <Route path="/attendees" element={<Attendees />} />*/}

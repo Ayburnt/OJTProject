@@ -30,14 +30,7 @@ function OrganizerNav() {
       docTitle: "My Events | Sari-Sari Events",
       link: (userCode) => `/org/${userCode}/my-event`,
       color: "#5BD4D4"
-    },
-    {
-      pattern: "/org/:userCode/attendees",
-      title: "Attendees Overview",
-      docTitle: "Attendees | Sari-Sari Events",
-      link: (userCode) => `/org/${userCode}/attendees`,
-      color: "#FF965D"
-    },
+    },    
     {
       pattern: "/org/:userCode/account",
       title: "Manage Account",

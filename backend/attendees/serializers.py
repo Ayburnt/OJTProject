@@ -6,15 +6,21 @@ from transactions.models import Transaction
 import uuid
 from django.db import IntegrityError
 
+class RegFormQuesSeializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reg_Form_Question
+        fields = "__all__"
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
         fields = "__all__"
 
 class AttendeeResponseSerializer(serializers.ModelSerializer):
+    questions = RegFormQuesSeializer(source='reg_form_question', read_only=True)
     class Meta:
         model = Attendee_Response
-        fields = ["question", "response_value"]
+        fields = "__all__"
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta:
@@ -53,7 +59,7 @@ class AttendeeSerializer(serializers.ModelSerializer):
         queryset=Transaction.objects.all(),
         write_only=True   # 👈 ensures it won’t show in output
     )
-
+    
     event_details = EventSerializer(source="event", read_only=True)
     transaction_read = TransactionSerializer(source="transaction", read_only=True)
     ticket_read = TicketTypeSerializer(source="ticket_type", read_only=True)

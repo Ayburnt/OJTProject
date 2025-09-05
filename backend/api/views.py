@@ -506,7 +506,7 @@ class ProfileCompletionView(APIView):
         if 'user_code' in serializer.errors:
             if any(err.code == 'unique' for err in serializer.errors['user_code']):
                 return Response(
-                    {'user_code' : ['The provided user code is already taken. Please choose a different one.']},
+                    {'user_code' : ['The provided organization code is already taken. Please choose a different one.']},
                     status=status.HTTP_400_BAD_REQUEST
                 )
         print("ProfileCompletionView serializer errors:", serializer.errors)

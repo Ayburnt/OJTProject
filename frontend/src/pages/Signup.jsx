@@ -20,7 +20,7 @@ function Signup({ onAuthSuccess }) {
         localStorage.setItem('refreshToken', tokens.refresh);
         localStorage.setItem('userRole', userData.role);
         localStorage.setItem('userEmail', userData.email);
-        localStorage.setItem('orgLogo', userData.org_logo);
+        localStorage.setItem('orgLogo', userData.org_logo || '');
 
         // Store other user data received from backend
         localStorage.setItem('userFirstName', userData.first_name || '');
@@ -278,7 +278,6 @@ function Signup({ onAuthSuccess }) {
                 localStorage.setItem('userRole', data.user.role); // Ensure role is consistent
                 localStorage.setItem('isLoggedIn', true);
                 localStorage.setItem('userCode', data.user.user_code);
-                localStorage.setItem('orgLogo', data.org_logo);
 
                 // Final redirect after profile completion
                 const userCodePath = data.user.user_code;
@@ -425,7 +424,7 @@ function Signup({ onAuthSuccess }) {
 
 
     return (
-        <div className="flex items-center justify-center md:py-10 bg-white md:bg-gray-100 2xl:min-h-screen"> {/* Light background like in the image */}
+        <div className="flex items-center justify-center md:py-10 bg-white md:bg-gray-100 md:min-h-screen 2xl:min-h-screen"> {/* Light background like in the image */}
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >

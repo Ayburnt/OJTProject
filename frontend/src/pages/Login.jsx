@@ -90,7 +90,7 @@ function Login() {
   }, []);
 
   return (
-    <div className="flex items-center justify-center h-screen xl:h-auto 2xl:h-screen xl:py-10 rounded-lg bg-white md:bg-gray-100">
+    <div className="flex items-center justify-center h-screen xl:h-auto 2xl:min-h-screen xl:py-10 rounded-lg bg-white md:bg-gray-100">
       <form onSubmit={handleSubmit}
         className="bg-white flex flex-col items-center rounded-xl p-5 md:py-10 md:shadow-2xl w-full max-w-lg">
         

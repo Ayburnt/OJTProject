@@ -230,7 +230,7 @@ export default function Ticket() {
                   <p className="text-xs font-outfit sm:text-sm text-gray-500 mt-4 text-center">
                     Scan this code at Entrance Venue <br />
                     <span className="inline-flex items-center space-x-1">
-                      <CiSaveDown2 size={14} className="text-gray-500" />
+                      <RiQrScan2Line size={14} className="text-gray-500" />
                       <span>QR Scanner Required</span>
                     </span>
                   </p>

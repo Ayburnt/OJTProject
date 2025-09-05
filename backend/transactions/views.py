@@ -3,7 +3,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from django.db import transaction as db_transaction
 from .models import Transaction
-from .serializers import TransactionSerializer
+from .serializers import TransactionSerializer, AttendeeSerializer
 from attendees.models import Attendee, Attendee_Response
 from attendees.serializers import AttendeeSerializer
 from events.models import Event
@@ -11,6 +11,15 @@ from django.conf import settings
 import uuid
 import requests
 import os
+
+class TransactionListView(generics.CreateAPIView):
+    queryset = Transaction.objects.all()
+    serializer_class = TransactionSerializer
+
+    def get(self, request, event_code):
+        transactions = Transaction.objects.filter(event_id=event_code)        
+        serializer = self.get_serializer(transactions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class TransactionCreateView(generics.CreateAPIView):
     queryset = Transaction.objects.all()

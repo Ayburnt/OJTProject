@@ -6,7 +6,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 
-function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode }) {
+function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
   const navigate = useNavigate();
@@ -14,7 +14,9 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
   // Delete API call
   const handleDelete = async () => {
     try {
-      await api.delete(`/update/${eventCode}/`); // make sure URL matches DRF path      
+      await api.delete(`/update/${eventCode}/`); // make sure URL matches DRF path
+      setTypedCode('');
+      setConfirmDelete(false);
       fetchEventDetails();
     } catch (err) {
       console.error(err);
@@ -48,6 +50,7 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
   const totalTickets = ticketTypes.reduce((sum, ticket) => sum + ticket.quantity_total, 0);
 
   const eDetailsStyle = `font-outfit text-grey flex flex-row gap-3`;
+
 
   return (
     <>    
@@ -101,13 +104,13 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
       )}
 
       {/* Event card */}
-      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-shadow duration-300 leading-none border-2 border-gray-200'>
+      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 hover:scale-101'>
         <div className='overflow-hidden rounded-lg aspect-video'>
           <img src={eventPoster} alt="" className='object-cover' />
         </div>
 
         <div className='flex flex-row justify-between items-center w-full'>
-          <p className='font-outfit text-2xl truncate w-full'>{eventName}</p>
+          <p className='font-outfit text-2xl truncate w-full cursor-pointer hover:underline' onClick={() => fetchAttendees(selected)}>{eventName}</p>
           <p className={`font-outfit py-1 px-3 text-xs text-white rounded-full ml-3 
             ${eventStatus === 'pending' ? 'bg-slate-700' :
               eventStatus === 'published' ? 'bg-green-700' :
