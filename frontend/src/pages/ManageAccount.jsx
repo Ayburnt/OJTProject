@@ -22,11 +22,22 @@ const MessageModal = ({ message, onClose }) => {
   );
 };
 
+const InputFields = ({ lbl, fieldType, fieldName }) => {
+  return (
+    <div className='w-full flex flex-col items-start font-outfit'>
+      <label htmlFor="" className='font-medium text-sm text-[#555555]'>{lbl}</label>
+      <input type={fieldType} name={fieldName} className='w-full text-sm border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm' />
+    </div>
+  )
+
+}
+
 const ManageAccount = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddUser, setIsAddUser] = useState(false);
   const { userCode } = useAuth();
 
   const [notifications, setNotifications] = useState({
@@ -34,6 +45,7 @@ const ManageAccount = () => {
     sms: false,
     marketing: false
   });
+
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
@@ -59,6 +71,19 @@ const ManageAccount = () => {
   useEffect(() => {
     fetchProfile();
   }, []);
+
+  useEffect(() => {
+    if (isAddUser) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset'; // or 'auto'
+    }
+
+    // Cleanup function to reset overflow when component unmounts
+    return () => {
+      document.body.style.overflow = 'unset'; // or 'auto'
+    };
+  }, [isAddUser]);
 
   const handleSave = async () => {
     try {
@@ -156,15 +181,40 @@ const ManageAccount = () => {
     );
   }
 
+
+
   return (
-    <div className="flex min-h-screen bg-gray-100 font-outfit">
+    <div className="flex min-h-screen bg-gray-100 pt-18 md:pt-0 font-outfit">
+      {isAddUser && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 font-outfit">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm xl:max-w-lg px-6 py-10 text-center">
+            <h1 className='text-2xl font-semibold text-secondary'>Add New Account</h1>
+            <p className='max-w-lg text-gray-500'>This account has access to check in attendees and view their details.</p>
+            <div className='grid grid-cols-1 gap-3 mt-5'>
+              <InputFields lbl='First Name' fieldType='text' fieldName='first_name' />
+              <InputFields lbl='Last Name' fieldType='text' fieldName='last_name' />
+              <InputFields lbl='Email' fieldType='email' fieldName='email' />
+              <div className='w-full flex flex-col items-start font-outfit'>
+                <label htmlFor="" className='font-medium text-[#555555] text-sm'>Password <span className='text-gray-400'>(at least 8 characters)</span></label>
+                <input type='password' name='password' className='w-full border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm text-sm' />
+                <button className='text-secondary self-start text-sm cursor-pointer font-medium hover:text-secondary/90'>Generate password</button>
+              </div>
+            </div>
+            <div className='mt-5 flex flex-row items-center justify-end'>
+              <button onClick={() => setIsAddUser(false)} className='hover:text-secondary/90 transition-all duration-300 text-secondary font-medium mr-3 cursor-pointer'>Cancel</button>
+              <button className='bg-secondary hover:bg-secondary/90 transition-all duration-300 font-medium text-white py-2 px-4 rounded-lg cursor-pointer'>Add Account</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Sidebar */}
       <div className="md:block md:w-56 lg:w-64 shrink-0">
         <OrganizerNav />
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full mt-10 ml-5">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full md:ml-5 lg:ml-0">
         {/* Profile Picture and Account Actions */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-7 flex-1">
           <div className="flex flex-col lg:flex-row w-full items-center sm:items-start justify-between gap-6">
@@ -273,94 +323,99 @@ const ManageAccount = () => {
 
             {/* Profile Info */}
             <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-10 w-full">
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+              <div className="flex flex-col w-full lg:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h3 className="text-lg font-semibold font-outfit text-gray-800">Profile Information</h3>
-                <button
-                  onClick={() => isEditing ? handleSave() : setIsEditing(true)}
-                  className={`px-4 py-2 rounded-lg transition-colors w-full sm:w-auto cursor-pointer ${isEditing
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-teal-600 hover:bg-teal-700 text-white'
-                    }`}
-                >
-                  {isEditing ? 'Save Changes' : 'Edit Profile'}
-                </button>
+                <div className='w-full md:w-auto items-center justify-center md:justify-end flex flex-row gap-5 lg:gap-2'>
+                  <button className='cursor-pointer hover:bg-secondary/5 px-4 py-2 border border-secondary rounded-lg text-secondary' onClick={() => setIsAddUser(true)}>
+                    Add an Account
+                  </button>
+                  <button
+                    onClick={() => isEditing ? handleSave() : setIsEditing(true)}
+                    className={`px-4 py-2 rounded-lg transition-colors cursor-pointer ${isEditing
+                      ? 'bg-green-600 hover:bg-green-700 text-white'
+                      : 'bg-teal-600 hover:bg-teal-700 text-white'
+                      }`}
+                  >
+                    {isEditing ? 'Save Changes' : 'Edit Profile'}
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization</label>
-                <input
-                  type="text"
-                  value={userData.company_name || ''}
-                  onChange={(e) => setUserData({ ...userData, company_name: e.target.value })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                    : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization Email Address</label>
-                <input
-                  type="text"
-                  value={userData.company_website || ''}
-                  onChange={(e) => setUserData({ ...userData, company_website: e.target.value })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                    : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">First Name</label>
-                <input
-                  type="text"
-                  value={userData.first_name || ''}
-                  onChange={(e) => setUserData({ ...userData, first_name: e.target.value })}
-                  disabled={!isEditing}
-                  className={`w-full px-4 py-3 border rounded-lg text-base ${isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                    : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Last Name</label>
-                <input
-                  type="text"
-                  value={userData.last_name || ''}
-                  onChange={(e) => setUserData({ ...userData, last_name: e.target.value })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-3 border rounded-lg text-base ${isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                    : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Email</label>
-                <input
-                  type="email"
-                  value={userData.email || ''}
-                  disabled={true}
-                  className="w-full px-3 py-2 border rounded-lg text-base border-gray-200 bg-gray-50 focus:outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Phone</label>
-                <input
-                  type="tel"
-                  value={userData.phone_number || ''}
-                  onChange={(e) => setUserData({ ...userData, phone_number: e.target.value })}
-                  disabled={!isEditing}
-                  className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
-                    ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
-                    : 'border-gray-200 bg-gray-50'
-                    } focus:outline-none`}
-                />
-              </div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization</label>
+                  <input
+                    type="text"
+                    value={userData.company_name || ''}
+                    onChange={(e) => setUserData({ ...userData, company_name: e.target.value })}
+                    disabled={!isEditing}
+                    className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
+                      ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                      : 'border-gray-200 bg-gray-50'
+                      } focus:outline-none`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization Email Address</label>
+                  <input
+                    type="text"
+                    value={userData.company_website || ''}
+                    onChange={(e) => setUserData({ ...userData, company_website: e.target.value })}
+                    disabled={!isEditing}
+                    className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
+                      ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                      : 'border-gray-200 bg-gray-50'
+                      } focus:outline-none`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    value={userData.first_name || ''}
+                    onChange={(e) => setUserData({ ...userData, first_name: e.target.value })}
+                    disabled={!isEditing}
+                    className={`w-full px-4 py-3 border rounded-lg text-base ${isEditing
+                      ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                      : 'border-gray-200 bg-gray-50'
+                      } focus:outline-none`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    value={userData.last_name || ''}
+                    onChange={(e) => setUserData({ ...userData, last_name: e.target.value })}
+                    disabled={!isEditing}
+                    className={`w-full px-3 py-3 border rounded-lg text-base ${isEditing
+                      ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                      : 'border-gray-200 bg-gray-50'
+                      } focus:outline-none`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={userData.email || ''}
+                    disabled={true}
+                    className="w-full px-3 py-2 border rounded-lg text-base border-gray-200 bg-gray-50 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={userData.phone_number || ''}
+                    onChange={(e) => setUserData({ ...userData, phone_number: e.target.value })}
+                    disabled={!isEditing}
+                    className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
+                      ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
+                      : 'border-gray-200 bg-gray-50'
+                      } focus:outline-none`}
+                  />
+                </div>
               </div>
             </div>
 
@@ -427,5 +482,6 @@ const ManageAccount = () => {
     </div>
   );
 };
+
 
 export default ManageAccount;

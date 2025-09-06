@@ -104,13 +104,13 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
       )}
 
       {/* Event card */}
-      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 hover:scale-101'>
+      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={() => fetchAttendees(selected)}>
         <div className='overflow-hidden rounded-lg aspect-video'>
           <img src={eventPoster} alt="" className='object-cover' />
         </div>
 
         <div className='flex flex-row justify-between items-center w-full'>
-          <p className='font-outfit text-2xl truncate w-full cursor-pointer hover:underline' onClick={() => fetchAttendees(selected)}>{eventName}</p>
+          <p className='font-outfit text-2xl truncate w-full'>{eventName}</p>
           <p className={`font-outfit py-1 px-3 text-xs text-white rounded-full ml-3 
             ${eventStatus === 'pending' ? 'bg-slate-700' :
               eventStatus === 'published' ? 'bg-green-700' :

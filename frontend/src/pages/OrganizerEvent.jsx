@@ -393,7 +393,13 @@ const OrganizerEvent = () => {
 
               {/* Sticky Footer */}
               <div className="border-t border-gray-200">
-                <div className="flex items-center justify-between px-6 py-4 text-sm">
+                <div className='w-full flex items-center justify-center'>
+                  <div className='w-[90%] justify-between flex flex-row'>
+                  <span className="text-gray-600">Price:</span>
+                  <span className="text-gray-800 font-medium">₱{selectedAttendee.ticket_read?.price}</span>
+                </div>      
+                </div>                          
+                <div className="flex items-center justify-between px-6 py-4 text-sm">                  
                   <span className="text-gray-600">Ticket Link:</span>
                   <button
                     className="flex items-center gap-2 text-blue-600 hover:underline font-medium"

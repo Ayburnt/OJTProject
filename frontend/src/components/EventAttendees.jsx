@@ -5,8 +5,36 @@ import { RiQrScan2Line } from "react-icons/ri";
 import { CiSearch } from "react-icons/ci";
 import api from '../api';
 import { Scanner } from "@yudiel/react-qr-scanner";
+import Paper from '@mui/material/Paper';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
+import Tooltip from '@mui/material/Tooltip';
+
 
 function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAttendees, loadingAttendees, setSelectedAttendee, attendees, setAttendees, searchAttendees, setSearchAttendees }) {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+  
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  // Get the current page data
+  const paginatedAttendees = filteredAttendees.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
   const [scanning, setScanning] = useState(false);
   const fileInputRef = useRef(null);
   const handleDecode = (result) => {
@@ -63,6 +91,7 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
       alert("Failed to upload CSV.");
     }
   };
+  
   return (
     <>
       {scanning && (
@@ -120,110 +149,130 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
 
           <button
             onClick={uploadCsv}
-            className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center gap-2 cursor-pointer"                  >
+            className="w-[48%] md:min-w-[140px] whitespace-nowrap py-2 px-3 text-sm bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-md transition-all flex justify-center items-center gap-2 cursor-pointer"
+          >
             Upload CSV <GoUpload />
           </button>
 
           <input type="file" accept=".csv" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
         </div>
       </div>
+      
       {/* Table */}
-      <div className="overflow-x-auto rounded-md">
-        <table className="w-full text-center border-collapse rounded-md">
-          <thead>
-            <tr className="text-gray-600 text-sm bg-gray-100">
-              <th className="py-3 px-4 border border-gray-300">Reference Code</th>
-              <th className="py-3 px-4 border border-gray-300">Reg.date</th>
-              <th className="py-3 px-4 border border-gray-300">Name</th>
-              <th className="py-3 px-4 border border-gray-300">Email</th>
-              <th className="py-3 px-4 border border-gray-300">Ticket Type</th>
-              <th className="py-3 px-4 border border-gray-300">Paid</th>
-              <th className="py-3 px-4 border border-gray-300">Check-in Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loadingAttendees ? (
-              <tr>
-                <td colSpan="7" className="py-6 text-center text-gray-500 border border-gray-300">
-                  Loading attendees...
-                </td>
-
-              </tr>
-            ) : filteredAttendees.length > 0 ? (
-              filteredAttendees.map((a, idx) => (
-                <tr
-                  key={a.id}
-                  className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
-                  onClick={() => setSelectedAttendee(a)}
-                >
-                  {/* Reference Code */}
-                  <td onClick={() => setSelectedAttendee(a)} className="py-3 px-4 border border-gray-300 text-gray-600">
-                    {a.attendee_code || "—"}
-                  </td>
-
-                  {/* Reg.date */}
-                  <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                    {new Date(a.created_at).toLocaleDateString()}
-                  </td>
-                  {/* Name */}
-                  <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.fullName}</td>
-
-                  {/* Email → Gmail */}
-                  <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                    <a
-                      href={`https://mail.google.com/mail/?view=cm&fs=1&to=${a.email}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-secondary hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {a.email}
-                    </a>
-                  </td>
-
-                  {/* Ticket */}
-                  <td className="py-3 px-4 border border-gray-300 text-gray-600">{a.ticket_read?.ticket_name}</td>
-
-                  {/* Paid toggle */}
-                  <td
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!a.paid) {
-                        a.paid = "yes";
-                      } else if (a.paid === "yes") {
-                        a.paid = "no";
-                      } else {
-                        a.paid = null;
-                      }
-                      setAttendees([...attendees]); // refresh UI
-                    }}
-                    className="py-3 px-4 border border-gray-300 text-gray-600"
+      <Paper sx={{ width: '100%', overflow: 'hidden', fontFamily: 'Outfit, sans-serif' }}>
+        <TableContainer sx={{ maxHeight: 440 }}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Reference Code</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}l>Reg.date</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Name</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Email</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Ticket Type</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Paid</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Check-in Time</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {loadingAttendees ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="py-6 text-center text-gray-500">
+                    Loading attendees...
+                  </TableCell>
+                </TableRow>
+              ) : paginatedAttendees.length > 0 ? (
+                paginatedAttendees.map((a, idx) => (
+                  <Tooltip key={a.id} title="Click to view details" placement="top" arrow>
+                  <TableRow                    
+                    className={`text-sm ${idx % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100 transition cursor-pointer`}
+                    onClick={() => setSelectedAttendee(a)}
                   >
-                    {a.paid === "yes" ? (
-                      <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Yes</span>
-                    ) : a.paid === "no" ? (
-                      <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">No</span>
-                    ) : (
-                      <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-400 text-xs">—</span>
-                    )}
-                  </td>
+                    {/* Reference Code */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {a.attendee_code || "—"}
+                    </TableCell>
 
-                  {/* Check-in */}
-                  <td className="py-3 px-4 border border-gray-300 text-gray-600">
-                    {a.attendance?.check_in_time
-                      ? new Date(a.attendance.check_in_time).toLocaleString()
-                      : ''}
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="7" className="py-6 text-gray-500 border">No attendees found.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                    {/* Reg.date */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {new Date(a.created_at).toLocaleDateString()}
+                    </TableCell>
+                    
+                    {/* Name */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {a.fullName}
+                    </TableCell>
+
+                    {/* Email → Gmail */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${a.email}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-secondary hover:underline"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {a.email}
+                      </a>
+                    </TableCell>
+
+                    {/* Ticket */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {a.ticket_read?.ticket_name}
+                    </TableCell>
+
+                    {/* Paid toggle */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!a.paid) {
+                          a.paid = "yes";
+                        } else if (a.paid === "yes") {
+                          a.paid = "no";
+                        } else {
+                          a.paid = null;
+                        }
+                        setAttendees([...attendees]); // refresh UI
+                      }}
+                      className="py-3 px-4 text-gray-600"
+                    >
+                      {a.paid === "yes" ? (
+                        <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs">Yes</span>
+                      ) : a.paid === "no" ? (
+                        <span className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs">No</span>
+                      ) : (
+                        <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-400 text-xs">—</span>
+                      )}
+                    </TableCell>
+
+                    {/* Check-in */}
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {a.attendance?.check_in_time
+                        ? new Date(a.attendance.check_in_time).toLocaleString()
+                        : ''}
+                    </TableCell>
+                  </TableRow>
+                  </Tooltip>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} colSpan={7} className="py-6 text-gray-500 text-center">
+                    No attendees found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 100]}
+          component="div"
+          count={filteredAttendees.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
     </>
   )
 }
