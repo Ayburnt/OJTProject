@@ -280,7 +280,7 @@ export default function Ticket() {
                   </div>
                   <div className="flex justify-between border-b pb-2">
                     <span className="font-medium text-gray-700">Ticket Holder:</span>
-                    <span>{attendee?.fullName}</span>
+                    <span>{attendee?.firstname} {attendee?.lastname}</span>
                   </div>
                   <div className="flex flex-col border-b pb-3">
                     <div className="flex flex-row justify-between">
@@ -373,7 +373,7 @@ export default function Ticket() {
                                             {attendee?.attendee_code}
                                         </p>
                                         <p className="font-semibold font-outfit text-gray-800 text-2xl">
-                                            {attendee?.fullName}
+                                            {attendee?.firstname} {attendee?.lastname}
                                         </p>     
                                     </div>
 

@@ -109,6 +109,10 @@ class UserLoginSerializer(serializers.Serializer):
             user = authenticate(request=self.context.get('request'), email=email, password=password)
             if not user:
                 raise serializers.ValidationError('Invalid login credentials.')
+            
+            # 🚨 Block inactive accounts
+            if not user.is_active:
+                raise serializers.ValidationError('This account is inactive. Please contact your organizer.')
         else:
             raise serializers.ValidationError('Must include "email" and "password".')
 
@@ -245,6 +249,7 @@ class UserSerializer(serializers.ModelSerializer):
             'role',
             'phone_number',
             'org_logo',
+            'is_active',
             'birthday',
             'gender',
             'company_name',

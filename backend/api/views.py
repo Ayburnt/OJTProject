@@ -213,7 +213,6 @@ class RegisterStaffView(APIView):
 
         # ✅ 2. Verify with Google
         secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
-        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
 
         verify_url = "https://www.google.com/recaptcha/api/siteverify"
         payload = {"secret": secret_key, "response": captcha_token}
@@ -221,7 +220,6 @@ class RegisterStaffView(APIView):
         try:
             r = requests.post(verify_url, data=payload)
             result = r.json()
-            print("📌 Google verification result:", result)  # Debug
 
             if not result.get("success"):
                 return Response(
@@ -237,6 +235,13 @@ class RegisterStaffView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         
+        staff_count = CustomUser.objects.filter(added_by=request.user, role='staff', is_active=True).count()
+        if staff_count >= 5:
+            return Response(
+                {"detail": "You can add a maximum of 5 staff accounts."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         data = request.data.copy()
         if 'captcha' in data:
             data.pop('captcha')
@@ -973,3 +978,80 @@ class OrganizerListView(ListAPIView):
                 email__icontains=search
             )
         return queryset
+    
+
+class StaffListView(APIView):
+    """
+    View all staff accounts created by the logged-in organizer.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Only get staff accounts added by this user
+        staff_accounts = CustomUser.objects.filter(added_by=request.user, role='staff')
+        serializer = UserSerializer(staff_accounts, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+class StaffSoftDeleteView(APIView):
+    """
+    Soft delete a staff account (set is_active=False).
+    Only the organizer who created the staff can perform this.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk=None):
+        try:
+            staff = CustomUser.objects.get(pk=pk, role="staff", added_by=request.user)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"detail": "Staff account not found or you don't have permission to delete it."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        if not staff.is_active:
+            return Response(
+                {"detail": "Staff account is already inactive."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        staff.is_active = False
+        staff.save(update_fields=["is_active"])
+
+        return Response({"detail": "Staff account deactivated successfully."}, status=status.HTTP_200_OK)
+    
+class StaffSoftReactivateView(APIView):
+    """
+    Reactivate a soft-deleted staff account (set is_active=True).
+    Only the organizer who created the staff can perform this.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk=None):
+        try:
+            staff = CustomUser.objects.get(pk=pk, role="staff", added_by=request.user)
+        except CustomUser.DoesNotExist:
+            return Response(
+                {"detail": "Staff account not found or you don't have permission to reactivate it."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Prevent exceeding staff limit
+        staff_count = CustomUser.objects.filter(
+            added_by=request.user, role='staff', is_active=True
+        ).count()
+        if staff_count >= 5:
+            return Response(
+                {"detail": "You can add a maximum of 5 active staff accounts."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if staff.is_active:
+            return Response(
+                {"detail": "Staff account is already active."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        staff.is_active = True
+        staff.save(update_fields=["is_active"])
+
+        return Response({"detail": "Staff account reactivated successfully."}, status=status.HTTP_200_OK)

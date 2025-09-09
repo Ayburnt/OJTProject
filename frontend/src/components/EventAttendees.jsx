@@ -14,11 +14,14 @@ import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import Tooltip from '@mui/material/Tooltip';
+import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 
 
 function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAttendees, loadingAttendees, setSelectedAttendee, attendees, setAttendees, searchAttendees, setSearchAttendees }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sortOrder, setSortOrder] = useState("asc"); // "asc" or "desc"
+
   
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -91,6 +94,20 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
       alert("Failed to upload CSV.");
     }
   };
+
+  const handleSortByLastName = () => {
+  const newOrder = sortOrder === "asc" ? "desc" : "asc";
+  setSortOrder(newOrder);
+
+  const sorted = [...attendees].sort((a, b) => {
+    if (a.lastname.toLowerCase() < b.lastname.toLowerCase()) return newOrder === "asc" ? -1 : 1;
+    if (a.lastname.toLowerCase() > b.lastname.toLowerCase()) return newOrder === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  setAttendees(sorted);
+};
+
   
   return (
     <>
@@ -165,11 +182,14 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
             <TableHead>
               <TableRow>
                 <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Reference Code</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}l>Reg.date</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Name</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>First Name</TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }} onClick={handleSortByLastName}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    Last Name{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div></TableCell>
                 <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Email</TableCell>
                 <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Ticket Type</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Paid</TableCell>
+                {/* <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Paid</TableCell> */}
                 <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Check-in Time</TableCell>
               </TableRow>
             </TableHead>
@@ -190,16 +210,15 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
                     {/* Reference Code */}
                     <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
                       {a.attendee_code || "—"}
-                    </TableCell>
-
-                    {/* Reg.date */}
-                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
-                      {new Date(a.created_at).toLocaleDateString()}
-                    </TableCell>
+                    </TableCell>                   
                     
                     {/* Name */}
                     <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
-                      {a.fullName}
+                      {a.firstname}
+                    </TableCell>
+
+                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">
+                      {a.lastname}
                     </TableCell>
 
                     {/* Email → Gmail */}
@@ -221,7 +240,7 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
                     </TableCell>
 
                     {/* Paid toggle */}
-                    <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}
+                    {/* <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!a.paid) {
@@ -242,7 +261,7 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
                       ) : (
                         <span className="px-3 py-1 rounded-full bg-gray-100 text-gray-400 text-xs">—</span>
                       )}
-                    </TableCell>
+                    </TableCell> */}
 
                     {/* Check-in */}
                     <TableCell sx={{fontFamily: 'Outfit, sans-serif'}} className="py-3 px-4 text-gray-600">

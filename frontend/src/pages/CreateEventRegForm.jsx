@@ -99,8 +99,11 @@ export default function CreateEventRegForm({ formData, setFormData, handleEventC
               </div>
             </div>
 
-            <label htmlFor="" className="font-outfit text-lg">Full Name</label>
-              <p className="font-outfit text-sm text-gray-600 font-light mb-3">Respondent full name are collected and protected.</p>
+            <label htmlFor="" className="font-outfit text-lg">First Name</label>
+              <p className="font-outfit text-sm text-gray-600 font-light mb-3">Respondent first name are collected and protected.</p>
+
+            <label htmlFor="" className="font-outfit text-lg">Last Name</label>
+              <p className="font-outfit text-sm text-gray-600 font-light mb-3">Respondent last name are collected and protected.</p>
           </div>
 
 

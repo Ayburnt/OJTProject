@@ -172,7 +172,8 @@ class UploadCSVView(APIView):
 
                 Attendee.objects.create(
                     event=event,
-                    fullName=row.get('Full Name'),
+                    firstname=row.get('First Name'),
+                    lastname=row.get('Last Name'),
                     email=row.get('Email'),
                     ticket_type=ticket
                 )
@@ -202,7 +203,8 @@ class ExportCSVView(APIView):
         for a in attendees:
             writer.writerow([
                 a.created_at.strftime("%Y-%m-%d"),
-                a.fullName,
+                a.firstname,
+                a.lastname,
                 a.email,
                 a.ticket_type.ticket_name if a.ticket_type else ""
             ])

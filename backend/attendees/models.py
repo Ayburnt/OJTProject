@@ -21,8 +21,9 @@ class Attendee(models.Model):
         to_field='payment_ref',
         related_name="attendees"
     )
-
-    fullName = models.CharField(max_length=255)
+    
+    firstname = models.CharField(max_length=255)
+    lastname = models.CharField(max_length=255)
     email = models.EmailField(null=True, blank=True)
     attendee_code = models.CharField(max_length=100, unique=True, null=True, blank=True)
     event = models.ForeignKey(
@@ -45,7 +46,7 @@ class Attendee(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.fullName} - {self.event}"
+        return f"{self.firstname} - {self.event}"
 
     def save(self, *args, **kwargs):
         # --- Auto-set attendee_status if free ticket ---
@@ -102,7 +103,7 @@ class Attendee_Response(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Response by {self.attendee.fullName} to '{self.question}'"
+        return f"Response by {self.attendee.firstname} to '{self.question}'"
 
 
 class Event_Attendance(models.Model):
@@ -117,4 +118,4 @@ class Event_Attendance(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Attendance for {self.attendee.fullName} at {self.check_in_time}"
+        return f"Attendance for {self.attendee.firstname} at {self.check_in_time}"

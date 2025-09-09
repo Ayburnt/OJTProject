@@ -18,6 +18,7 @@ class TransactionSerializer(serializers.ModelSerializer):
 
 class AttendeeResponseSerializer(serializers.ModelSerializer):
     questions = RegFormQuesSeializer(source='reg_form_question', read_only=True)
+    attendee = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Attendee_Response
         fields = "__all__"
@@ -71,7 +72,8 @@ class AttendeeSerializer(serializers.ModelSerializer):
         model = Attendee
         fields = [
             "id",
-            "fullName",
+            "firstname",
+            "lastname",
             "email",
             "attendee_code",
             "event",

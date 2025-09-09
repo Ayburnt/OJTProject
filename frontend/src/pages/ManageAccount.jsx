@@ -8,6 +8,7 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { toast } from 'react-toastify';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
+import { FaTrashAlt } from "react-icons/fa";
 
 // Modal for success/error messages
 const MessageModal = ({ message, onClose }) => {
@@ -60,29 +61,29 @@ const ManageAccount = () => {
   });
 
   const handleStaffDataChange = (e) => {
-        // e.target refers to the input field that triggered the event
-        const { name, value } = e.target;
-        // Use the spread operator to copy the existing state and then
-        // update only the field that changed ([name]: value)
-        setStaffData(prevData => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-  
+    // e.target refers to the input field that triggered the event
+    const { name, value } = e.target;
+    // Use the spread operator to copy the existing state and then
+    // update only the field that changed ([name]: value)
+    setStaffData(prevData => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
 
-  const handleRegStaff = async(e) => {
+
+  const handleRegStaff = async (e) => {
     e.preventDefault();
     setIsStaffLoading(true);
     console.log(staffData)
 
     if (staffData.password && staffData.password.length < 8) {
-    toast.error("Password must be at least 8 characters long.");
-    setIsStaffLoading(false);
-    return;
-  }    
-    
-    try{
+      toast.error("Password must be at least 8 characters long.");
+      setIsStaffLoading(false);
+      return;
+    }
+
+    try {
       const payload = {
         ...staffData,      // flatten out email, password, etc.
         captcha: captchaToken
@@ -91,36 +92,37 @@ const ManageAccount = () => {
       toast.success("Staff account created successfully!");
       setStaffData({
         first_name: '',
-    last_name: '',
-    email: '',
-    password: '',
-    role: 'staff',
+        last_name: '',
+        email: '',
+        password: '',
+        role: 'staff',
       })
       setIsAddUser(false);
-      
-    recaptchaRef.current.reset();
-    setCaptchaToken(null);
+      fetchStaffs();
+
+      recaptchaRef.current.reset();
+      setCaptchaToken(null);
     } catch (err) {
-    console.error("Failed to add account:", err);
+      console.error("Failed to add account:", err);
 
-    if (err.response?.data) {
-      Object.entries(err.response.data).forEach(([field, messages]) => {
-        if (Array.isArray(messages)) {
-          messages.forEach((msg) => toast.error(`${field}: ${msg}`));
-        } else {
-          toast.error(`${field}: ${messages}`);
-        }
-      });
-    } else {
-      toast.error("Failed to add account. Please try again.");
+      if (err.response?.data) {
+        Object.values(err.response.data).forEach((messages) => {
+          if (Array.isArray(messages)) {
+            messages.forEach((msg) => toast.error(msg));
+          } else {
+            toast.error(messages);
+          }
+        });
+      } else {
+        toast.error("Failed to add account. Please try again.");
+      }
+
+      // ✅ Reset captcha after failed submission
+      recaptchaRef.current.reset();
+      setCaptchaToken(null);
+    } finally {
+      setIsStaffLoading(false);
     }
-
-    // ✅ Reset captcha after failed submission
-    recaptchaRef.current.reset();
-    setCaptchaToken(null);
-  } finally {
-    setIsStaffLoading(false);
-  }
   }
 
 
@@ -243,6 +245,48 @@ const ManageAccount = () => {
     }
   };
 
+  const [staffList, setStaffList] = useState([]);
+  const [showInactive, setShowInactive] = useState(false);
+  const fetchStaffs = async () => {
+    try {
+      const res = await api.get(`staff-list/`);
+      setStaffList(res.data);
+      console.log(res.data)
+    } catch (err) {
+      console.error("Failed to fetch staff accounts:", err);
+    }
+  }
+
+  useEffect(() => {
+    fetchStaffs();
+  }, [])
+
+  // Active Staffs
+const activeStaffs = staffList.filter((staff) => staff.is_active);
+// Inactive Staffs
+const inactiveStaffs = staffList.filter((staff) => !staff.is_active);
+
+const handleDeactivate = async (id) => {
+  try {
+    await api.delete(`staff/${id}/delete/`);
+    toast.success("Staff account deactivated!");
+    fetchStaffs();
+  } catch (err) {
+    console.log(err)
+    toast.error("Failed to deactivate staff.");
+  }
+};
+
+const handleReactivate = async (id) => {
+  try {
+    await api.post(`staff/${id}/reactivate/`, { is_active: true });
+    toast.success("Staff account reactivated!");
+    fetchStaffs();
+  } catch (err) {
+    toast.error("Failed to reactivate staff.");
+  }
+};
+
 
   if (loading) {
     return (
@@ -261,13 +305,13 @@ const ManageAccount = () => {
   }
 
   const generatePassword = (length = 8) => {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
-  let password = "";
-  for (let i = 0; i < length; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-};
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
+    let password = "";
+    for (let i = 0; i < length; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return password;
+  };
 
 
   return (
@@ -275,7 +319,7 @@ const ManageAccount = () => {
       {isStaffLoading && (
         <Backdrop
           sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
-          open={isStaffLoading}          
+          open={isStaffLoading}
         >
           <CircularProgress color="inherit" />
         </Backdrop>
@@ -521,6 +565,57 @@ const ManageAccount = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Staff Accounts */}
+            <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">
+                <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
+                <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
+                  {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
+                    activeStaffs.map((staff) => (
+                      <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
+                        <div>
+                          <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name}</h3>
+                          <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
+                        </div>
+                        <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
+                      </div>
+                    ))
+                  ) : (
+                    <h2>No active staff accounts</h2>
+                  )}
+                </div>
+
+                {showInactive && (
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
+          Inactive Staff Accounts
+        </h3>
+        <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {inactiveStaffs.map((staff) => (
+            <div
+              key={staff.id}
+              className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
+            >
+              <div>
+                <h3 className="leading-none font-medium">
+                  {staff.first_name} {staff.last_name}
+                </h3>
+                <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+              </div>
+              <button                
+                onClick={() => handleReactivate(staff.id)}
+                className="text-green-600 text-sm hover:underline cursor-pointer"
+              >
+                Reactivate
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+                
+                <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>                    
             </div>
 
             {/* Notification Preferences */}

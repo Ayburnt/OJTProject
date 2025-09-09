@@ -119,7 +119,7 @@
               
               <!-- Ticket Info -->
               <div class="ticket-box">
-                <p><strong>Name:</strong> {{ attendee.fullName }}</p>
+                <p><strong>Name:</strong> {{ attendee.firstname }} {{ attendee.lastname }}</p>
                 {% if attendee.email %}
                 <p><strong>Email:</strong> {{ attendee.email }}</p>
                 {% endif %}

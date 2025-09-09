@@ -345,6 +345,10 @@ const OrganizerEvent = () => {
               <div className="flex-1 overflow-y-auto">
                 <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
                   <div className="flex justify-between py-2">
+                    <span className="text-gray-500">Transaction Code</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.transaction_read.payment_ref}</span>
+                  </div>
+                  <div className="flex justify-between py-2">
                     <span className="text-gray-500">Reference Code</span>
                     <span className="text-gray-800 font-medium">{selectedAttendee.attendee_code}</span>
                   </div>

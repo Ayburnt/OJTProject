@@ -28,7 +28,8 @@ function BuyTicket() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
-    fullName: "",
+    firstname: "",
+    lastname: "",
     ticketType: "", // will store ticket.id
     ticket_quantity: 1,
     promoCode: "",
@@ -37,7 +38,7 @@ function BuyTicket() {
   });
 
   const [ticketHolders, setTicketHolders] = useState([
-    { fullName: "", email: ""},
+    { firstname: "", lastname: "", email: ""},
   ]);
 
   // 🔹 Compute total price from backend tickets
@@ -62,7 +63,7 @@ function BuyTicket() {
       const updated = [...prev];
       if (formData.ticket_quantity > prev.length) {
         for (let i = prev.length; i < formData.ticket_quantity; i++) {
-          updated.push({ fullName: "", email: ""});
+          updated.push({ firstname: "", lastname: "", email: ""});
         }
       } else if (formData.ticket_quantity < prev.length) {
         updated.length = formData.ticket_quantity;
@@ -113,7 +114,8 @@ function BuyTicket() {
 
     // 2. Buyer (main attendee)
     const mainAttendee = {
-      fullName: formData.fullName,
+      firstname: formData.firstname,
+      lastname: formData.lastname,
       email: formData.email,
       event: eventDetails.event_code,
       ticket_type: formData.ticketType, 
@@ -131,7 +133,8 @@ function BuyTicket() {
     // 3. Other ticket holders
     for (const holder of ticketHolders) {
       const extraAttendee = {
-        fullName: holder.fullName || "Guest",
+        firstname: holder.firstname || "Guest",
+        lastname: holder.lastname || "Guest",
         email: holder.email,
         event: eventDetails.event_code,
         ticket_type: formData.ticketType,
@@ -351,14 +354,27 @@ function BuyTicket() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name (FirstName LastName) <span className="text-red-500">*</span>
+              First Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              name="fullName"
-              value={formData.fullName}
+              name="firstname"
+              value={formData.firstname}
               onChange={handleChange}
-              placeholder="e.g., Jane Doe"
+              className={shortLongInput}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Last Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="lastname"
+              value={formData.lastname}
+              onChange={handleChange}
               className={shortLongInput}
               required
             />
@@ -517,10 +533,20 @@ function BuyTicket() {
                 </h3>
                 <input
                   type="text"
-                  placeholder="Full Name"
-                  value={holder.fullName}
+                  placeholder="First Name"
+                  value={holder.firstname}
                   onChange={(e) =>
-                    handleHolderChange(idx, "fullName", e.target.value)
+                    handleHolderChange(idx, "firstname", e.target.value)
+                  }
+                  className={shortLongInput}
+                  required
+                />
+                <input
+                  type="text"
+                  placeholder="Last Name"
+                  value={holder.lastname}
+                  onChange={(e) =>
+                    handleHolderChange(idx, "lastname", e.target.value)
                   }
                   className={shortLongInput}
                   required
