@@ -104,7 +104,10 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
       )}
 
       {/* Event card */}
-      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={() => fetchAttendees(selected)}>
+      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
+        e.stopPropagation();
+        fetchAttendees(selected)        
+      }}>
         <div className='overflow-hidden rounded-lg aspect-video'>
           <img src={eventPoster} alt="" className='object-cover' />
         </div>
@@ -130,7 +133,9 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
           <button
             className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 
     ${isSelling ? 'bg-red-600 hover:bg-red-700' : 'bg-secondary hover:bg-secondary/90'}`}
-            onClick={handleTicketSelling}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleTicketSelling()}}
           >
             {isSelling ? "Close registration" : "Open registration"}
           </button>
@@ -138,13 +143,17 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
           <div className='flex flex-row gap-3'>
             <button
               className='text-secondary text-lg cursor-pointer outline-none'
-              onClick={() => navigate(`/org/edit/${eventCode}`)}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/org/edit/${eventCode}`)}}
             >
               <RiEditLine />
             </button>
             <button
               className='text-red-600 text-lg outline-none cursor-pointer'
-              onClick={() => setConfirmDelete(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setConfirmDelete(true)}}
             >
               <RiDeleteBin6Line />
             </button>

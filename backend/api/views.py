@@ -192,6 +192,135 @@ class UserRegistrationView(APIView):
         # Add this line to print serializer errors when validation fails
         print("UserRegistrationView serializer errors:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class RegisterStaffView(APIView):
+    """
+    API endpoint for user registration with email and password.
+    """
+    authentication_classes = [JWTAuthentication] # No authentication needed for registration
+    permission_classes = [IsAuthenticated] # No permissions needed for registration
+
+    def post(self, request):
+        # ✅ 1. Get captcha token
+        captcha_token = request.data.get("captcha")
+        print("📌 Captcha token from frontend:", captcha_token)  # Debug
+
+        if not captcha_token:
+            return Response(
+                {"error": "Captcha token missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ 2. Verify with Google
+        secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
+        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
+
+        verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {"secret": secret_key, "response": captcha_token}
+
+        try:
+            r = requests.post(verify_url, data=payload)
+            result = r.json()
+            print("📌 Google verification result:", result)  # Debug
+
+            if not result.get("success"):
+                return Response(
+                    {
+                        "error": "Invalid reCAPTCHA. Please try again.",
+                        "details": result,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Error verifying reCAPTCHA: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+        
+        data = request.data.copy()
+        if 'captcha' in data:
+            data.pop('captcha')
+        
+        serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            try:
+                user = serializer.save(added_by=request.user) # This calls the create method in the serializer
+                tokens = get_tokens_for_user(user)
+
+                # Determine if profile completion is needed based on role
+                needs_profile_completion = user.role == 'organizer'
+
+                # --- Send Account Confirmation Email ---
+                sender_email = settings.DEFAULT_FROM_EMAIL
+                subject = "Welcome to Sari-Sari Events! Your Account is Ready"
+                
+                context = {
+                    'first_name': user.first_name,
+                    'email': user.email,
+                    'password': request.data.get('password'),
+                    'added_by_email': user.added_by.email if user.added_by else None,
+                    'added_by_name': f"{user.added_by.first_name} {user.added_by.last_name}" if user.added_by else None,
+                }
+                html_confirmation_body = render_to_string('api/emails/staff_acc_confirm.html', context)
+                text_confirmation_body = strip_tags(html_confirmation_body)
+
+                if ses_client:
+                    try:
+                        ses_client.send_email(
+                            Source=sender_email,
+                            Destination={
+                                'ToAddresses': [user.email],
+                            },
+                            Message={
+                                'Subject': {'Data': subject},
+                                'Body': {
+                                    'Html': {'Data': html_confirmation_body},
+                                    'Text': {'Data': text_confirmation_body},
+                                },
+                            }
+                        )
+                        print(f"Account confirmation email sent to {user.email}")
+                    except ClientError as e:
+                        print(f"SES Error sending confirmation email: {e.response['Error']['Message']}")
+                    except Exception as e:
+                        print(f"General Error sending confirmation email: {e}")
+                else:
+                    print("SES client not initialized. Cannot send confirmation email.")
+                # --- END NEW ---
+
+                return Response({
+                    'message': 'User registered successfully.',
+                    'user': {
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'profile_picture': user.profile_picture,
+                        'org_logo': request.build_absolute_uri(user.org_logo.url) if user.org_logo else None,
+                        'role': user.role,
+                        'phone_number': user.phone_number,
+                        'birthday': user.birthday.isoformat() if user.birthday else None,
+                        'gender': user.gender,
+                        'company_name': user.company_name,
+                        'company_website': user.company_website,
+                        'needs_profile_completion': needs_profile_completion, # Flag for frontend
+                        'user_code': user.user_code,
+                    },
+                    'tokens': tokens,
+                }, status=status.HTTP_201_CREATED)
+            except IntegrityError:
+                return Response(
+                    {'detail': 'Staff account with this email already exists.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            except Exception as e:
+                print(f"Error during manual user registration: {e}")
+                return Response(
+                    {'detail': 'An unexpected error occurred during registration.'},
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
+        # Add this line to print serializer errors when validation fails
+        print("UserRegistrationView serializer errors:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginView(APIView):
     """
@@ -218,26 +347,29 @@ class UserLoginView(APIView):
                 not user.user_code
             )
 
+            response_data = {
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'profile_picture': user.profile_picture,
+                'org_logo': request.build_absolute_uri(user.org_logo.url) if user.org_logo else None,
+                'role': user.role,
+                'phone_number': user.phone_number,
+                'birthday': user.birthday.isoformat() if user.birthday else None,
+                'gender': user.gender,
+                'company_name': user.company_name,
+                'company_website': user.company_website,
+                'needs_profile_completion': needs_profile_completion,
+                'user_code': user.user_code,  # Always return organizer’s code for consistency
+                'verification_status': user.verification_status,
+            }
+
             return Response({
-                'message': 'Login successful.',
-                'user': {
-                    'email': user.email,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'profile_picture': user.profile_picture,
-                    'org_logo': request.build_absolute_uri(user.org_logo.url) if user.org_logo else None,
-                    'role': user.role,
-                    'phone_number': user.phone_number,
-                    'birthday': user.birthday.isoformat() if user.birthday else None,
-                    'gender': user.gender,
-                    'company_name': user.company_name,
-                    'company_website': user.company_website,
-                    'needs_profile_completion': needs_profile_completion, # Flag for frontend
-                    'user_code': user.user_code,
-                    'verification_status': user.verification_status,
-                },
+                'message': f"User is {user.role}",
+                'user': response_data,
                 'tokens': tokens,
             }, status=status.HTTP_200_OK)
+                                    
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class GoogleAuthRegisterView(APIView):

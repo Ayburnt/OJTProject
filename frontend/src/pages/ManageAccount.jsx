@@ -4,6 +4,10 @@ import OrganizerNav from '../components/OrganizerNav';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import useAuth from '../hooks/useAuth';
+import ReCAPTCHA from "react-google-recaptcha";
+import { toast } from 'react-toastify';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 
 // Modal for success/error messages
 const MessageModal = ({ message, onClose }) => {
@@ -22,11 +26,11 @@ const MessageModal = ({ message, onClose }) => {
   );
 };
 
-const InputFields = ({ lbl, fieldType, fieldName }) => {
+const InputFields = ({ lbl, fieldType, fieldName, handleStaffDataChange, inputValue }) => {
   return (
     <div className='w-full flex flex-col items-start font-outfit'>
       <label htmlFor="" className='font-medium text-sm text-[#555555]'>{lbl}</label>
-      <input type={fieldType} name={fieldName} className='w-full text-sm border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm' />
+      <input onChange={handleStaffDataChange} value={inputValue} required type={fieldType} name={fieldName} className='w-full text-sm border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm' />
     </div>
   )
 
@@ -38,6 +42,7 @@ const ManageAccount = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAddUser, setIsAddUser] = useState(false);
+  const [isStaffLoading, setIsStaffLoading] = useState(false);
   const { userCode } = useAuth();
 
   const [notifications, setNotifications] = useState({
@@ -46,9 +51,83 @@ const ManageAccount = () => {
     marketing: false
   });
 
+  const [staffData, setStaffData] = useState({
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    role: 'staff',
+  });
+
+  const handleStaffDataChange = (e) => {
+        // e.target refers to the input field that triggered the event
+        const { name, value } = e.target;
+        // Use the spread operator to copy the existing state and then
+        // update only the field that changed ([name]: value)
+        setStaffData(prevData => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+  
+
+  const handleRegStaff = async(e) => {
+    e.preventDefault();
+    setIsStaffLoading(true);
+    console.log(staffData)
+
+    if (staffData.password && staffData.password.length < 8) {
+    toast.error("Password must be at least 8 characters long.");
+    setIsStaffLoading(false);
+    return;
+  }    
+    
+    try{
+      const payload = {
+        ...staffData,      // flatten out email, password, etc.
+        captcha: captchaToken
+      };
+      const res = await api.post(`auth/register-staff/`, payload);
+      toast.success("Staff account created successfully!");
+      setStaffData({
+        first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    role: 'staff',
+      })
+      setIsAddUser(false);
+      
+    recaptchaRef.current.reset();
+    setCaptchaToken(null);
+    } catch (err) {
+    console.error("Failed to add account:", err);
+
+    if (err.response?.data) {
+      Object.entries(err.response.data).forEach(([field, messages]) => {
+        if (Array.isArray(messages)) {
+          messages.forEach((msg) => toast.error(`${field}: ${msg}`));
+        } else {
+          toast.error(`${field}: ${messages}`);
+        }
+      });
+    } else {
+      toast.error("Failed to add account. Please try again.");
+    }
+
+    // ✅ Reset captcha after failed submission
+    recaptchaRef.current.reset();
+    setCaptchaToken(null);
+  } finally {
+    setIsStaffLoading(false);
+  }
+  }
+
 
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
+  const [captchaToken, setCaptchaToken] = useState(null);
+  const recaptchaRef = useRef();
 
   const fileInputRef = useRef(null); // for profile picture
   const logoInputRef = useRef(null); // for company logo
@@ -181,28 +260,53 @@ const ManageAccount = () => {
     );
   }
 
+  const generatePassword = (length = 8) => {
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
 
 
   return (
     <div className="flex min-h-screen bg-gray-100 pt-18 md:pt-0 font-outfit">
+      {isStaffLoading && (
+        <Backdrop
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+          open={isStaffLoading}          
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
+      )}
+
       {isAddUser && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 font-outfit">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-sm xl:max-w-lg px-6 py-10 text-center">
             <h1 className='text-2xl font-semibold text-secondary'>Add New Account</h1>
             <p className='max-w-lg text-gray-500'>This account has access to check in attendees and view their details.</p>
             <div className='grid grid-cols-1 gap-3 mt-5'>
-              <InputFields lbl='First Name' fieldType='text' fieldName='first_name' />
-              <InputFields lbl='Last Name' fieldType='text' fieldName='last_name' />
-              <InputFields lbl='Email' fieldType='email' fieldName='email' />
+              <InputFields inputValue={staffData.first_name} handleStaffDataChange={handleStaffDataChange} lbl='First Name' fieldType='text' fieldName='first_name' />
+              <InputFields inputValue={staffData.last_name} handleStaffDataChange={handleStaffDataChange} lbl='Last Name' fieldType='text' fieldName='last_name' />
+              <InputFields inputValue={staffData.email} handleStaffDataChange={handleStaffDataChange} lbl='Email' fieldType='email' fieldName='email' />
               <div className='w-full flex flex-col items-start font-outfit'>
                 <label htmlFor="" className='font-medium text-[#555555] text-sm'>Password <span className='text-gray-400'>(at least 8 characters)</span></label>
-                <input type='password' name='password' className='w-full border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm text-sm' />
-                <button className='text-secondary self-start text-sm cursor-pointer font-medium hover:text-secondary/90'>Generate password</button>
+                <input value={staffData.password} onChange={handleStaffDataChange} required type='password' name='password' className='w-full border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm text-sm' />
+                <button onClick={() => setStaffData(prev => ({ ...prev, password: generatePassword() }))} className='text-secondary self-start text-sm cursor-pointer font-medium hover:text-secondary/90'>Generate password</button>
               </div>
+            </div>
+
+            <div className='w-full flex justify-center items-center'>
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                onChange={(token) => setCaptchaToken(token)}
+              />
             </div>
             <div className='mt-5 flex flex-row items-center justify-end'>
               <button onClick={() => setIsAddUser(false)} className='hover:text-secondary/90 transition-all duration-300 text-secondary font-medium mr-3 cursor-pointer'>Cancel</button>
-              <button className='bg-secondary hover:bg-secondary/90 transition-all duration-300 font-medium text-white py-2 px-4 rounded-lg cursor-pointer'>Add Account</button>
+              <button onClick={handleRegStaff} className='bg-secondary hover:bg-secondary/90 transition-all duration-300 font-medium text-white py-2 px-4 rounded-lg cursor-pointer'>Add Account</button>
             </div>
           </div>
         </div>

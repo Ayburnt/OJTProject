@@ -54,6 +54,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ('organizer', 'Organizer'),
         ('admin', 'Admin'),
+        ('staff', 'Staff'),
     )
 
     VERIFICATION_STATUS_CHOICES = (
@@ -61,6 +62,14 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('pending', 'Pending'),
         ('verified', 'Verified'),
         ('declined', 'Declined'),
+    )
+
+    added_by = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='subaccounts'
     )
 
     email = models.EmailField(unique=True)
@@ -79,7 +88,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     birthday = models.DateField(blank=True, null=True)
     gender = models.CharField(max_length=10, blank=True, null=True) # Re-added the gender field
-    user_code = models.CharField(unique=True, blank=True, null=True)
+    user_code = models.CharField(max_length=25, unique=True, blank=True, null=True)
     qr_profile_link = models.URLField(max_length=500, blank=True, null=True)
     qr_code_image = models.ImageField(upload_to="qr_codes/", blank=True, null=True)
     

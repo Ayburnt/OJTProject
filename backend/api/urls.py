@@ -14,10 +14,12 @@ from .views import (
     CurrentUserView,
     change_password,
     OrganizerListView,
+    RegisterStaffView,
 )
 
 urlpatterns = [
     path('auth/register/', UserRegistrationView.as_view(), name='register'),
+    path('auth/register-staff/', RegisterStaffView.as_view(), name='register-staff'),
     path('auth/login/', UserLoginView.as_view(), name='login'),
     path('auth/google/register/', GoogleAuthRegisterView.as_view(), name='google_register'),
     path('auth/google/login/', GoogleAuthLoginView.as_view(), name='google_login'),

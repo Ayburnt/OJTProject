@@ -95,7 +95,10 @@ export const useAuth = () => {
 
     if (user.role === 'organizer') {
       navigate(`/org/${user.user_code}/dashboard`);
-    } else if (user.role === 'admin') {
+    } else if(user.role === 'staff'){
+      navigate(`/find-my-ticket`);
+    }
+    else if (user.role === 'admin') {
       navigate('/admin-dashboard');
     } else {
       navigate('/');

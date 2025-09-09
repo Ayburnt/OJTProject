@@ -20,7 +20,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     company_website = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True)
     # Added min_length to password fields
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
-    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'}, min_length=8)
+    confirm_password = serializers.CharField(write_only=True, required=False, style={'input_type': 'password'}, min_length=8)
     role = serializers.ChoiceField(choices=CustomUser.ROLE_CHOICES, default='organizer') # Updated default role
     phone_number = serializers.CharField(max_length=20, required=False, allow_blank=True, allow_null=True) # New field
     birthday = serializers.DateField(required=False, allow_null=True) # New field
@@ -28,10 +28,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     profile_picture = serializers.URLField(max_length=500, required=False, allow_blank=True, allow_null=True) # New field for profile picture
     user_code = serializers.CharField(max_length=25, required=False, allow_blank=True, allow_null=True)
     qr_code_image_url = serializers.SerializerMethodField()
+    added_by = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture', 'user_code', 'qr_profile_link', 'qr_code_image', 'qr_code_image_url') # Added gender
+        fields = ('first_name', 'last_name', 'email', 'company_name', 'company_website', 'password', 'confirm_password', 'role', 'phone_number', 'birthday', 'gender', 'profile_picture', 'user_code', 'qr_profile_link', 'qr_code_image', 'qr_code_image_url', 'added_by')
         extra_kwargs = {
             'first_name': {'required': False, 'allow_blank': True}, # Made optional for initial registration
             'last_name': {'required': False, 'allow_blank': True},  # Made optional for initial registration
@@ -40,19 +41,28 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         """
-        Check that the two password fields match.
-        This validation runs only if 'password' is present in data.
+        Only enforce confirm_password if role is not staff.
         """
-        if 'password' in data and 'confirm_password' in data:
-            if data['password'] != data['confirm_password']:
+        role = data.get('role', 'organizer')
+        password = data.get('password')
+        confirm = data.get('confirm_password')
+
+        # If role is not staff → require password confirmation
+        if role != 'staff':
+            if not confirm:
+                raise serializers.ValidationError({"confirm_password": "This field is required for organizers."})
+            if password != confirm:
                 raise serializers.ValidationError({"confirm_password": "Passwords do not match."})
+
         return data
+
 
     def create(self, validated_data):
         """
         Create and return a new `CustomUser` instance, given the validated data.
         """
-        validated_data.pop('confirm_password') # Remove confirm_password as it's not a model field
+        validated_data.pop('confirm_password', None) # Remove confirm_password as it's not a model field
+        added_by = validated_data.pop('added_by', None)
         user = CustomUser.objects.create_user(
             email=validated_data['email'],
             password=validated_data['password'],
@@ -65,10 +75,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
             birthday=validated_data.get('birthday', None), # Save new field
             gender=validated_data.get('gender', None), # Save new field
             profile_picture=validated_data.get('profile_picture', 'https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575'), # Save new field
-            user_code=validated_data.get('user_code', ''),
+            user_code=validated_data.get('user_code') or None,
             qr_profile_link=validated_data.get('qr_profile_link', ''),
             qr_code_image=validated_data.get('qr_code_image','')
         )
+
+        if added_by:  # 👈 assign FK if provided
+            user.added_by = added_by
+            user.save()
+
         return user
     
     def get_qr_code_image_url(self, obj):
