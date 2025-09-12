@@ -882,6 +882,56 @@ class ResetPasswordView(APIView):
             {"detail": "Password has been reset successfully."},
             status=status.HTTP_200_OK
         )
+    
+class CurrentStaffView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        added_by = user.added_by  # <-- instance of the same model, or None
+
+        return Response({
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "profile_picture": (
+                request.build_absolute_uri(user.profile_picture.url)
+                if hasattr(user.profile_picture, "url")
+                else (
+                    request.build_absolute_uri(user.profile_picture)
+                    if user.profile_picture else None
+                )
+            ),
+            "org_logo": request.build_absolute_uri(user.org_logo.url) if user.org_logo else None,
+            "role": user.role,
+            "phone_number": user.phone_number,
+            "birthday": user.birthday.isoformat() if user.birthday else None,
+            "gender": user.gender,
+            "company_name": user.company_name,
+            "company_website": user.company_website,
+            "user_code": user.user_code,
+            "qr_code_image": (
+                request.build_absolute_uri(user.qr_code_image.url)
+                if user.qr_code_image else None
+            ),
+            "qr_profile_link": user.qr_profile_link,
+            "verification_status": user.verification_status,
+
+            # keep raw id if you want
+            "added_by_id": user.added_by_id,
+
+            # include info about the user who added this one
+            "added_by": {
+                "id": added_by.id,
+                "email": added_by.email,
+                "first_name": added_by.first_name,
+                "last_name": added_by.last_name,
+                "role": added_by.role,
+                "user_code": added_by.user_code,
+            } if added_by else None,
+        })
+
 
 class CurrentUserView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -1055,3 +1105,4 @@ class StaffSoftReactivateView(APIView):
         staff.save(update_fields=["is_active"])
 
         return Response({"detail": "Staff account reactivated successfully."}, status=status.HTTP_200_OK)
+    

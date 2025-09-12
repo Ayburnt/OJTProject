@@ -36,13 +36,30 @@ export default function Ticket() {
   const [attendanceDetails, setAttendanceDetails] = useState(null);
   const { isLoggedIn, userCode, userRole } = useAuth();
 
+  // useEffect(() => {
+  //   if (isLoggedIn && (userRole === 'organizer' || userRole === 'staff') && (eventDetails?.created_by === userCode || eventDetails?.created_by)) {
+  //     setIsOrganizer(true);
+  //   } else {
+  //     setIsOrganizer(false);
+  //   }
+  // }, [isLoggedIn, userRole, userCode, eventDetails?.created_by]);
+
   useEffect(() => {
-    if (isLoggedIn && userRole === 'organizer' && eventDetails?.created_by === userCode) {
-      setIsOrganizer(true);
-    } else {
-      setIsOrganizer(false);
+    const fetchStaffOrg = async() => {
+      try{
+        const res = await api.get(`staff-info/`);
+        if(isLoggedIn && (userRole === 'organizer' || userRole === 'staff') && (eventDetails?.created_by === userCode || eventDetails?.created_by === res.data.added_by.user_code)){
+          setIsOrganizer(true);
+        } else{
+          setIsOrganizer(false);
+        }
+      } catch(err){
+        console.log("Error fetching staff details.", err);
+      }
     }
-  }, [isLoggedIn, userRole, userCode, eventDetails?.created_by]);
+    
+    fetchStaffOrg();
+  },[isLoggedIn, userRole, userCode, eventDetails?.created_by])
 
   useEffect(() => {
     api.get(`/attendees/booking-info/${attendeeCode}/`)

@@ -17,7 +17,7 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class AttendeeResponseSerializer(serializers.ModelSerializer):
-    questions = RegFormQuesSeializer(source='reg_form_question', read_only=True)
+    question_details = RegFormQuesSeializer(source='question', read_only=True)
     attendee = serializers.PrimaryKeyRelatedField(read_only=True)
     class Meta:
         model = Attendee_Response
@@ -93,10 +93,30 @@ class AttendeeSerializer(serializers.ModelSerializer):
         ]
 
     def get_attendance(self, obj):
-        attendance = Event_Attendance.objects.filter(attendee=obj).first()
-        if attendance:
-            return EventAttendanceSerializer(attendance, context=self.context).data
-        return None
+        attendance = (
+            Event_Attendance.objects
+            .select_related("checked_in_by_organizer")   # join to CustomUser
+            .filter(attendee=obj)
+            .first()
+        )
+
+        if not attendance:
+            return None
+
+        # serialize attendance itself
+        attendance_data = EventAttendanceSerializer(attendance, context=self.context).data
+
+        # add some info from the staff user
+        staff = attendance.checked_in_by_organizer
+        attendance_data["checked_in_by"] = {
+            "id": staff.id,
+            "email": staff.email,
+            "first_name": staff.first_name,
+            "last_name": staff.last_name,
+            "role": staff.role,
+        }
+
+        return attendance_data
 
     def create(self, validated_data):
         responses_data = validated_data.pop("responses", [])

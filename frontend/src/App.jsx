@@ -29,6 +29,8 @@ import BuyTicket from './pages/BuyTicket.jsx';
 import PrivateRoute from './hooks/protectedRoute.jsx';
 import BookingConfirmation from './pages/BookingConfirmation.jsx';
 import TransactionConfirmation from './pages/TransactionConfirmation.jsx';
+import StaffDashboard from './pages/StaffDashboard.jsx';
+import StaffManageAccount from './pages/StaffManageAccount.jsx';
 
 import Q1 from './footer/Q1.jsx';
 import Q2 from './footer/Q2.jsx';
@@ -78,6 +80,8 @@ function App() {
     '/policy',
     '/security',  
     '/attendee',
+    '/staff',
+    '/staff/account'
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -127,6 +131,8 @@ function App() {
           <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
           <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
           <Route path='/org/edit/:eventcode' element={<PrivateRoute requiredRole={'organizer'}><EditEvent /></PrivateRoute>} />
+          <Route path="/staff" element={<PrivateRoute requiredRole={'staff'}><StaffDashboard /></PrivateRoute>} /> 
+          <Route path="/staff/account" element={<PrivateRoute requiredRole={'staff'}><StaffManageAccount /></PrivateRoute>} /> 
           <Route path='/events/:eventcode/checkout' element={<BuyTicket />} />
 
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}
@@ -136,7 +142,7 @@ function App() {
           <Route path='/admin-dashboard' element={<PrivateRoute requiredRole={'admin'}><AdminDashboard /></PrivateRoute>} /> 
           <Route path='/admin-eventcontrol' element={<PrivateRoute requiredRole={'admin'}><AdminEventControl /></PrivateRoute>} /> 
           <Route path='/admin-review' element={<PrivateRoute requiredRole={'admin'}><AdminReviewPage /></PrivateRoute>} /> 
-          <Route path="/attendees/:eventcode" element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} /> 
+          <Route path="/attendees/:eventcode" element={<PrivateRoute requiredRole={'admin'}><AdminAttendees /></PrivateRoute>} />           
           <Route path="/attendee/:attendeeCode" element={<BookingConfirmation />} /> 
           <Route path="/transaction/:transactCode" element={<TransactionConfirmation />} /> 
 
@@ -149,7 +155,7 @@ function App() {
           <Route path="/contact-us" element={<ContactUs />} />
           <Route path="/term" element={<Term />} />
           <Route path="/policy" element={<Policy />} />
-          <Route path="/security" element={<Security />} />
+          <Route path="/security" element={<Security />} />          
 
 
         </Routes>

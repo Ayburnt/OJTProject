@@ -6,11 +6,13 @@ from .views import (
     EventDetailView,
     OrganizerProfilePublicView,
     toggle_ticket_selling,
+    EventListCreateStaffView,
 )
 
 urlpatterns = [
     # URL for listing all events and creating a new one
     path('list-create/', EventListCreateAPIView.as_view(), name='event-list-create'),
+    path('list-create/staff/', EventListCreateStaffView.as_view(), name='event-list-create-staff'),
     path('event-public-view/', EventPublicView.as_view(), name='event-public-view'),
 
     # URL for retrieving, updating, and deleting a specific event by its event_code

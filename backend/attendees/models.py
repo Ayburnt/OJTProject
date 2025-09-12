@@ -7,6 +7,7 @@ from django.utils import timezone
 import qrcode
 from django.db import transaction
 from django.conf import settings
+
 class Attendee(models.Model):
     STATUS_CHOICES = (
         ('registered', 'Registered'),
@@ -112,8 +113,7 @@ class Event_Attendance(models.Model):
     checked_in_by_organizer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='checked_in_attendances',
-        to_field='user_code'
+        related_name='checked_in_attendances',        
     )
     created_at = models.DateTimeField(auto_now_add=True)
 

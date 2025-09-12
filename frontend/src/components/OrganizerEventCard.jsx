@@ -5,10 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
+import useAuth from '../hooks/useAuth.js';
 
 function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
+  const {userRole} = useAuth();
   const navigate = useNavigate();
 
   // Delete API call
@@ -128,8 +130,9 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
         <p className={eDetailsStyle}><GoCalendar />{eventDate}</p>
         <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
         <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
-
-        <div className='flex flex-row gap-3 mt-3 w-full'>
+        
+        {userRole === 'organizer' && (
+          <div className='flex flex-row gap-3 mt-3 w-full'>
           <button
             className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 
     ${isSelling ? 'bg-red-600 hover:bg-red-700' : 'bg-secondary hover:bg-secondary/90'}`}
@@ -159,6 +162,9 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
             </button>
           </div>
         </div>
+        )}            
+
+
       </div>
     </>
   );

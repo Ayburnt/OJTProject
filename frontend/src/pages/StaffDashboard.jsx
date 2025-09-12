@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import OrganizerNav from '../components/OrganizerNav';
+import StaffNav from '../components/StaffNav';
 import EventCard from '../components/OrganizerEventCard';
 import { Link, useNavigate } from "react-router-dom";
 import Chatbot from '../pages/Chatbot';
@@ -21,7 +21,7 @@ const OrganizerEvent = () => {
 
   const fetchEventDetails = async () => {
     try {
-      const res = await api.get(`/list-create/`);
+      const res = await api.get(`/list-create/staff/`);
       setEvents(res.data);
     } catch (err) {
       console.error("Error fetching events:", err);
@@ -33,7 +33,7 @@ const OrganizerEvent = () => {
   }, []);
 
   useEffect(() => {
-    document.title = "Organizer Event | Sari-Sari Events";
+    document.title = "Staff | Sari-Sari Events";
   }, []);
 
   // Format date + time
@@ -176,7 +176,7 @@ const OrganizerEvent = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen font-outfit pb-10">
-      <OrganizerNav />
+      <StaffNav />
 
       <div className="pt-23 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
         {/* Header */}
@@ -189,21 +189,10 @@ const OrganizerEvent = () => {
               >
                 <IoIosArrowBack className="text-secondary text-xl" />
                 <span className="text-secondary text-sm font-medium font-outfit">Back</span>
-              </div>
-              <img
-                src={orgLogo}
-                className='hidden rounded-full md:flex w-[2.5rem] mr-10'
-                alt=''
-              />
+              </div>              
             </div>
           )}
-          {currentEvent === null && (
-            <img
-              src={orgLogo}
-              className='hidden rounded-full md:flex w-[2.5rem] mr-10'
-              alt=''
-            />
-          )}
+          
         </div>
 
         {!currentEvent ? (
@@ -257,13 +246,6 @@ const OrganizerEvent = () => {
                   </button>
                 ))}
               </div>
-
-              <Link
-                to={`/org/${userCode}/create-event`}
-                className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
-              >
-                Create New Event
-              </Link>
             </div>
 
             {/* Event Cards */}

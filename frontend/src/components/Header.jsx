@@ -248,7 +248,8 @@ function Header() {
             Create Event
           </button>
           {isLoggedIn ? (
-            <>
+            userRole === 'organizer' ? (
+              <>
               {orgLogo && (
                 <img
                   src={orgLogo}
@@ -282,6 +283,42 @@ function Header() {
                 </button>
               </div>
             </>
+            ) : (
+              <>
+              {orgLogo && (
+                <img
+                  src={orgLogo}
+                  alt="User Profile"
+                  className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                  onClick={() => setIsAccDD(!isAccDD)}
+                />
+              )}
+              <div
+                className={`${
+                  isAccDD ? "grid" : "hidden"
+                } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
+              >
+                <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
+                  {userFirstName} {userLastName}
+                  {verificationStatus === "verified" && (
+                    <FaCheckCircle className="text-green-400" />
+                  )}
+                </p>
+                <button
+                  onClick={() => navigate(`/staff`)}
+                  className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                >
+                  Events
+                </button>
+                <button
+                  className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                  onClick={logout}
+                >
+                  Log out
+                </button>
+              </div>
+            </>
+            )
           ) : (
             <Link
               to="/login"
@@ -333,7 +370,8 @@ function Header() {
               Create Event
             </button>
             {isLoggedIn ? (
-              <>
+              userRole === 'organizer' ? (
+                <>
                 <button
                   onClick={() => navigate(`/org/${userCode}/dashboard`)}
                   className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
@@ -347,6 +385,22 @@ function Header() {
                   Log out
                 </button>
               </>
+              ) : (
+                <>
+                <button
+                  onClick={() => navigate(`/staff`)}
+                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                >
+                  Events
+                </button>
+                <button
+                  onClick={logout}
+                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                >
+                  Log out
+                </button>
+              </>
+              )              
             ) : (
               <Link
                 to="/login"

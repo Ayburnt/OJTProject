@@ -222,7 +222,7 @@ class AttendeeDetailView(APIView):
             return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)            
         
         serializer = AttendeeSerializer(attendee, context={"request": request})
-        print("📦 Serialized data:", serializer.data)
+        print("📦 Serialized data:", serializer.data.attendance)
         return Response(serializer.data)
 
 class TransactionDetailView(APIView):
@@ -271,18 +271,18 @@ class EventAttendanceView(APIView):
         attendee_code = request.data.get("attendee_code")
         user_code = request.data.get("user_code")
 
-        if not attendee_code or not user_code:
-            return Response({"error": "attendee_code and user_code required"}, status=status.HTTP_400_BAD_REQUEST)
+        if not attendee_code:
+            return Response({"error": "attendee_code is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             attendee = Attendee.objects.get(attendee_code=attendee_code)
         except Attendee.DoesNotExist:
             return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        try:
-            organizer = User.objects.get(user_code=user_code)
-        except User.DoesNotExist:
-            return Response({"error": "Organizer not found"}, status=status.HTTP_404_NOT_FOUND)
+        # try:
+        #     organizer = User.objects.get(user_code=user_code)
+        # except User.DoesNotExist:
+        #     return Response({"error": "Organizer not found"}, status=status.HTTP_404_NOT_FOUND)
 
         # Prevent double check-in
         existing = Event_Attendance.objects.filter(attendee=attendee).first()
@@ -292,7 +292,7 @@ class EventAttendanceView(APIView):
         # Create attendance record
         attendance = Event_Attendance.objects.create(
             attendee=attendee,
-            checked_in_by_organizer=organizer
+            checked_in_by_organizer=request.user,   # store PK of logged-in user
         )
 
         # Update attendee status

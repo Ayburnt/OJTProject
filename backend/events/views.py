@@ -144,6 +144,19 @@ class EventListCreateAPIView(APIView):
 
         print("📌 Serializer errors:", serializer.errors)  # Debug
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class EventListCreateStaffView(APIView):
+    parser_classes = [NestedMultiPartParser]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        added_by = user.added_by
+        events = Event.objects.filter(created_by=added_by.user_code)
+        serializer = EventSerializer(events, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)    
+    
 
 class EventRetrieveUpdateDestroyAPIView(APIView):
     parser_classes = [NestedMultiPartParser]
