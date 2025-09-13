@@ -21,6 +21,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView
 import requests
+from django.db.models import Q
 
 
 # Import all necessary serializers
@@ -235,10 +236,13 @@ class RegisterStaffView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
         
-        staff_count = CustomUser.objects.filter(added_by=request.user, role='staff', is_active=True).count()
+        staff_count = CustomUser.objects.filter(added_by=request.user, is_active=True
+                                                ).filter(
+                                                    Q(role='staff') | Q(role='co-organizer')
+                                                ).count()
         if staff_count >= 5:
             return Response(
-                {"detail": "You can add a maximum of 5 staff accounts."},
+                {"detail": "You can add a maximum of 5 accounts."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
@@ -890,7 +894,6 @@ class CurrentStaffView(APIView):
     def get(self, request):
         user = request.user
         added_by = user.added_by  # <-- instance of the same model, or None
-
         return Response({
             "email": user.email,
             "first_name": user.first_name,
@@ -929,6 +932,8 @@ class CurrentStaffView(APIView):
                 "last_name": added_by.last_name,
                 "role": added_by.role,
                 "user_code": added_by.user_code,
+                'company_name': added_by.company_name,
+                'company_website': added_by.company_website,
             } if added_by else None,
         })
 
@@ -1001,8 +1006,8 @@ def change_password(request):
         return Response({"detail": "Current password is incorrect."},
                         status=status.HTTP_400_BAD_REQUEST)
 
-    if len(new_password) < 6:
-        return Response({"detail": "New password must be at least 6 characters."},
+    if len(new_password) < 8:
+        return Response({"detail": "New password must be at least 8 characters."},
                         status=status.HTTP_400_BAD_REQUEST)
 
     user.set_password(new_password)
@@ -1038,7 +1043,10 @@ class StaffListView(APIView):
 
     def get(self, request):
         # Only get staff accounts added by this user
-        staff_accounts = CustomUser.objects.filter(added_by=request.user, role='staff')
+        staff_accounts = CustomUser.objects.filter(added_by=request.user
+                                                   ).filter(
+                                                       Q(role='staff') | Q(role='co-organizer')
+                                                    )
         serializer = UserSerializer(staff_accounts, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -1078,20 +1086,28 @@ class StaffSoftReactivateView(APIView):
 
     def post(self, request, pk=None):
         try:
-            staff = CustomUser.objects.get(pk=pk, role="staff", added_by=request.user)
+            staff = CustomUser.objects.get(
+                Q(pk=pk),
+                Q(role="staff") | Q(role="co-organizer"),
+                added_by=request.user
+            )
         except CustomUser.DoesNotExist:
             return Response(
-                {"detail": "Staff account not found or you don't have permission to reactivate it."},
+                {"detail": "Account not found or you don't have permission to reactivate it."},
                 status=status.HTTP_404_NOT_FOUND
             )
 
         # Prevent exceeding staff limit
         staff_count = CustomUser.objects.filter(
-            added_by=request.user, role='staff', is_active=True
+            added_by=request.user,
+            is_active=True
+        ).filter(
+            Q(role="staff") | Q(role="co-organizer")
         ).count()
+
         if staff_count >= 5:
             return Response(
-                {"detail": "You can add a maximum of 5 active staff accounts."},
+                {"detail": "You can add a maximum of 5 active accounts."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 

@@ -13,7 +13,7 @@ function Header() {
     isLoggedIn,
     userRole,
     userLastName,
-    userFirstName,    
+    userFirstName,
     logout,
     userCode,
     orgLogo,
@@ -67,7 +67,7 @@ function Header() {
     const fetchOrganizers = async () => {
       try {
         const res = await api.get(`/organizers/`);
-        setAllOrganizers(res.data || []);        
+        setAllOrganizers(res.data || []);
       } catch (err) {
         console.error("API Fetch Error (organizers):", err);
         setAllOrganizers([]);
@@ -233,91 +233,94 @@ function Header() {
         <nav className="hidden lg:flex items-center space-x-6">
           <Link
             to="/find-my-ticket"
-            className={`${
-              isLoggedIn && userRole === "client" ? "hidden" : "block"
-            } text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
+            className={`${isLoggedIn && userRole === "client" ? "hidden" : "block"
+              } text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
           >
             Find my Ticket
           </Link>
           <button
             onClick={handleCreateEvent}
-            className={`${
-              isLoggedIn && userRole === "guest" ? "hidden" : "block"
-            } cursor-pointer text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
+            className={`${isLoggedIn && userRole === "guest" ? "hidden" : "block"
+              } cursor-pointer text-gray-700 hover:text-teal-600 transition-colors text-base font-medium`}
           >
             Create Event
           </button>
           {isLoggedIn ? (
-            userRole === 'organizer' ? (
+            (userRole === 'organizer' || userRole === 'co-organizer') ? (
               <>
-              {orgLogo && (
-                <img
-                  src={orgLogo}
-                  alt="User Profile"
-                  className="h-8 w-8 rounded-full object-cover cursor-pointer"
-                  onClick={() => setIsAccDD(!isAccDD)}
-                />
-              )}
-              <div
-                className={`${
-                  isAccDD ? "grid" : "hidden"
-                } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
-              >
-                <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
-                  {userFirstName} {userLastName}
-                  {verificationStatus === "verified" && (
-                    <FaCheckCircle className="text-green-400" />
-                  )}
-                </p>
-                <button
-                  onClick={() => navigate(`/org/${userCode}/dashboard`)}
-                  className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                {orgLogo && (
+                  <img
+                    src={orgLogo}
+                    alt="User Profile"
+                    className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                    onClick={() => setIsAccDD(!isAccDD)}
+                  />
+                )}
+                <div
+                  className={`${isAccDD ? "grid" : "hidden"
+                    } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
                 >
-                  Dashboard
-                </button>
-                <button
-                  className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
-                  onClick={logout}
-                >
-                  Log out
-                </button>
-              </div>
-            </>
+                  <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
+                    {userFirstName} {userLastName}
+                    {verificationStatus === "verified" && (
+                      <FaCheckCircle className="text-green-400" />
+                    )}
+                  </p>
+                  <button
+                    onClick={() => {
+                      if (userRole === 'organizer') {
+                        navigate(`/org/${userCode}/dashboard`)
+                      } else if (userRole === 'co-organizer') {
+                        navigate(`/org/dashboard`)
+                      }
+                    }}
+
+                    className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                    onClick={logout}
+                  >
+                    Log out
+                  </button>
+                </div>
+              </>
             ) : (
               <>
-              {orgLogo && (
-                <img
-                  src={orgLogo}
-                  alt="User Profile"
-                  className="h-8 w-8 rounded-full object-cover cursor-pointer"
-                  onClick={() => setIsAccDD(!isAccDD)}
-                />
-              )}
-              <div
-                className={`${
-                  isAccDD ? "grid" : "hidden"
-                } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
-              >
-                <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
-                  {userFirstName} {userLastName}
-                  {verificationStatus === "verified" && (
-                    <FaCheckCircle className="text-green-400" />
-                  )}
-                </p>
-                <button
-                  onClick={() => navigate(`/staff`)}
-                  className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                {orgLogo && (
+                  <img
+                    src={orgLogo}
+                    alt="User Profile"
+                    className="h-8 w-8 rounded-full object-cover cursor-pointer"
+                    onClick={() => setIsAccDD(!isAccDD)}
+                  />
+                )}
+                <div
+                  className={`${isAccDD ? "grid" : "hidden"
+                    } shadow-lg text-sm bg-white absolute right-5 top-full origin-top-right grid-cols-1 place-items-center overflow-hidden border border-gray-300 rounded-b-lg w-full max-w-[15%]`}
                 >
-                  Events
-                </button>
-                <button
-                  className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
-                  onClick={logout}
-                >
-                  Log out
-                </button>
-              </div>
-            </>
+                  <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
+                    {userFirstName} {userLastName}
+                    {verificationStatus === "verified" && (
+                      <FaCheckCircle className="text-green-400" />
+                    )}
+                  </p>
+                  <button
+                    onClick={() => navigate(`/staff`)}
+                    className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                  >
+                    Events
+                  </button>
+                  <button
+                    className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
+                    onClick={logout}
+                  >
+                    Log out
+                  </button>
+                </div>
+              </>
             )
           ) : (
             <Link
@@ -370,37 +373,43 @@ function Header() {
               Create Event
             </button>
             {isLoggedIn ? (
-              userRole === 'organizer' ? (
+              (userRole === 'organizer' || userRole === 'co-organizer') ? (
                 <>
-                <button
-                  onClick={() => navigate(`/org/${userCode}/dashboard`)}
-                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-                >
-                  Dashboard
-                </button>
-                <button
-                  onClick={logout}
-                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-                >
-                  Log out
-                </button>
-              </>
+                  <button
+                    onClick={() => {
+                      if (userRole === 'organizer') {
+                        navigate(`/org/${userCode}/dashboard`)
+                      } else if (userRole === 'co-organizer') {
+                        navigate(`/org/dashboard`)
+                      }
+                    }}
+                    className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                  >
+                    Dashboard
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                  >
+                    Log out
+                  </button>
+                </>
               ) : (
                 <>
-                <button
-                  onClick={() => navigate(`/staff`)}
-                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-                >
-                  Events
-                </button>
-                <button
-                  onClick={logout}
-                  className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
-                >
-                  Log out
-                </button>
-              </>
-              )              
+                  <button
+                    onClick={() => navigate(`/staff`)}
+                    className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                  >
+                    Events
+                  </button>
+                  <button
+                    onClick={logout}
+                    className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
+                  >
+                    Log out
+                  </button>
+                </>
+              )
             ) : (
               <Link
                 to="/login"

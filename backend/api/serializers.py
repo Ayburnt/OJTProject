@@ -48,7 +48,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         confirm = data.get('confirm_password')
 
         # If role is not staff → require password confirmation
-        if role != 'staff':
+        if role != 'staff' and role != 'co-organizer':
             if not confirm:
                 raise serializers.ValidationError({"confirm_password": "This field is required for organizers."})
             if password != confirm:

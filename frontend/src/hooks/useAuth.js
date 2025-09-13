@@ -95,10 +95,11 @@ export const useAuth = () => {
 
     if (user.role === 'organizer') {
       navigate(`/org/${user.user_code}/dashboard`);
-    } else if(user.role === 'staff'){
+    } else if (userRole === 'co-organizer') {
+      navigate(`/org/dashboard`)
+    } else if (user.role === 'staff') {
       navigate(`/staff`);
-    }
-    else if (user.role === 'admin') {
+    } else if (user.role === 'admin') {
       navigate('/admin-dashboard');
     } else {
       navigate('/');
@@ -116,7 +117,7 @@ export const useAuth = () => {
     userEmail,
     userCode,
     userFirstName,
-    userLastName,    
+    userLastName,
     userProfile,
     verificationStatus,
     orgLogo,

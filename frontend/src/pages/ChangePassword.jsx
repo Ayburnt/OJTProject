@@ -30,8 +30,8 @@ const ChangePassword = () => {
       setPasswordMismatchError(true);
       return;
     }
-    if (!newPassword || newPassword.length < 6) {
-      setGeneralError('Password must be at least 6 characters long.');
+    if (!newPassword || newPassword.length < 8) {
+      setGeneralError('Password must be at least 8 characters long.');
       return;
     }
 

@@ -53,6 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     """
     ROLE_CHOICES = (
         ('organizer', 'Organizer'),
+        ('co-organizer', 'Co-Organizer'),
         ('admin', 'Admin'),
         ('staff', 'Staff'),
     )

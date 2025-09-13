@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FiUpload } from "react-icons/fi";
 import StaffNav from '../components/StaffNav';
+import OrganizerNav from '../components/OrganizerNav';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import useAuth from '../hooks/useAuth';
@@ -44,7 +45,7 @@ const ManageAccount = () => {
   const [error, setError] = useState(null);
   const [isAddUser, setIsAddUser] = useState(false);
   const [isStaffLoading, setIsStaffLoading] = useState(false);
-  const { userCode } = useAuth();
+  const { userCode, userRole } = useAuth();
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -79,7 +80,6 @@ const ManageAccount = () => {
   const handleRegStaff = async (e) => {
     e.preventDefault();
     setIsStaffLoading(true);
-    console.log(staffData)
 
     if (staffData.password && staffData.password.length < 8) {
       toast.error("Password must be at least 8 characters long.");
@@ -141,8 +141,8 @@ const ManageAccount = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const res = await api.get(`/me/`);
-      setUserData(res.data);
+      const res = await api.get(`/staff-info/`);
+      setUserData(res.data);      
       setError(null);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
@@ -255,7 +255,6 @@ const ManageAccount = () => {
     try {
       const res = await api.get(`staff-list/`);
       setStaffList(res.data);
-      console.log(res.data)
     } catch (err) {
       console.error("Failed to fetch staff accounts:", err);
     }
@@ -362,7 +361,9 @@ const handleReactivate = async (id) => {
 
       {/* Sidebar */}
       <div className="md:block md:w-56 lg:w-64 shrink-0">
-        <StaffNav />
+        {userRole === 'co-organizer' ? (
+          <OrganizerNav />
+        ) : (<StaffNav />)}
       </div>
 
       {/* Main Content */}
@@ -374,10 +375,7 @@ const handleReactivate = async (id) => {
             <div className="bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-10 w-full">
               <div className="flex flex-col w-full lg:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h3 className="text-lg font-semibold font-outfit text-gray-800">Profile Information</h3>
-                <div className='w-full md:w-auto items-center justify-center md:justify-end flex flex-row gap-5 lg:gap-2'>
-                  <button className='cursor-pointer hover:bg-secondary/5 px-4 py-2 border border-secondary rounded-lg text-secondary' onClick={() => setIsAddUser(true)}>
-                    Add an Account
-                  </button>
+                <div className='w-full md:w-auto items-center justify-center md:justify-end flex flex-row gap-5 lg:gap-2'>                  
                   <button
                     onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                     className={`px-4 py-2 rounded-lg transition-colors cursor-pointer ${isEditing
@@ -395,9 +393,9 @@ const handleReactivate = async (id) => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization</label>
                   <input
                     type="text"
-                    value={userData.company_name || ''}
+                    value={userData.added_by.company_name || ''}
                     onChange={(e) => setUserData({ ...userData, company_name: e.target.value })}
-                    disabled={!isEditing}
+                    disabled
                     className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
                       ? 'border-gray-300 focus:ring-2 focus:ring-teal-500'
                       : 'border-gray-200 bg-gray-50'
@@ -408,7 +406,7 @@ const handleReactivate = async (id) => {
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization Email Address</label>
                   <input
                     type="text"
-                    value={userData.company_website || ''}
+                    value={userData.added_by.company_website || ''}
                     onChange={(e) => setUserData({ ...userData, company_website: e.target.value })}
                     disabled={!isEditing}
                     className={`w-full px-3 py-2 border rounded-lg text-base ${isEditing
@@ -464,8 +462,15 @@ const handleReactivate = async (id) => {
                       : 'border-gray-200 bg-gray-50'
                       } focus:outline-none`}
                   />
-                </div>
+                </div>                
               </div>
+              <Link to="/change-password" className='w-full mt-4 flex items-end justify-end'>
+                                <button
+                                  className="px-5.5 py-2 text-sm font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+                                >
+                                  Change Password
+                                </button>
+                              </Link>
             </div>
             
 

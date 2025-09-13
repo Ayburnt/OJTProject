@@ -49,7 +49,7 @@ const parseTime = (timeString) => {
 const EditEventForm = () => {
     const { eventcode } = useParams();
     const navigate = useNavigate();
-    const { userCode } = useAuth();
+    const { userCode, userRole } = useAuth();
     const [step, setStep] = useState(1);
     const totalSteps = 4;
     const [isLoading, setIsLoading] = useState(false);
@@ -255,7 +255,13 @@ const EditEventForm = () => {
             });
         } catch (err) {
             console.error("Failed to fetch event data:", err);
-            navigate(`/org/${userCode}/my-event`);
+            if(userRole === 'organizer'){
+                navigate(`/org/${userCode}/my-event`);
+            } else if (userRole === 'co-organizer'){
+                navigate(`/org/my-event`);
+            }else{
+                navigate('/')
+            }
         } finally {
             setIsLoading(false);
         }
@@ -264,7 +270,7 @@ const EditEventForm = () => {
     if (eventcode) {
         fetchEventData();
     }
-}, [eventcode, navigate, userCode]);
+}, [eventcode, navigate, userCode, userRole]);
 
 
     // src/pages/EditEvent.jsx
@@ -367,7 +373,11 @@ const handleUpdate = async (e) => {
             headers: { "Content-Type": "multipart/form-data" },
         });
         setIsLoading(false);
-        navigate(`/org/${userCode}/my-event`);
+        if(userRole === 'organizer'){
+            navigate(`/org/${userCode}/my-event`);
+        } else if(userRole === 'co-organizer'){
+            navigate(`/org/my-event`);
+        }
     } catch (err) {
         console.error("Error updating event:", err.response?.data || err.message);
         setIsLoading(false);
@@ -438,7 +448,13 @@ const handleUpdate = async (e) => {
                         <div className="flex justify-end ml-auto space-x-4">
                             <button
                                 type="button"
-                                onClick={() => navigate(`/org/${userCode}/my-event`)}
+                                onClick={() => {
+                                    if(userRole === 'organizer'){
+                                        navigate(`/org/${userCode}/my-event`)    
+                                    } else{
+                                        navigate(`/org/my-event`)
+                                    }
+                                    }}
                                 className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
                             >
                                 Cancel

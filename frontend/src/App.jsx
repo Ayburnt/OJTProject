@@ -120,19 +120,24 @@ function App() {
           <Route path="/Events" element={<ViewAllEventsPage />} />
           <Route path="/events/:eventcode" element={<EventDetailPage />} /> 
           <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
+          <Route path='/org/dashboard' element={<PrivateRoute requiredRole={'co-organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path="/forgot-password" element={<ForgotPass />} />
           <Route path='/org/:userCode/my-event' element={<PrivateRoute requiredRole={'organizer'}><OrganizerEvent /></PrivateRoute>} />
+          <Route path='/org/my-event' element={<PrivateRoute requiredRole={'co-organizer'}><OrganizerEvent /></PrivateRoute>} />
           {/* <Route path='/org/:userCode/attendees' element={<PrivateRoute requiredRole={'organizer'}><Attendees /></PrivateRoute>} /> */}
           <Route path="/find-my-ticket" element={<FindMyTicket />} />
           <Route path="/org/:userCode" element={<TimeLine />} />
           {/* <Route path="/attendees" element={<Attendees />} />*/}
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
-          <Route path="/manage-account" element={<ManageAccount />} />
-          <Route path='/org/:userCode/change-password' element={<PrivateRoute requiredRole={'organizer'}><ChangePassword /></PrivateRoute>} />
+          
+          <Route path="/manage-account" element={<ManageAccount />} />          
+          <Route path='/change-password' element={<ChangePassword />} />
           <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
-          <Route path='/org/edit/:eventcode' element={<PrivateRoute requiredRole={'organizer'}><EditEvent /></PrivateRoute>} />
+          <Route path='/org/create-event' element={<PrivateRoute requiredRole={'co-organizer'}><CreateEvent /></PrivateRoute>} />
+          <Route path='/org/edit/:eventcode' element={<EditEvent />}/>
           <Route path="/staff" element={<PrivateRoute requiredRole={'staff'}><StaffDashboard /></PrivateRoute>} /> 
           <Route path="/staff/account" element={<PrivateRoute requiredRole={'staff'}><StaffManageAccount /></PrivateRoute>} /> 
+          <Route path="/org/account" element={<PrivateRoute requiredRole={'co-organizer'}><StaffManageAccount /></PrivateRoute>} /> 
           <Route path='/events/:eventcode/checkout' element={<BuyTicket />} />
 
           {/* <Route path='/create-event' element={<CreateEvent />} /> */}

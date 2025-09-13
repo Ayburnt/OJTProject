@@ -221,8 +221,7 @@ class AttendeeDetailView(APIView):
             print("❌ Attendee not found:", attendee_code)
             return Response({"error": "Attendee not found"}, status=status.HTTP_404_NOT_FOUND)            
         
-        serializer = AttendeeSerializer(attendee, context={"request": request})
-        print("📦 Serialized data:", serializer.data.attendance)
+        serializer = AttendeeSerializer(attendee, context={"request": request})        
         return Response(serializer.data)
 
 class TransactionDetailView(APIView):
@@ -235,8 +234,7 @@ class TransactionDetailView(APIView):
             print("❌ Transaction not found:", payment_ref)
             return Response({"error": "Transaction not found"}, status=status.HTTP_404_NOT_FOUND)            
         
-        serializer = AttendeeSerializer(attendee, many=True, context={"request": request})
-        print("📦 Serialized data:", serializer.data)
+        serializer = AttendeeSerializer(attendee, many=True, context={"request": request})        
         return Response(serializer.data)
 
 

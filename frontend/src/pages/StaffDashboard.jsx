@@ -10,6 +10,8 @@ import EventAttendees from '../components/EventAttendees.jsx';
 import EventDashboard from '../components/EventDashboard.jsx';
 import EventTransactions from '../components/EventTransactions.jsx';
 import { MdContentCopy } from "react-icons/md";
+import { RiQrScan2Line } from "react-icons/ri";
+import { Scanner } from "@yudiel/react-qr-scanner";
 
 const OrganizerEvent = () => {
   const navigate = useNavigate();
@@ -18,6 +20,16 @@ const OrganizerEvent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { userCode, orgLogo } = useAuth();
   const [selectedPage, setSelectedPage] = useState('Dashboard');
+
+  const [scanning, setScanning] = useState(false);
+  const handleDecode = (result) => {
+    if (result && result.length > 0) {
+      console.log("✅ Scanned:", result);
+      const scannedValue = result[0].rawValue; // Correctly access the rawValue property
+      setScanning(false);
+      window.location.href = scannedValue;
+    }
+  };
 
   const fetchEventDetails = async () => {
     try {
@@ -176,6 +188,24 @@ const OrganizerEvent = () => {
 
   return (
     <div className="bg-gray-50 min-h-screen font-outfit pb-10">
+      {scanning && (
+              <div className="fixed inset-0 bg-black bg-opacity-80 flex flex-col items-center justify-center z-50">
+                <p className="text-white mb-4">Scan a QR Code</p>
+                <div className="w-80 h-80 bg-white rounded-lg overflow-hidden">
+                  <Scanner
+                    onScan={handleDecode}
+                    onError={(err) => console.error("Scanner error:", err)}
+                    allowMultiple
+                  />
+                </div>
+                <button
+                  onClick={() => setScanning(false)}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
       <StaffNav />
 
       <div className="pt-23 md:ml-64 p-4 md:p-8 lg:p-12 flex flex-col items-center">
@@ -206,7 +236,8 @@ const OrganizerEvent = () => {
             {/* Search & Buttons */}
             <div className="flex flex-col w-[90%] md:w-full items-center md:items-start justify-between gap-4 mb-8">
               {/* Search bar */}
-              <div className="relative w-full">
+              <div className='grid grid-cols-5 w-full gap-3'>
+              <div className="relative w-full col-span-4">
                 <input
                   type="text"
                   placeholder="Search events by name or venue..."
@@ -230,6 +261,13 @@ const OrganizerEvent = () => {
                   />
                 </svg>
               </div>
+              <button
+                          onClick={() => setScanning(!scanning)}
+                          className="font-semibold w-full text-lg flex flex-row gap-1 items-center text-secondary cursor-pointer nowrap"
+                        >
+                          Scan QR <span><RiQrScan2Line /></span>
+                        </button>
+              </div>              
 
               {/* Action buttons */}
               <div className="flex flex-row w-full gap-3 items-center lg:w-[80%] xl:w-[70%] lg:justify-between overflow-x-auto hide-scrollbar text-sm">

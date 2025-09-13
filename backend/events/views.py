@@ -27,13 +27,29 @@ from django.conf import settings
 @permission_classes([IsAuthenticated])
 def toggle_ticket_selling(request, event_code):
     try:
-        event = Event.objects.get(event_code=event_code, created_by=request.user)
+        user = request.user
+        # Get the main organizer's account if the current user is a co-organizer
+        main_organizer = getattr(user, "added_by", None)
+        
+        # Determine the user to query for.
+        # Use the main organizer's account if it exists, otherwise use the current user.
+        # This handles both main organizers and co-organizers.
+        target_user = main_organizer if main_organizer else user
+        
+        # Check if the event exists and belongs to the target user
+        event = Event.objects.get(event_code=event_code, created_by=target_user)
+    
     except Event.DoesNotExist:
+        # If the event isn't found, it's either because the event_code is wrong
+        # or the current user (or their parent organizer) doesn't own it.
         return Response({"detail": "Event not found or unauthorized."}, status=status.HTTP_404_NOT_FOUND)
 
     is_selling = request.data.get("is_selling", True)
 
-    Ticket_Type.objects.filter(event=event).update(is_selling=is_selling)
+    # Use a transaction to ensure atomicity, although not strictly necessary for a single update.
+    # It's a good practice for data integrity.
+    with transaction.atomic():
+        Ticket_Type.objects.filter(event=event).update(is_selling=is_selling)
 
     return Response(
         {"detail": f"Ticket selling set to {is_selling} for event {event_code}"},
@@ -140,6 +156,77 @@ class EventListCreateAPIView(APIView):
         )
         if serializer.is_valid():
             serializer.save(created_by=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        print("📌 Serializer errors:", serializer.errors)  # Debug
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class CoOrgEventListCreateAPIView(APIView):
+    parser_classes = [NestedMultiPartParser]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        added_by = user.added_by
+        events = Event.objects.filter(created_by=added_by)
+        serializer = EventSerializer(events, many=True, context={"request": request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, *args, **kwargs):
+        # ✅ 1. Get captcha token
+        captcha_token = request.data.get("captcha")
+        print("📌 Captcha token from frontend:", captcha_token)  # Debug
+
+        if not captcha_token:
+            return Response(
+                {"error": "Captcha token missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # ✅ 2. Verify with Google
+        secret_key = os.getenv("RECAPTCHA_SECRET_KEY", settings.RECAPTCHA_SECRET_KEY)
+        print("📌 Using secret key (first 6 chars):", secret_key[:6], "******")  # Debug
+
+        verify_url = "https://www.google.com/recaptcha/api/siteverify"
+        payload = {"secret": secret_key, "response": captcha_token}
+
+        try:
+            r = requests.post(verify_url, data=payload)
+            result = r.json()
+            print("📌 Google verification result:", result)  # Debug
+
+            if not result.get("success"):
+                return Response(
+                    {
+                        "error": "Invalid reCAPTCHA. Please try again.",
+                        "details": result,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception as e:
+            return Response(
+                {"error": f"Error verifying reCAPTCHA: {str(e)}"},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        # ✅ 3. Proceed with saving event if captcha is valid
+        serializer = EventSerializer(
+            data=request.data,
+            context={"request": request},
+        )
+        if serializer.is_valid():
+            user = request.user
+            
+            # 🎯 FIX: Get the actual user object, not the user_code string.
+            organizer = getattr(user, "added_by", None)
+            
+            if not organizer:
+                # If the co-organizer doesn't have an added_by parent,
+                # use the co-organizer themselves as the creator.
+                organizer = user
+
+            serializer.save(created_by=organizer) # Pass the user object instance here
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         print("📌 Serializer errors:", serializer.errors)  # Debug

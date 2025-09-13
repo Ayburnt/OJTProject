@@ -7,7 +7,7 @@ import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
 import api from '../api.js'
 
 function OrganizerDashboard() {  
-  const { isLoggedIn, userCode, userFirstName, userProfile, orgLogo } = useAuth();
+  const { isLoggedIn, userCode, userFirstName, userRole, orgLogo } = useAuth();
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState({
     totalRevenue: 0,
@@ -19,7 +19,8 @@ function OrganizerDashboard() {
 
   useEffect(() => {
     const fetchEventDetails = async () => {
-      try {
+      if(userRole === 'organizer'){
+        try {
         const res = await api.get(`/list-create/`);
         const events = res.data;
 
@@ -64,11 +65,58 @@ function OrganizerDashboard() {
       } catch (err) {
         console.error("Error fetching events:", err);
       }
+      } else{
+        try {
+        const res = await api.get(`/list-create/co-org/`);
+        const events = res.data;
+
+        // Compute stats
+        let totalRevenue = 0;
+        let totalAttendees = 0;
+        let upcomingEvents = 0;
+
+        events.forEach(event => {
+          // attendees = total - available for each ticket
+          const attendees = event.ticket_types.reduce(
+            (sum, t) => sum + (t.quantity_total - t.quantity_available),
+            0
+          );
+
+          // revenue = sum of (sold tickets × price)
+          const revenue = event.ticket_types.reduce(
+            (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
+            0
+          );
+
+          totalAttendees += attendees;
+          totalRevenue += revenue;
+
+          // Check upcoming events
+          const now = new Date();
+          const start = new Date(`${event.start_date}T${event.start_time}`);
+          if (event.status === "published" && now < start) {
+            upcomingEvents += 1;
+          }
+        });
+
+        setStats({
+          totalRevenue,
+          totalAttendees,
+          totalEvents: events.length,
+          upcomingEvents,
+        });
+
+        setEvents(events);
+        console.log(events);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      }
+      }
+      
     };
 
-
     fetchEventDetails();
-  }, []);
+  }, [userRole]);
 
   function formatDateTime(dateStr, timeStr) {
     const dt = new Date(`${dateStr}T${timeStr}`); // combine date + time

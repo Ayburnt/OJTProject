@@ -108,7 +108,12 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
       {/* Event card */}
       <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
         e.stopPropagation();
-        fetchAttendees(selected)        
+        if(userRole === 'staff'){
+          console.log(selected.event_code);
+          navigate(`/events/${selected.event_code}`)
+        } else{
+          fetchAttendees(selected)
+        }        
       }}>
         <div className='overflow-hidden rounded-lg aspect-video'>
           <img src={eventPoster} alt="" className='object-cover' />
@@ -131,7 +136,7 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
         <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
         <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
         
-        {userRole === 'organizer' && (
+        {(userRole === 'organizer' || userRole === 'co-organizer') && (
           <div className='flex flex-row gap-3 mt-3 w-full'>
           <button
             className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 

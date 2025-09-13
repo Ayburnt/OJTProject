@@ -11,11 +11,13 @@ function OrganizerNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const currentPath = location.pathname;
-  const { isLoggedIn, orgLogo, logout } = useAuth();
+  const { isLoggedIn, orgLogo, logout, userRole } = useAuth();
 
   let title;
+  let pathConfig=[];
 
-  const pathConfig = [
+  if(userRole === 'organizer'){
+    pathConfig = [
     {
       pattern: "/org/:userCode/dashboard",
       exact: true,
@@ -39,16 +41,43 @@ function OrganizerNav() {
       color: "#EF4B4C"
     }
   ];
+  }  else if(userRole === 'co-organizer'){
+    pathConfig = [
+    {
+      pattern: "/org/dashboard",
+      exact: true,
+      title: "Dashboard Overview",
+      docTitle: "Dashboard | Sari-Sari Events",
+      link: () => `/org/dashboard`,
+      color: "#009494"
+    },
+    {
+      pattern: "/org/my-event",
+      title: "Event Overview",
+      docTitle: "My Events | Sari-Sari Events",
+      link: () => `/org/my-event`,
+      color: "#5BD4D4"
+    },    
+    {
+      pattern: "/org/account",
+      title: "Manage Account",
+      docTitle: "Manage Account | Sari-Sari Events",
+      link: () => `/org/account`,
+      color: "#EF4B4C"
+    }
+  ];
+  }
 
-  // Find which route matches the current path
-  const currentRoute = pathConfig.find(cfg =>
-    matchPath({ path: cfg.pattern, end: cfg.exact || false }, location.pathname)
-  ) || { title: "404 - Page Not Found", docTitle: "Sari-Sari Events" };
+    const currentRoute =
+    pathConfig.find((cfg) =>
+      matchPath({ path: cfg.pattern, end: cfg.exact || false }, location.pathname)
+    ) || { title: "404 - Page Not Found", docTitle: "Sari-Sari Events" };
 
-  // Update document title dynamically
+  // Update browser tab title
   useEffect(() => {
     document.title = currentRoute.docTitle;
   }, [currentRoute.docTitle]);
+
 
   // Extract userCode from URL for link generation
   const userCode = location.pathname.split("/")[2];

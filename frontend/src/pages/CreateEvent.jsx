@@ -35,7 +35,7 @@ const createNewQuestion = () => ({
 const CreateEventForm = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  const { userCode } = useAuth();
+  const { userCode, userRole } = useAuth();
   const totalSteps = 4;
 
   const [formData, setFormData] = useState({
@@ -215,7 +215,7 @@ const CreateEventForm = () => {
   const [isCancelConfirm, setIsCancelConfirm] = useState(false);
 
   const handleCancel = () => {
-    if (formData.title === '' && formData.description === '' && formData.event_code === '') {
+    if (formData.title === '' && formData.description === '' && formData.event_code === '') {      
       navigate(`/org/${userCode}/my-event`);
       setIsCancelConfirm(false);
     } else {
@@ -372,8 +372,8 @@ const CreateEventForm = () => {
       }
     });
 
-
-    try {
+    if(userRole === 'organizer'){
+      try {
       await api.post("/list-create/", form, {
         headers: { "Content-Type": "multipart/form-data" },
       });
@@ -381,7 +381,11 @@ const CreateEventForm = () => {
       if (redirectTo) {
         navigate(redirectTo);
       } else {
-        navigate(`/org/${userCode}/my-event`);
+        if(userRole === 'organizer'){
+          navigate(`/org/${userCode}/my-event`);
+        }else {
+          navigate(`/org/my-event`);
+        }
       }
     } catch (err) {
       console.error("Error creating event:", err.response?.data || err.message);
@@ -408,6 +412,48 @@ const CreateEventForm = () => {
         // Generic fallback
         setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
       }
+    }
+    }    else{
+      try {
+      await api.post("/list-create/co-org/", form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setIsLoading(false);
+      if (redirectTo) {
+        navigate(redirectTo);
+      } else {
+        if(userRole === 'organizer'){
+          navigate(`/org/${userCode}/my-event`);
+        }else {
+          navigate(`/org/my-event`);
+        }
+      }
+    } catch (err) {
+      console.error("Error creating event:", err.response?.data || err.message);
+      setIsLoading(false);
+
+      if (err.response?.data) {
+        // If backend sends detailed validation error
+        const errorData = err.response.data;
+        let errorMsg = "Error creating event:\n";
+
+        Object.entries(errorData).forEach(([field, messages]) => {
+          if (Array.isArray(messages)) {
+            errorMsg += `${field}: ${messages.join(", ")}\n`;
+          } else if (typeof messages === "string") {
+            errorMsg += `${field}: ${messages}\n`;
+          } else {
+            errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
+          }
+        });
+        // REPLACED: alert(errorMsg);
+        setAlert({ show: true, message: errorMsg });
+      } else {
+        // REPLACED: alert("An unexpected error occurred. Please try again.");
+        // Generic fallback
+        setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
+      }
+    }
     }
   };
 
@@ -638,7 +684,12 @@ const CreateEventForm = () => {
               <div className="flex justify-end ml-auto space-x-4">
                 <button
                   type="button"
-                  onClick={() => navigate(`/org/${userCode}/my-event`)}
+                  onClick={() => {
+                    if(userRole === 'organizer'){
+                      navigate(`/org/${userCode}/my-event`)
+                    }else{
+                      navigate(`/org/my-event`)
+                    }}}
                   className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
                 >
                   Cancel

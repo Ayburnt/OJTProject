@@ -235,12 +235,18 @@ class EventSerializer(serializers.ModelSerializer):
         ticket_types_data = validated_data.pop('ticket_types', [])
         reg_form_templates_data = validated_data.pop('reg_form_templates', [])
 
-        # Assign the authenticated user as the creator
-        request = self.context.get('request')
-        user = None
-        if request and request.user.is_authenticated:
-            user = request.user
-            validated_data['created_by'] = user
+        # get the value passed from view, if any
+        created_by = validated_data.pop("created_by", None)
+
+        request = self.context.get("request")
+        user = request.user if request and request.user.is_authenticated else None
+
+        # fallback if view didn’t send created_by
+        if created_by is None and user:
+            created_by = user
+
+        # add it back before creating the Event
+        validated_data["created_by"] = created_by
 
         # Handle file uploads
         if request and request.FILES.get('event_poster'):

@@ -20,7 +20,11 @@ function Login() {
     if (isLoggedIn) {
       if(userRole === 'organizer'){
         navigate(`/org/${userCode}/dashboard`)
-      }if(userRole === 'admin'){
+      }else if(userRole === 'co-organizer'){
+        navigate(`/org/dashboard`)
+      }else if(userRole === 'staff'){
+        navigate(`/staff`)
+      }else if(userRole === 'admin'){
         navigate(`/admin-dashboard`);
       }
     }

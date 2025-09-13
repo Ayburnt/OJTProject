@@ -36,30 +36,27 @@ export default function Ticket() {
   const [attendanceDetails, setAttendanceDetails] = useState(null);
   const { isLoggedIn, userCode, userRole } = useAuth();
 
-  // useEffect(() => {
-  //   if (isLoggedIn && (userRole === 'organizer' || userRole === 'staff') && (eventDetails?.created_by === userCode || eventDetails?.created_by)) {
-  //     setIsOrganizer(true);
-  //   } else {
-  //     setIsOrganizer(false);
-  //   }
-  // }, [isLoggedIn, userRole, userCode, eventDetails?.created_by]);
 
   useEffect(() => {
-    const fetchStaffOrg = async() => {
-      try{
-        const res = await api.get(`staff-info/`);
-        if(isLoggedIn && (userRole === 'organizer' || userRole === 'staff') && (eventDetails?.created_by === userCode || eventDetails?.created_by === res.data.added_by.user_code)){
-          setIsOrganizer(true);
-        } else{
-          setIsOrganizer(false);
+    const fetchStaffOrg = async () => {
+      if (isLoggedIn) {
+        try {
+          const res = await api.get(`staff-info/`);
+          if ((userRole === 'organizer' || userRole === 'staff' || userRole === 'co-organizer') && (eventDetails?.created_by === userCode || eventDetails?.created_by === res.data.added_by.user_code)) {
+            setIsOrganizer(true);
+          } else {
+            setIsOrganizer(false);
+          }
+        } catch (err) {
+          console.log("Error fetching staff details.", err);
         }
-      } catch(err){
-        console.log("Error fetching staff details.", err);
+      } else{
+        setIsOrganizer(false);
       }
     }
-    
+
     fetchStaffOrg();
-  },[isLoggedIn, userRole, userCode, eventDetails?.created_by])
+  }, [isLoggedIn, userRole, userCode, eventDetails?.created_by])
 
   useEffect(() => {
     api.get(`/attendees/booking-info/${attendeeCode}/`)
@@ -333,75 +330,75 @@ export default function Ticket() {
 
       {/* Printing page layout (vertical ticket style) */}
       {/* Printing page layout (vertical ticket style) */}
-            <div
-                ref={componentRef}
-                className="bg-white w-full h-[29.7cm] p-[5px] hidden print:grid grid-cols-2 grid-rows-2 place-items-center space-y-2 font-outfit h-screen justify-center items-center"
-            >                
-                            {/* Outer Dashed Border for Cut-out */}
-                            <div className="w-[93%] border-2 border-dashed border-[#D9D9D9] rounded-xl">
+      <div
+        ref={componentRef}
+        className="bg-white w-full h-[29.7cm] p-[5px] hidden print:grid grid-cols-2 grid-rows-2 place-items-center space-y-2 font-outfit h-screen justify-center items-center"
+      >
+        {/* Outer Dashed Border for Cut-out */}
+        <div className="w-[93%] border-2 border-dashed border-[#D9D9D9] rounded-xl">
 
-                                {/* Ticket Wrapper */}
-                                <div className="border-2 border-[#D9D9D9] rounded-lg shadow-md overflow-hidden text-center font-outfit w-full">
-                                    {/* Header: Poster + Logo */}
-                                    <div className="bg-Dark-grayish-blue p-3 flex justify-between items-center">
-                                        {/* Event Poster */}
-                                        <img
-                                            src={eventDetails?.event_poster}
-                                            alt="Event Poster"
-                                            className="w-[40%] aspect-video object-cover rounded"
-                                        />
+          {/* Ticket Wrapper */}
+          <div className="border-2 border-[#D9D9D9] rounded-lg shadow-md overflow-hidden text-center font-outfit w-full">
+            {/* Header: Poster + Logo */}
+            <div className="bg-Dark-grayish-blue p-3 flex justify-between items-center">
+              {/* Event Poster */}
+              <img
+                src={eventDetails?.event_poster}
+                alt="Event Poster"
+                className="w-[40%] aspect-video object-cover rounded"
+              />
 
-                                        {/* Logo Placeholder */}
-                                        <div className="w-[20%] aspect-square flex items-center justify-center border rounded bg-white">
-                                            <img
-                                                src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909"
-                                                alt="Logo Placeholder"
-                                                className="w-full object-contain"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Event Title Bar */}
-                                    <div className="bg-Dark-grayish-blue text-white py-1 border-t items-center flex flex-col border-dashed border-white">
-                                        <h2 className="text-2xl font-outfit font-bold w-[95%] text-center leading-none mt-2">
-                                            {eventDetails?.title}
-                                        </h2>
-                                        <p className="text-sm font-outfit text-center leading-none mb-3">
-                                            {eventDetails?.category
-                                                ? eventDetails.category.charAt(0).toUpperCase() +
-                                                eventDetails.category.slice(1)
-                                                : ""} {"Event"}
-                                        </p>
-
-                                        {/* Broken Line Separator */}
-                                        <div className="border-t border-dashed border-white w-full mb-3"></div>
-                                    </div>
-
-                                    {/* QR Code */}
-                                    <div className="flex flex-col items-center p-4">
-                                        <div className="w-[50%] aspect-square bg-gray-100 flex items-center justify-center">
-                                            <img
-                                                src={attendee?.ticket_qr_image}y
-                                                alt="QR Code"
-                                                className="w-full"
-                                            />
-                                        </div>
-                                        <p className="text-sm text-gray-500 leading-none">
-                                            {attendee?.attendee_code}
-                                        </p>
-                                        <p className="font-semibold font-outfit text-gray-800 text-2xl">
-                                            {attendee?.firstname} {attendee?.lastname}
-                                        </p>     
-                                    </div>
-
-                                    {/* Footer (same as top color) */}
-                                    <div className="bg-Dark-grayish-blue font-semibold font-outfit text-white text-xl py-3">
-                                        <p>{attendee?.ticket_read.ticket_name}</p>
-                                    </div>
-                                </div>
-                            </div>                        
-
+              {/* Logo Placeholder */}
+              <div className="w-[20%] aspect-square flex items-center justify-center border rounded bg-white">
+                <img
+                  src="https://ik.imagekit.io/cafedejur/sari-sari-events/sariLogo.svg?updatedAt=1753510696909"
+                  alt="Logo Placeholder"
+                  className="w-full object-contain"
+                />
+              </div>
             </div>
+
+            {/* Event Title Bar */}
+            <div className="bg-Dark-grayish-blue text-white py-1 border-t items-center flex flex-col border-dashed border-white">
+              <h2 className="text-2xl font-outfit font-bold w-[95%] text-center leading-none mt-2">
+                {eventDetails?.title}
+              </h2>
+              <p className="text-sm font-outfit text-center leading-none mb-3">
+                {eventDetails?.category
+                  ? eventDetails.category.charAt(0).toUpperCase() +
+                  eventDetails.category.slice(1)
+                  : ""} {"Event"}
+              </p>
+
+              {/* Broken Line Separator */}
+              <div className="border-t border-dashed border-white w-full mb-3"></div>
+            </div>
+
+            {/* QR Code */}
+            <div className="flex flex-col items-center p-4">
+              <div className="w-[50%] aspect-square bg-gray-100 flex items-center justify-center">
+                <img
+                  src={attendee?.ticket_qr_image} y
+                  alt="QR Code"
+                  className="w-full"
+                />
+              </div>
+              <p className="text-sm text-gray-500 leading-none">
+                {attendee?.attendee_code}
+              </p>
+              <p className="font-semibold font-outfit text-gray-800 text-2xl">
+                {attendee?.firstname} {attendee?.lastname}
+              </p>
+            </div>
+
+            {/* Footer (same as top color) */}
+            <div className="bg-Dark-grayish-blue font-semibold font-outfit text-white text-xl py-3">
+              <p>{attendee?.ticket_read.ticket_name}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
 
 
     </>

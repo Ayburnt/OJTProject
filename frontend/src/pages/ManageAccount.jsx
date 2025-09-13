@@ -44,7 +44,7 @@ const ManageAccount = () => {
   const [error, setError] = useState(null);
   const [isAddUser, setIsAddUser] = useState(false);
   const [isStaffLoading, setIsStaffLoading] = useState(false);
-  const { userCode } = useAuth();
+  const { userCode, userRole } = useAuth();
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -57,7 +57,7 @@ const ManageAccount = () => {
     last_name: '',
     email: '',
     password: '',
-    role: 'staff',
+    role: '',
   });
 
   const handleStaffDataChange = (e) => {
@@ -74,8 +74,12 @@ const ManageAccount = () => {
 
   const handleRegStaff = async (e) => {
     e.preventDefault();
-    setIsStaffLoading(true);
-    console.log(staffData)
+    setIsStaffLoading(true);    
+
+    if (!staffData.role || staffData.role === '') {
+      toast.error("Select an account role.");
+      return;
+    }
 
     if (staffData.password && staffData.password.length < 8) {
       toast.error("Password must be at least 8 characters long.");
@@ -95,7 +99,7 @@ const ManageAccount = () => {
         last_name: '',
         email: '',
         password: '',
-        role: 'staff',
+        role: '',
       })
       setIsAddUser(false);
       fetchStaffs();
@@ -250,8 +254,7 @@ const ManageAccount = () => {
   const fetchStaffs = async () => {
     try {
       const res = await api.get(`staff-list/`);
-      setStaffList(res.data);
-      console.log(res.data)
+      setStaffList(res.data);      
     } catch (err) {
       console.error("Failed to fetch staff accounts:", err);
     }
@@ -262,30 +265,34 @@ const ManageAccount = () => {
   }, [])
 
   // Active Staffs
-const activeStaffs = staffList.filter((staff) => staff.is_active);
-// Inactive Staffs
-const inactiveStaffs = staffList.filter((staff) => !staff.is_active);
+  const activeStaffs = staffList.filter((staff) => staff.is_active);
+  // Inactive Staffs
+  const inactiveStaffs = staffList.filter((staff) => !staff.is_active);
 
-const handleDeactivate = async (id) => {
-  try {
-    await api.delete(`staff/${id}/delete/`);
-    toast.success("Staff account deactivated!");
-    fetchStaffs();
-  } catch (err) {
-    console.log(err)
-    toast.error("Failed to deactivate staff.");
-  }
-};
+  const handleDeactivate = async (id) => {
+    try {
+      await api.delete(`staff/${id}/delete/`);
+      toast.success("Staff account deactivated!");
+      fetchStaffs();
+    } catch (err) {
+      console.log(err)
+      toast.error("Failed to deactivate staff.");
+    }
+  };
 
-const handleReactivate = async (id) => {
-  try {
-    await api.post(`staff/${id}/reactivate/`, { is_active: true });
-    toast.success("Staff account reactivated!");
-    fetchStaffs();
-  } catch (err) {
-    toast.error("Failed to reactivate staff.");
-  }
-};
+  const handleReactivate = async (id) => {
+    try {
+      await api.post(`staff/${id}/reactivate/`, { is_active: true });
+      toast.success("Staff account reactivated!");
+      fetchStaffs();
+    } catch (err) {
+      const message =
+      err.response?.data?.detail ||
+      err.response?.data?.message ||
+      "Failed to reactivate staff.";
+    toast.error(message, { autoClose: 5000 });
+    }
+  };
 
 
   if (loading) {
@@ -326,11 +333,19 @@ const handleReactivate = async (id) => {
       )}
 
       {isAddUser && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 font-outfit">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm xl:max-w-lg px-6 py-10 text-center">
+        <div className="fixed inset-0 z-100 py-10 h-screen flex items-center justify-center bg-black/50 font-outfit">
+          <div className="bg-white flex xl:h-full overflow-y-auto flex-col rounded-lg shadow-xl w-full max-w-sm xl:max-w-lg px-6 py-10 text-center">
             <h1 className='text-2xl font-semibold text-secondary'>Add New Account</h1>
-            <p className='max-w-lg text-gray-500'>This account has access to check in attendees and view their details.</p>
             <div className='grid grid-cols-1 gap-3 mt-5'>
+              <div className='w-full flex flex-col items-start font-outfit'>
+                <label htmlFor="" className='font-medium text-[#555555] text-sm'>Role</label>
+                <select name="role" value={staffData.role} onChange={handleStaffDataChange} required={!staffData.role || staffData.role === ''} id="" className='w-full border border-[#AAAAAA] focus:bg-gray-100 transition-all duration-300 outline-none py-2 px-3 rounded-md shadow-sm text-sm'>
+                  <option value="" selected disabled>--</option>
+                  <option value="staff">Staff</option>
+                  <option value="co-organizer">Co-Organizer</option>
+                </select>
+                <p className='text-gray-400 self-start font-light text-xs text-left'>Co-organizer: Full access, except for adding accounts. Staff: Can check in and view attendee details only.</p>
+              </div>
               <InputFields inputValue={staffData.first_name} handleStaffDataChange={handleStaffDataChange} lbl='First Name' fieldType='text' fieldName='first_name' />
               <InputFields inputValue={staffData.last_name} handleStaffDataChange={handleStaffDataChange} lbl='Last Name' fieldType='text' fieldName='last_name' />
               <InputFields inputValue={staffData.email} handleStaffDataChange={handleStaffDataChange} lbl='Email' fieldType='email' fieldName='email' />
@@ -380,7 +395,7 @@ const handleReactivate = async (id) => {
                     alt="Profile"
                   />
                   <button
-                    onClick={handleProfileUpload}
+                    onClick={handleLogoUpload}
                     className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
                     aria-label="Upload photo"
                   >
@@ -404,10 +419,10 @@ const handleReactivate = async (id) => {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
-              <Link to="/org/:userCode/change-password">
+            <div className="grid grid-cols-1 gap-4 w-full sm:w-auto">
+              <Link to="/change-password">
                 <button
-                  className="w-full px-5.5 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+                  className="w-full px-5.5 py-2 text-sm font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                 >
                   Change Password
                 </button>
@@ -417,39 +432,32 @@ const handleReactivate = async (id) => {
               {userData.verification_status === 'pending' ? (
                 <button
                   disabled
-                  className="w-full px-9 py-2 text-lg font-outfit text-gray-500 border border-gray-500 rounded-lg cursor-not-allowed"
+                  className="w-full px-9 py-2 text-sm font-outfit text-gray-500 border border-gray-500 rounded-lg cursor-not-allowed"
                 >
                   Verification Pending
                 </button>
               ) : userData.verification_status === 'verified' ? (
                 <button
                   disabled
-                  className="w-full px-9 py-2 text-lg font-outfit text-green-600 border border-green-600 rounded-lg cursor-not-allowed"
+                  className="w-full px-9 py-2 text-sm font-outfit text-green-600 border border-green-600 rounded-lg cursor-not-allowed"
                 >
                   Verified
                 </button>
               ) : (
                 <Link to={`/org/${userCode}/verification-form`}>
                   <button
-                    className="w-full px-9 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+                    className="w-full px-9 py-2 text-sm font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
                   >
                     {userData.verification_status === 'declined' ? 'Re-Verify Account' : 'Verify Account'}
                   </button>
                 </Link>
               )}
-
-              {/* Upload Logo Button */}
-              <button
-                onClick={handleLogoUpload}
-                className="w-full px-9 py-2 text-lg font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-              >
-                Upload Logo
-              </button>
+              
 
               {/* Delete Account Button */}
               <button
                 onClick={() => handleShowModal('Delete account functionality would go here!')}
-                className="w-full px-4 py-2 text-lg font-outfit text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                className="w-full px-4 py-2 text-sm font-outfit text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
               >
                 Delete Account
               </button>
@@ -474,9 +482,11 @@ const handleReactivate = async (id) => {
               <div className="flex flex-col w-full lg:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <h3 className="text-lg font-semibold font-outfit text-gray-800">Profile Information</h3>
                 <div className='w-full md:w-auto items-center justify-center md:justify-end flex flex-row gap-5 lg:gap-2'>
-                  <button className='cursor-pointer hover:bg-secondary/5 px-4 py-2 border border-secondary rounded-lg text-secondary' onClick={() => setIsAddUser(true)}>
-                    Add an Account
-                  </button>
+                  {userRole === 'organizer' && (
+                    <button className='cursor-pointer hover:bg-secondary/5 px-4 py-2 border border-secondary rounded-lg text-secondary' onClick={() => setIsAddUser(true)}>
+                      Add an Account
+                    </button>
+                  )}
                   <button
                     onClick={() => isEditing ? handleSave() : setIsEditing(true)}
                     className={`px-4 py-2 rounded-lg transition-colors cursor-pointer ${isEditing
@@ -567,56 +577,58 @@ const handleReactivate = async (id) => {
               </div>
             </div>
 
-            {/* Staff Accounts */}
-            <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">
-                <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
-                <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
-                  {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
-                    activeStaffs.map((staff) => (
-                      <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
-                        <div>
-                          <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name}</h3>
-                          <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
-                        </div>
-                        <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
+            {userRole === 'organizer' && (
+              <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">
+              <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
+              <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
+                {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
+                  activeStaffs.map((staff) => (
+                    <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
+                      <div>
+                        <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name} ({staff.role})</h3>
+                        <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
                       </div>
-                    ))
-                  ) : (
-                    <h2>No active staff accounts</h2>
-                  )}
-                </div>
-
-                {showInactive && (
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
-          Inactive Staff Accounts
-        </h3>
-        <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
-          {inactiveStaffs.map((staff) => (
-            <div
-              key={staff.id}
-              className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
-            >
-              <div>
-                <h3 className="leading-none font-medium">
-                  {staff.first_name} {staff.last_name}
-                </h3>
-                <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+                      <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
+                    </div>
+                  ))
+                ) : (
+                  <h2>No active staff accounts</h2>
+                )}
               </div>
-              <button                
-                onClick={() => handleReactivate(staff.id)}
-                className="text-green-600 text-sm hover:underline cursor-pointer"
-              >
-                Reactivate
-              </button>
+
+              {showInactive && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
+                    Inactive Staff Accounts
+                  </h3>
+                  <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    {inactiveStaffs.map((staff) => (
+                      <div
+                        key={staff.id}
+                        className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
+                      >
+                        <div>
+                          <h3 className="leading-none font-medium">
+                            {staff.first_name} {staff.last_name}
+                          </h3>
+                          <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+                        </div>
+                        <button
+                          onClick={() => handleReactivate(staff.id)}
+                          className="text-green-600 text-sm hover:underline cursor-pointer"
+                        >
+                          Reactivate
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>
             </div>
-          ))}
-        </div>
-      </div>
-    )}
-                
-                <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>                    
-            </div>
+            )}
+                        
 
             {/* Notification Preferences */}
             <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">

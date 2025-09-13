@@ -7,11 +7,13 @@ from .views import (
     OrganizerProfilePublicView,
     toggle_ticket_selling,
     EventListCreateStaffView,
+    CoOrgEventListCreateAPIView
 )
 
 urlpatterns = [
     # URL for listing all events and creating a new one
     path('list-create/', EventListCreateAPIView.as_view(), name='event-list-create'),
+    path('list-create/co-org/', CoOrgEventListCreateAPIView.as_view(), name='co-org-list-create'),
     path('list-create/staff/', EventListCreateStaffView.as_view(), name='event-list-create-staff'),
     path('event-public-view/', EventPublicView.as_view(), name='event-public-view'),
 

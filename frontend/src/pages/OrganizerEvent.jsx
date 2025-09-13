@@ -16,21 +16,30 @@ const OrganizerEvent = () => {
   const [selectedCategory, setSelectedCategory] = useState('All Events');
   const [events, setEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { userCode, orgLogo } = useAuth();
+  const { userCode, orgLogo, userRole } = useAuth();
   const [selectedPage, setSelectedPage] = useState('Dashboard');
 
   const fetchEventDetails = async () => {
-    try {
+    if(userRole === 'organizer'){
+      try {
       const res = await api.get(`/list-create/`);
       setEvents(res.data);
     } catch (err) {
       console.error("Error fetching events:", err);
     }
+    } else if(userRole === 'co-organizer'){
+      try {
+      const res = await api.get(`/list-create/co-org/`);
+      setEvents(res.data);
+    } catch (err) {
+      console.error("Error fetching events:", err);
+    }
+    }
   };
 
   useEffect(() => {
     fetchEventDetails();
-  }, []);
+  }, [userRole]);
 
   useEffect(() => {
     document.title = "Organizer Event | Sari-Sari Events";
@@ -136,7 +145,8 @@ const OrganizerEvent = () => {
   const [searchAttendees, setSearchAttendees] = useState("");
   const filteredAttendees = attendees.filter(
     (a) =>
-      a.fullName?.toLowerCase().includes(searchAttendees.toLowerCase()) ||
+      a.firstname?.toLowerCase().includes(searchAttendees.toLowerCase()) ||
+      a.lastname?.toLowerCase().includes(searchAttendees.toLowerCase()) ||
       a.email?.toLowerCase().includes(searchAttendees.toLowerCase())
   );
 
@@ -259,7 +269,7 @@ const OrganizerEvent = () => {
               </div>
 
               <Link
-                to={`/org/${userCode}/create-event`}
+                to={userRole === 'organizer' ? `/org/${userCode}/create-event` : `/org/create-event`}
                 className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
               >
                 Create New Event
@@ -360,7 +370,7 @@ const OrganizerEvent = () => {
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-500">Name</span>
-                    <span className="text-gray-800 font-medium">{selectedAttendee.fullName}</span>
+                    <span className="text-gray-800 font-medium">{selectedAttendee.firstname} {selectedAttendee.lastname}</span>
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-500">Email</span>
