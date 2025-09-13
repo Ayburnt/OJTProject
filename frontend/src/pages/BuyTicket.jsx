@@ -24,13 +24,12 @@ function BuyTicket() {
   const [ticketLinks, setTicketLinks] = useState([]);
   const [transacCode, setTransactCode] = useState();
 
-
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     firstname: "",
     lastname: "",
-    ticketType: "", // will store ticket.id
+    ticketType: "",
     ticket_quantity: 1,
     promoCode: "",
     agree: false,
@@ -38,10 +37,9 @@ function BuyTicket() {
   });
 
   const [ticketHolders, setTicketHolders] = useState([
-    { firstname: "", lastname: "", email: ""},
+    { firstname: "", lastname: "", email: "" },
   ]);
 
-  // 🔹 Compute total price from backend tickets
   const selectedTicket = tickets.find(
     (t) => t.id === Number(formData.ticketType)
   );
@@ -63,7 +61,7 @@ function BuyTicket() {
       const updated = [...prev];
       if (formData.ticket_quantity > prev.length) {
         for (let i = prev.length; i < formData.ticket_quantity; i++) {
-          updated.push({ firstname: "", lastname: "", email: ""});
+          updated.push({ firstname: "", lastname: "", email: "" });
         }
       } else if (formData.ticket_quantity < prev.length) {
         updated.length = formData.ticket_quantity;
@@ -81,92 +79,86 @@ function BuyTicket() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
+    e.preventDefault();
+    setIsLoading(true);
 
-  if (!captchaToken) {      
+    if (!captchaToken) {
       toast.error("Please complete the captcha before submitting.");
       setIsLoading(false);
       return;
     }
 
-  if (!formData.agree) {
-    toast.error("You must agree to the Terms & Conditions.");
-    setIsLoading(false);
-    return;
-  }
+    if (!formData.agree) {
+      toast.error("You must agree to the Terms & Conditions.");
+      setIsLoading(false);
+      return;
+    }
 
-  let newTicketLinks = [];
+    let newTicketLinks = [];
 
-  try {        
-    // 1. Create the transaction first
-    const resTransaction = await api.post("/transactions/create/", {
-      event: eventDetails.event_code,
-      amount: totalPrice,
-      transaction_type: 'TicketPurchase',
-      status: "pending",
-      captcha: captchaToken,
-    });
-    console.log("Transaction response:", resTransaction.data.transaction.payment_ref);
+    try {
+      const resTransaction = await api.post("/transactions/create/", {
+        event: eventDetails.event_code,
+        amount: totalPrice,
+        transaction_type: "TicketPurchase",
+        status: "pending",
+        captcha: captchaToken,
+      });
 
-    setTransactCode(resTransaction.data.transaction.payment_ref);
-    const transactionId = resTransaction.data.transaction.payment_ref;  // 👈 use this for attendees
+      setTransactCode(resTransaction.data.transaction.payment_ref);
+      const transactionId = resTransaction.data.transaction.payment_ref;
 
-    // 2. Buyer (main attendee)
-    const mainAttendee = {
-      firstname: formData.firstname,
-      lastname: formData.lastname,
-      email: formData.email,
-      event: eventDetails.event_code,
-      ticket_type: formData.ticketType, 
-      ticket_quantity: 1,
-      transaction: transactionId,   // 👈 link FK here
-      responses: Object.entries(formData.questions || {}).map(([qId, value]) => ({
-        question: qId,
-        response_value: Array.isArray(value) ? value.join(", ") : value,
-      })),
-    };
-
-    const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
-    newTicketLinks.push(resMain.data.attendee_code);
-
-    // 3. Other ticket holders
-    for (const holder of ticketHolders) {
-      const extraAttendee = {
-        firstname: holder.firstname || "Guest",
-        lastname: holder.lastname || "Guest",
-        email: holder.email,
+      const mainAttendee = {
+        firstname: formData.firstname,
+        lastname: formData.lastname,
+        email: formData.email,
         event: eventDetails.event_code,
         ticket_type: formData.ticketType,
         ticket_quantity: 1,
-        transaction: transactionId,  // 👈 same FK
-        responses: [],
+        transaction: transactionId,
+        responses: Object.entries(formData.questions || {}).map(
+          ([qId, value]) => ({
+            question: qId,
+            response_value: Array.isArray(value)
+              ? value.map((f) => (f.name ? f.name : f)).join(", ")
+              : value,
+          })
+        ),
       };
-      const resExtra = await api.post("/attendees/buy-ticket/", extraAttendee);
-      newTicketLinks.push(resExtra.data.attendee_code);
+
+      const resMain = await api.post("/attendees/buy-ticket/", mainAttendee);
+      newTicketLinks.push(resMain.data.attendee_code);
+
+      for (const holder of ticketHolders) {
+        const extraAttendee = {
+          firstname: holder.firstname || "Guest",
+          lastname: holder.lastname || "Guest",
+          email: holder.email,
+          event: eventDetails.event_code,
+          ticket_type: formData.ticketType,
+          ticket_quantity: 1,
+          transaction: transactionId,
+          responses: [],
+        };
+        const resExtra = await api.post(
+          "/attendees/buy-ticket/",
+          extraAttendee
+        );
+        newTicketLinks.push(resExtra.data.attendee_code);
+      }
+
+      setTicketLinks(newTicketLinks);
+      setIsLoading(false);
+      setIsModalOpen(true);
+    } catch (err) {
+      setIsLoading(false);
+      toast.error("Something went wrong while booking. Please try again.");
+      console.error("Error submitting:", err.response?.data || err.message);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // Done ✅
-    setTicketLinks(newTicketLinks);
-    setIsLoading(false);
-    setIsModalOpen(true);
-    console.log("resmain", resMain.data)
-    console.log("mainAttendee", mainAttendee.data)
-    console.log("resTransaction", resTransaction.data)
-  } catch (err) {
-    setIsLoading(false);
-    toast.error("Something went wrong while booking. Please try again.");
-    console.error("Error submitting:", err.response?.data || err.message);
-  } finally{
-    setIsLoading(false);
-  }
-};
-
-
-
-
-
-  // 🔹 Fetch event details
   useEffect(() => {
     const fetchEvent = async () => {
       try {
@@ -182,7 +174,7 @@ function BuyTicket() {
         if (res.data.ticket_types?.length > 0) {
           setFormData((prev) => ({
             ...prev,
-            ticketType: res.data.ticket_types[0].id, // default first ticket
+            ticketType: res.data.ticket_types[0].id,
           }));
         }
       } catch (err) {
@@ -202,18 +194,25 @@ function BuyTicket() {
     const optionsTime = { hour: "numeric", minute: "2-digit", hour12: true };
 
     if (!end || start.toDateString() === end.toDateString()) {
-      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString("en-US", optionsTime)}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
+      return `${start.toLocaleDateString("en-US", optionsDate)} at ${start.toLocaleTimeString(
+        "en-US",
+        optionsTime
+      )}${end ? ` - ${end.toLocaleTimeString("en-US", optionsTime)}` : ""}`;
     } else {
-      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString("en-US", optionsTime)} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString("en-US", optionsTime)}`;
+      return `${start.toLocaleDateString("en-US", optionsDate)}, ${start.toLocaleTimeString(
+        "en-US",
+        optionsTime
+      )} - ${end.toLocaleDateString("en-US", optionsDate)}, ${end.toLocaleTimeString(
+        "en-US",
+        optionsTime
+      )}`;
     }
   }
 
-  // 🔹 Sync ticket holders count with quantity
   useEffect(() => {
     if (formData.ticket_quantity > 5) {
-      setTicketHolders([]); // no ticket holders shown if > 5
+      setTicketHolders([]);
     } else {
-      // Only render (quantity - 1) holders since buyer is already one
       const neededHolders = Math.max(0, formData.ticket_quantity - 1);
       setTicketHolders((prev) => {
         const updated = [...prev];
@@ -228,7 +227,6 @@ function BuyTicket() {
       });
     }
   }, [formData.ticket_quantity]);
-
 
   const shortLongInput =
     "px-3 text-gray-600 w-full border-b-1 border-grey focus:border-teal-600 outline-none py-2 bg-transparent";
@@ -246,13 +244,13 @@ function BuyTicket() {
       let updated = { ...prev.questions };
 
       if (type === "checkbox") {
-        // Multiple answers allowed
         const current = updated[qId] || [];
         updated[qId] = checked
           ? [...current, value]
           : current.filter((v) => v !== value);
+      } else if (type === "file-upload") {
+        updated[qId] = value;
       } else {
-        // Single value (short, long, radio)
         updated[qId] = value;
       }
 
@@ -260,11 +258,16 @@ function BuyTicket() {
     });
   };
 
-
   return (
-    <> 
+    <>
       {isLoading && <LoadingScreen isLoading={isLoading} />}
-      {isModalOpen && <RegisterSuccess setIsModalOpen={setIsModalOpen} transacCode={transacCode} ticketLinks={ticketLinks} />}
+      {isModalOpen && (
+        <RegisterSuccess
+          setIsModalOpen={setIsModalOpen}
+          transacCode={transacCode}
+          ticketLinks={ticketLinks}
+        />
+      )}
       <div className="max-w-lg mx-4 mt-5 mb-5 min-h-screen shadow-lg rounded-3xl bg-white overflow-hidden px-10 font-outfit md:mx-auto lg:max-w-2xl 2xl:max-w-4xl">
         {/* Private Event Modal */}
         {isPrivate && (
@@ -284,10 +287,11 @@ function BuyTicket() {
                 type="button"
                 disabled={privateCodeInput !== eventDetails.private_code}
                 onClick={() => setIsPrivate(false)}
-                className={`px-6 py-3 font-semibold rounded-xl ${privateCodeInput === eventDetails.private_code
-                  ? "bg-secondary text-white"
-                  : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                  }`}
+                className={`px-6 py-3 font-semibold rounded-xl ${
+                  privateCodeInput === eventDetails.private_code
+                    ? "bg-secondary text-white"
+                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                }`}
               >
                 Enter
               </button>
@@ -323,7 +327,11 @@ function BuyTicket() {
               eventDetails?.end_date,
               eventDetails?.end_time
             )}{" "}
-            <br /> {eventDetails?.venue_specific !== null && eventDetails?.venue_specific !== '' ? eventDetails?.venue_specific + ', ' : ''}{eventDetails?.venue_address}
+            <br />{" "}
+            {eventDetails?.venue_specific
+              ? eventDetails?.venue_specific + ", "
+              : ""}
+            {eventDetails?.venue_address}
           </p>
           <div className="mt-4">
             <h2 className="font-medium text-gray-800">Description</h2>
@@ -379,6 +387,7 @@ function BuyTicket() {
               required
             />
           </div>
+
           {/* Custom Questions */}
           {questions.map((q) => (
             <div key={q.id}>
@@ -440,7 +449,9 @@ function BuyTicket() {
                         type="checkbox"
                         name={`q_${q.id}`}
                         value={opt.option_value}
-                        checked={(formData.questions[q.id] || []).includes(opt.option_value)}
+                        checked={(
+                          formData.questions[q.id] || []
+                        ).includes(opt.option_value)}
                         onChange={(e) =>
                           handleQuestionChange(
                             q.id,
@@ -456,17 +467,50 @@ function BuyTicket() {
                   ))}
                 </div>
               )}
+
+              {q.question_type === "file-upload" && (
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    multiple={q.max_files > 1}
+                    accept={
+                      q.allow_specific_types && q.file_types
+                        ? q.file_types.join(",")
+                        : "*"
+                    }
+                    onChange={(e) =>
+                      handleQuestionChange(
+                        q.id,
+                        Array.from(e.target.files),
+                        "file-upload"
+                      )
+                    }
+                    className="block w-full text-sm text-gray-600 border rounded-lg cursor-pointer bg-gray-50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                  />
+                  {formData.questions[q.id] &&
+                    Array.isArray(formData.questions[q.id]) &&
+                    formData.questions[q.id].length > 0 && (
+                      <ul className="text-xs text-gray-500 mt-1">
+                        {formData.questions[q.id].map((f, idx) => (
+                          <li key={idx}>{f.name}</li>
+                        ))}
+                      </ul>
+                    )}
+                </div>
+              )}
             </div>
           ))}
-          
-
 
           {/* Ticket Selection */}
           <div className="w-full mt-10">
             {eventDetails?.seating_map && (
               <div className="mb-4 w-full">
                 <p className="text-gray-600">Seating Map</p>
-                <img className="w-full object-contain" src={eventDetails.seating_map} alt="" />
+                <img
+                  className="w-full object-contain"
+                  src={eventDetails.seating_map}
+                  alt=""
+                />
               </div>
             )}
           </div>
@@ -483,8 +527,9 @@ function BuyTicket() {
             >
               {tickets.map((t) => (
                 <option key={t.id} value={t.id}>
-                  {t.price === 0 || t.price === '0.00' ? " Free" : 
-                  t.ticket_name + ' - ' + '₱' + t.price}
+                  {t.price === 0 || t.price === "0.00"
+                    ? " Free"
+                    : t.ticket_name + " - ₱" + t.price}
                 </option>
               ))}
             </select>
@@ -512,8 +557,9 @@ function BuyTicket() {
           {/* Ticket Holders */}
           {formData.ticket_quantity > 5 ? (
             <div className="p-4 border rounded-lg bg-yellow-50 text-sm text-gray-700">
-              You are booking more than 5 tickets.
-              Please email the list of ticket holders (full name{eventDetails?.collect_email === 'collect' ? ' and email' : ''} to{" "}
+              You are booking more than 5 tickets. Please email the list of
+              ticket holders (full name
+              {eventDetails?.collect_email === "collect" ? " and email" : ""} to{" "}
               <a
                 href="mailto:info@sari-sari.com"
                 className="text-blue-600 underline"
@@ -553,16 +599,16 @@ function BuyTicket() {
                 />
                 {eventDetails?.collect_email === "collect" && (
                   <input
-                  type="email"
-                  placeholder="Email"
-                  value={holder.email}
-                  onChange={(e) =>
-                    handleHolderChange(idx, "email", e.target.value)
-                  }
-                  className={shortLongInput}
-                  required
-                />
-                )}                                
+                    type="email"
+                    placeholder="Email"
+                    value={holder.email}
+                    onChange={(e) =>
+                      handleHolderChange(idx, "email", e.target.value)
+                    }
+                    className={shortLongInput}
+                    required
+                  />
+                )}
               </div>
             ))
           )}
@@ -609,11 +655,11 @@ function BuyTicket() {
           </div>
 
           <div className="flex justify-center my-4">
-                          <ReCAPTCHA
-                            sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                            onChange={(token) => setCaptchaToken(token)}
-                          />
-                        </div>
+            <ReCAPTCHA
+              sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+              onChange={(token) => setCaptchaToken(token)}
+            />
+          </div>
 
           {/* Submit */}
           <button
@@ -621,7 +667,7 @@ function BuyTicket() {
             disabled={!formData.agree || !formData.ticketType || isLoading}
             className="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold mb-5 rounded-lg transition cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400"
           >
-            Check Out
+            Submit
           </button>
         </form>
       </div>
