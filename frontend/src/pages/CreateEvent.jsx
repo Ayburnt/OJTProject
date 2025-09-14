@@ -215,7 +215,7 @@ const CreateEventForm = () => {
   const [isCancelConfirm, setIsCancelConfirm] = useState(false);
 
   const handleCancel = () => {
-    if (formData.title === '' && formData.description === '' && formData.event_code === '') {      
+    if (formData.title === '' && formData.description === '' && formData.event_code === '') {
       navigate(`/org/${userCode}/my-event`);
       setIsCancelConfirm(false);
     } else {
@@ -296,16 +296,30 @@ const CreateEventForm = () => {
     } else if (!hasPaidTickets) {
       form.append("status", "published");
     } else if (hasPaidTickets) {
-      if (verificationStatus === "verified") {
-        form.append("status", "pending");
-      } else {
-        form.append("status", "draft");
-        setIsLoading(false);
-        setIsVerifiedConfirm(true);
-        return;
+      if(userRole === 'organizer'){
+        if (verificationStatus === "verified") {
+          form.append("status", "pending");
+          setIsLoading(false);
+          navigate(`/org/${userCode}/my-event`);
+        } else {
+          form.append("status", "draft");
+          setIsLoading(false);
+          setIsVerifiedConfirm(true);
+          return;
+        }
+      } else if(userRole === 'co-organizer'){
+        if (verificationStatus === "verified") {
+          form.append("status", "pending");
+          setIsLoading(false);
+          navigate(`/org/${userCode}/my-event`);
+        } else {
+          form.append("status", "draft");
+          setIsLoading(false);
+          setIsVerifiedConfirm(true);
+          return;
+        }
       }
     }
-
 
 
     // === Append reg form templates ===
@@ -372,88 +386,88 @@ const CreateEventForm = () => {
       }
     });
 
-    if(userRole === 'organizer'){
+    if (userRole === 'organizer') {
       try {
-      await api.post("/list-create/", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setIsLoading(false);
-      if (redirectTo) {
-        navigate(redirectTo);
-      } else {
-        if(userRole === 'organizer'){
-          navigate(`/org/${userCode}/my-event`);
-        }else {
-          navigate(`/org/my-event`);
+        await api.post("/list-create/", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setIsLoading(false);
+        if (redirectTo) {
+          navigate(redirectTo);
+        } else {
+          if (userRole === 'organizer') {
+            navigate(`/org/${userCode}/my-event`);
+          } else {
+            navigate(`/org/my-event`);
+          }
+        }
+      } catch (err) {
+        console.error("Error creating event:", err.response?.data || err.message);
+        setIsLoading(false);
+
+        if (err.response?.data) {
+          // If backend sends detailed validation error
+          const errorData = err.response.data;
+          let errorMsg = "Error creating event:\n";
+
+          Object.entries(errorData).forEach(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              errorMsg += `${field}: ${messages.join(", ")}\n`;
+            } else if (typeof messages === "string") {
+              errorMsg += `${field}: ${messages}\n`;
+            } else {
+              errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
+            }
+          });
+          // REPLACED: alert(errorMsg);
+          setAlert({ show: true, message: errorMsg });
+        } else {
+          // REPLACED: alert("An unexpected error occurred. Please try again.");
+          // Generic fallback
+          setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
       }
-    } catch (err) {
-      console.error("Error creating event:", err.response?.data || err.message);
-      setIsLoading(false);
-
-      if (err.response?.data) {
-        // If backend sends detailed validation error
-        const errorData = err.response.data;
-        let errorMsg = "Error creating event:\n";
-
-        Object.entries(errorData).forEach(([field, messages]) => {
-          if (Array.isArray(messages)) {
-            errorMsg += `${field}: ${messages.join(", ")}\n`;
-          } else if (typeof messages === "string") {
-            errorMsg += `${field}: ${messages}\n`;
-          } else {
-            errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
-          }
-        });
-        // REPLACED: alert(errorMsg);
-        setAlert({ show: true, message: errorMsg });
-      } else {
-        // REPLACED: alert("An unexpected error occurred. Please try again.");
-        // Generic fallback
-        setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
-      }
-    }
-    }    else{
+    } else {
       try {
-      await api.post("/list-create/co-org/", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setIsLoading(false);
-      if (redirectTo) {
-        navigate(redirectTo);
-      } else {
-        if(userRole === 'organizer'){
-          navigate(`/org/${userCode}/my-event`);
-        }else {
-          navigate(`/org/my-event`);
+        await api.post("/list-create/co-org/", form, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setIsLoading(false);
+        if (redirectTo) {
+          navigate(redirectTo);
+        } else {
+          if (userRole === 'organizer') {
+            navigate(`/org/${userCode}/my-event`);
+          } else {
+            navigate(`/org/my-event`);
+          }
+        }
+      } catch (err) {
+        console.error("Error creating event:", err.response?.data || err.message);
+        setIsLoading(false);
+
+        if (err.response?.data) {
+          // If backend sends detailed validation error
+          const errorData = err.response.data;
+          let errorMsg = "Error creating event:\n";
+
+          Object.entries(errorData).forEach(([field, messages]) => {
+            if (Array.isArray(messages)) {
+              errorMsg += `${field}: ${messages.join(", ")}\n`;
+            } else if (typeof messages === "string") {
+              errorMsg += `${field}: ${messages}\n`;
+            } else {
+              errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
+            }
+          });
+          // REPLACED: alert(errorMsg);
+          setAlert({ show: true, message: errorMsg });
+        } else {
+          // REPLACED: alert("An unexpected error occurred. Please try again.");
+          // Generic fallback
+          setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
       }
-    } catch (err) {
-      console.error("Error creating event:", err.response?.data || err.message);
-      setIsLoading(false);
-
-      if (err.response?.data) {
-        // If backend sends detailed validation error
-        const errorData = err.response.data;
-        let errorMsg = "Error creating event:\n";
-
-        Object.entries(errorData).forEach(([field, messages]) => {
-          if (Array.isArray(messages)) {
-            errorMsg += `${field}: ${messages.join(", ")}\n`;
-          } else if (typeof messages === "string") {
-            errorMsg += `${field}: ${messages}\n`;
-          } else {
-            errorMsg += `${field}: ${JSON.stringify(messages)}\n`;
-          }
-        });
-        // REPLACED: alert(errorMsg);
-        setAlert({ show: true, message: errorMsg });
-      } else {
-        // REPLACED: alert("An unexpected error occurred. Please try again.");
-        // Generic fallback
-        setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
-      }
-    }
     }
   };
 
@@ -534,7 +548,7 @@ const CreateEventForm = () => {
 
       {isVerifiedConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-secondary rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-sm md:max-w-md p-6 relative text-center">
             <button
               onClick={() => setIsVerifiedConfirm(false)}
               className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-xl cursor-pointer"
@@ -685,11 +699,12 @@ const CreateEventForm = () => {
                 <button
                   type="button"
                   onClick={() => {
-                    if(userRole === 'organizer'){
+                    if (userRole === 'organizer') {
                       navigate(`/org/${userCode}/my-event`)
-                    }else{
+                    } else {
                       navigate(`/org/my-event`)
-                    }}}
+                    }
+                  }}
                   className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 transition-colors duration-200 cursor-pointer"
                 >
                   Cancel
@@ -699,10 +714,10 @@ const CreateEventForm = () => {
                     type="button"
                     onClick={() => {
                       const form = document.querySelector("form");
-                      if(step === 2 && formData.duration_type === 'single' && !formData.start_date){
+                      if (step === 2 && formData.duration_type === 'single' && !formData.start_date) {
                         console.log('fill upan mo - single')
                         return;
-                      } else if(step === 2 && formData.duration_type === 'multiple' && (!formData.start_date || !formData.end_date)){
+                      } else if (step === 2 && formData.duration_type === 'multiple' && (!formData.start_date || !formData.end_date)) {
                         console.log('fill upan mo - multiple')
                         return;
                       }

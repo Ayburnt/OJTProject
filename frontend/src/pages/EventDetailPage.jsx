@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, FaCheckCircle, FaCheckSquare, FaLaptop } from 'react-icons/fa';
 import { FaRegUser } from "react-icons/fa";
+import { IoCloseOutline } from "react-icons/io5";
+import { IoSend } from "react-icons/io5";
 import api from '../api.js';
+import useAuth from '../hooks/useAuth.js';
 
 /* ---------- Share Modal ---------- */
 function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
@@ -122,6 +125,14 @@ function EventDetailPage() {
     const [isShareOpen, setIsShareOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(false);
     const [isPosterOpen, setIsPosterOpen] = useState(false);
+    const [isComments, setIsComments] = useState(false);
+    const [isReplying, setIsReplying] = useState(false);
+    const [commentValue, setCommentValue] = useState('');
+    const [replyValue, setReplyValue] = useState('');
+    const { isLoggedIn, orgLogo } = useAuth();
+    const [comments, setComments] = useState([]);
+    const [replyingTo, setReplyingTo] = useState(null);
+    const [replies, setReplies] = useState(null);
 
     const navigate = useNavigate();
     const { eventcode } = useParams();
@@ -136,7 +147,7 @@ function EventDetailPage() {
             try {
                 const res = await api.get(`/events/${eventcode}/`);
                 setEventDetails(res.data);
-                console.log(res.data);
+                fetchComments(res.data.id);
             } catch (err) {
                 console.error("Error fetching event:", err);
             }
@@ -144,11 +155,67 @@ function EventDetailPage() {
         fetchEvent();
     }, [eventcode]);
 
+
+
+    const fetchComments = async (eventId) => {
+        try {
+            const response = await api.get(`/comments/list-create/${eventId}/`);
+            setComments(response.data);
+            console.log(response.data)
+        } catch (error) {
+            console.error("Error fetching comments:", error);
+        }
+    };
+
+    const handleAddComment = async (e) => {
+        e.preventDefault();
+        try {
+            await api.post(`/comments/list-create/${eventDetails.id}/`, {
+                text: commentValue,
+                replied_to: replyingTo,
+            });
+            setCommentValue('');
+            setReplyingTo(null); // Reset after successful post
+            fetchComments(eventDetails.id);
+        } catch (error) {
+            console.error("Error adding comment:", error);
+        }
+    };
+
+    const handleAddReply = async (e, id) => {
+        e.preventDefault();
+        try {
+            await api.post(`/comments/list-create/${eventDetails.id}/`, {
+                text: replyValue,
+                replied_to: id,
+            });
+            setReplyValue('');
+            setReplyingTo(null); // Reset after successful post
+            fetchComments(eventDetails.id);
+        } catch (error) {
+            console.error("Error adding comment:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (isComments) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset'; // or 'auto'
+        }
+
+        // Cleanup function to reset overflow when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset'; // or 'auto'
+        };
+    }, [isComments]);
+
     // Removed the handleRegister function to make the button have no function
     // const handleRegister = () => {
     //   console.log("Registered for the event!");
     //   setIsRegistered(true);
     // };
+
 
     if (!eventDetails) {
         return (
@@ -198,6 +265,7 @@ function EventDetailPage() {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     const qrUrl = eventDetails.event_qr_image; // from backend
 
+
     return (
         <div className="bg-gray-100 min-h-screen">
             {/* Poster Lightbox */}
@@ -212,6 +280,87 @@ function EventDetailPage() {
                             className="rounded-2xl"
                             alt=""
                         />
+                    </div>
+                </div>
+            )}
+
+            {isComments && (
+                <div className="fixed inset-0 z-100 py-10 h-screen flex items-center justify-center bg-black/50 font-outfit" onClick={(e) => {
+                    e.stopPropagation();
+                    setIsComments(false);
+                }}>
+                    <div className="bg-white flex max-h-150 flex-col rounded-lg shadow-xl w-full max-w-sm md:max-w-lg lg:max-w-xl 2xl:max-w-3xl text-center" onClick={(e) => {
+                        e.stopPropagation();
+                    }}>
+                        <div className='flex px-4 flex-row justify-between items-center w-full border-b-2 border-gray-200 py-5'>
+                            <h1 className='font-semibold text-xl'>Comments</h1>
+                            <button onClick={() => setIsComments(false)}><IoCloseOutline /></button>
+                        </div>
+
+                        <div className='flex flex-col gap-4 mt-3 px-4 pb-5 overflow-y-auto'>
+                            {Array.isArray(comments) && comments.length > 0 ? (
+                                comments.map((row) => (
+                                    <div key={row.id} className='gap-2 flex flex-row w-full items-start justify-start'>
+                                        <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                        <div className='flex flex-col items-start justify-start leading-none w-full'>
+                                            <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
+                                                <p className='text-lg leading-none font-semibold'>{row.user.company_name || `${row.user.first_name} ${row.user.last_name}`}</p>
+                                                <p className='text-left'>{row.text}</p>
+                                            </div>
+                                            <button className='cursor-pointer text-grey mt-1 text-sm leading-none' onClick={() => setReplyingTo((prev) => (prev?.id === row.id ? null : row))}>reply</button>
+
+                                            {row.replies.length > 0 && (
+                                                <>
+                                                <button onClick={() =>
+                                                    setReplies(replies === row.id ? null : row.id)
+                                                } className='text-black/60 leading-8 cursor-pointer'>{replies === row.id
+                                                    ? "Hide replies"
+                                                    : `View ${row.replies.length === 1 ? "reply" : `all ${row.replies.length} replies`}`}</button>
+                                                    <div className='flex flex-col gap-4 px-4'> 
+                                                        {replies === row.id && (
+                                                row.replies.map((reply) => (
+                                                    <div key={reply.id} className='gap-2 flex flex-row w-full items-start justify-start'>
+                                                        <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                                        <div className='flex flex-col items-start justify-start leading-none w-full'>
+                                                            <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
+                                                                <p className='text-lg leading-none font-semibold'>{reply.user.company_name || `${reply.user.first_name} ${reply.user.last_name}`}</p>
+                                                                <p className='text-left'>{reply.text}</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                                    </div>
+                                                    </>
+                                            )}
+                                        
+
+                                            {replyingTo?.id === row.id && (
+                                                <form key={replyingTo.id} onSubmit={(e) => handleAddReply(e, replyingTo.id)} className='py-3 self-end w-full px-3 flex flex-row items-center gap-2 justify-between'>
+                                                    <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                                    <input name='replyValue' value={replyValue} onChange={(e) => setReplyValue(e.target.value)} type="text" className='w-full outline-none border-2 rounded-lg border-gray-200 py-2 px-2' placeholder={`Write a public reply to ${replyingTo.user.company_name || replyingTo.user.first_name}...`} />
+                                                    <button type='submit' disabled={!replyValue}>
+                                                        <IoSend className={`text-xl ${replyValue && 'text-secondary cursor-pointer'}`} disabled={!replyValue} />
+                                                    </button>
+                                                </form>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>no comments</p>
+                            )}
+                        </div>
+
+                        {isLoggedIn && (
+                            <form onSubmit={handleAddComment} className='py-3 shadow-lg self-end w-full px-3 flex flex-row items-center gap-2 justify-between'>
+                                <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                <input name='commentValue' value={commentValue} onChange={(e) => setCommentValue(e.target.value)} type="text" className='w-full outline-none border-2 rounded-lg border-gray-200 py-2 px-2' placeholder='Write a public comment...' />
+                                <button type='submit' disabled={!commentValue}>
+                                    <IoSend className={`text-xl ${commentValue && 'text-secondary cursor-pointer'}`} disabled={!commentValue} />
+                                </button>
+                            </form>
+                        )}
                     </div>
                 </div>
             )}
@@ -247,13 +396,19 @@ function EventDetailPage() {
                             >
                                 Tickets
                             </a>
+                            <a
+                                onClick={() => setIsComments(true)}
+                                className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                            >
+                                Comments
+                            </a>
                         </nav>
                     </div>
 
                     {/* Description Section */}
                     <div
                         id="description-section"
-                         className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8" >
+                        className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8" >
                         <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200">
                             Description
                         </h2>
@@ -265,8 +420,8 @@ function EventDetailPage() {
                     {/* Tickets Section */}
                     <div
                         id="tickets-section"
-                       className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
-                         <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200 flex items-center">
+                        className="bg-white p-6 md:p-8 rounded-lg shadow-xl mb-8">
+                        <h2 className="text-lg md:text-3xl font-bold text-gray-800 mb-6 border-b pb-4 border-gray-200 flex items-center">
                             <FaCheckSquare className="text-teal-600 mr-2" />
                             Tickets
                         </h2>
@@ -475,9 +630,9 @@ function EventDetailPage() {
 
                 <div className="mb-20"></div>
             </div>
-            </div>
-            );
+        </div>
+    );
 
 }
 
-            export default EventDetailPage;
+export default EventDetailPage;

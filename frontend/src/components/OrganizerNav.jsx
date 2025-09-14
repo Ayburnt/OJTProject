@@ -66,6 +66,16 @@ function OrganizerNav() {
       color: "#EF4B4C"
     }
   ];
+  } else if(userRole === 'user'){
+    pathConfig = [    
+    {
+      pattern: "/user/account",
+      title: "Manage Account",
+      docTitle: "Manage Account | Sari-Sari Events",
+      link: () => `/user/account`,
+      color: "#EF4B4C"
+    }
+  ];
   }
 
     const currentRoute =

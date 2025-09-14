@@ -4,6 +4,7 @@ import { MdOutlineFileUpload } from "react-icons/md";
 import { FaRegCircle } from "react-icons/fa6";
 import { Link } from 'react-router-dom';
 import api, { ACCESS_TOKEN } from '../api.js';
+import useAuth from '../hooks/useAuth.js';
 
 // A reusable component for the document upload section
 const DocumentUploadSection = ({ title, fileTypes, fileSizeLimit, onFileChange, file }) => {
@@ -77,11 +78,12 @@ const DocumentUploadSection = ({ title, fileTypes, fileSizeLimit, onFileChange, 
 // The "Become an Organizer" form component
 const OrganizerInfoForm = ({ onNext, formData, handleChange }) => {
     const inputStyle = "mt-1 block w-full rounded-xl py-3 px-4 border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm";
+    const {userCode} = useAuth();
 
     return (
         <div className="bg-white w-full max-w-lg p-6 rounded-3xl shadow-lg border border-gray-200 space-y-6">
             <div className="flex items-center mb-6">
-                <Link to="/manage-account">
+                <Link to={`/org/${userCode}/account`}>
                     <button className="flex items-center font-outfit text-teal-600 hover:text-teal-800 transition-colors duration-200">
                         <FaArrowLeft />
                         <span className="ml-2 font-outfit font-medium">Back</span>

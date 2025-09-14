@@ -81,7 +81,8 @@ function App() {
     '/security',  
     '/attendee',
     '/staff',
-    '/staff/account'
+    '/staff/account',
+    '/user/account'
   ];
 
   // A helper function to check if the current path is in the excluded list
@@ -130,7 +131,7 @@ function App() {
           {/* <Route path="/attendees" element={<Attendees />} />*/}
           <Route path='/org/:userCode/account' element={<PrivateRoute requiredRole={'organizer'}><ManageAccount /></PrivateRoute>} />
           
-          <Route path="/manage-account" element={<ManageAccount />} />          
+          <Route path='/user/account' element={<PrivateRoute requiredRole={'user'}><ManageAccount /></PrivateRoute>} />
           <Route path='/change-password' element={<ChangePassword />} />
           <Route path='/org/:userCode/create-event' element={<PrivateRoute requiredRole={'organizer'}><CreateEvent /></PrivateRoute>} />
           <Route path='/org/create-event' element={<PrivateRoute requiredRole={'co-organizer'}><CreateEvent /></PrivateRoute>} />

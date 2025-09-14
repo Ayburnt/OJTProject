@@ -3,6 +3,9 @@ import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaf
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
+
 
 export default function LocationPicker({ value, onChange, handleLocationChange, formData, handleEventChange }) {
   const defaultCenter = { lat: 14.5995, lng: 120.9842 }; // Manila default
@@ -104,7 +107,7 @@ useEffect(() => {
       onChange={(e) => setSearchTerm(e.target.value)}
       className="w-full px-4 py-2 border border-gray-300 bg-white rounded-lg shadow-sm focus:ring-2 focus:ring-blue-500 outline-none"
     />
-    {suggestions.length > 0 && (
+    {suggestions.length > 0 ? (
       <ul className="absolute left-0 z-1000 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
         {suggestions.map((loc, idx) => (
           <li
@@ -116,6 +119,12 @@ useEffect(() => {
           </li>
         ))}
       </ul>
+    ) : searchTerm.length <= 4 && searchTerm.length >= 1  ? (
+      <Box sx={{ width: '100%' }} className="absolute left-0 z-1000 w-full bg-white px-3 border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto">
+      <Skeleton animation="wave" height={50} />
+    </Box>
+    ) : (
+      <></>
     )}
   </div>
 

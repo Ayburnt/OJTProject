@@ -16,8 +16,7 @@ urlpatterns = [
     
     path("api/attendees/", include("attendees.urls")),
     path("api/transactions/", include("transactions.urls")),
-
-
+    path('api/comments/', include('comments.urls')),    
 
 ]
 

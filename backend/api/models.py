@@ -56,6 +56,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         ('co-organizer', 'Co-Organizer'),
         ('admin', 'Admin'),
         ('staff', 'Staff'),
+        ('user', 'User'),
     )
 
     VERIFICATION_STATUS_CHOICES = (

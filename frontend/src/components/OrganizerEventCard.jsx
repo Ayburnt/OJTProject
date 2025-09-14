@@ -7,7 +7,7 @@ import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth.js';
 
-function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees }) {
+function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
   const {userRole} = useAuth();
@@ -121,14 +121,7 @@ function OrganizerEventCard({ fetchEventDetails, eventPoster, eventName, eventDa
 
         <div className='flex flex-row justify-between items-center w-full'>
           <p className='font-outfit text-2xl truncate w-full'>{eventName}</p>
-          <p className={`font-outfit py-1 px-3 text-xs text-white rounded-full ml-3 
-            ${eventStatus === 'pending' ? 'bg-slate-700' :
-              eventStatus === 'published' ? 'bg-green-700' :
-                eventStatus === 'cancelled' ? 'bg-red-500' :
-                  eventStatus === 'draft' ? 'bg-stone-700' :
-                    eventStatus === 'completed' ? 'bg-secondary' :
-                      'bg-amber-600'
-            }`}
+          <p className={`font-outfit py-1 px-3 text-xs rounded-full ml-3 ${eventStatusColor}`}
           >{eventStatus}</p>
         </div>
 

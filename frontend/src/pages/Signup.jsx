@@ -27,7 +27,7 @@ function Signup({ onAuthSuccess }) {
         localStorage.setItem('userProfile', userData.profile_picture || '');
         localStorage.setItem('userCode', userData.user_code || '');
 
-        if (userData.needs_profile_completion || selectedRole === 'guest') {
+        if (userData.needs_profile_completion || selectedRole === 'user') {
             // Pre-fill step 4 fields with any data already available (e.g., from Google)
             setFirstname(userData.first_name || '');
             setLastname(userData.last_name || '');
@@ -93,7 +93,7 @@ function Signup({ onAuthSuccess }) {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [isOrganizer, setIsOrganizer] = useState(false);
     const [isAttendee, setIsAttendee] = useState(false);
-    const [selectedRole, setSelectedRole] = useState("organizer"); // Default to 'guest'
+    const [selectedRole, setSelectedRole] = useState("organizer");
 
     // States for Step 4 (Fill up Information)
     const [firstname, setFirstname] = useState("");
@@ -340,7 +340,7 @@ function Signup({ onAuthSuccess }) {
 
     // New useEffect to initialize and render Google button when script is loaded AND step is 2
     useEffect(() => {
-        if (googleScriptLoaded && window.google && step === 1 && !googleGsiInitialized.current) {
+        if (googleScriptLoaded && window.google && step === 2 && !googleGsiInitialized.current) {
             // Initialize Google Sign-In only once
             window.google.accounts.id.initialize({
                 client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID, // Ensure this is correctly configured in your .env
@@ -428,7 +428,7 @@ function Signup({ onAuthSuccess }) {
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
-                {/*}
+                
                 {step === 1 && (
                     <>
 
@@ -450,7 +450,7 @@ function Signup({ onAuthSuccess }) {
                                 onClick={() => {
                                     setIsOrganizer(true);
                                     setIsAttendee(false);
-                                    setSelectedRole("client");
+                                    setSelectedRole("organizer");
                                 }}>
 
                                 <HiOutlineCalendarDays className="text-[8rem]" /> 
@@ -463,11 +463,11 @@ function Signup({ onAuthSuccess }) {
                                 onClick={() => {
                                     setIsOrganizer(false);
                                     setIsAttendee(true);
-                                    setSelectedRole("guest");
+                                    setSelectedRole("user");
                                 }}
                             >
                                 <HiOutlineIdentification className="text-[8rem]" />
-                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>attendee</p>
+                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>user</p>
                             </div>
                         </div>
 
@@ -486,10 +486,10 @@ function Signup({ onAuthSuccess }) {
                             Already have an account? <Link className="text-[#009a94] font-semibold" to={'/login'}>Sign in</Link>
                         </p>
                     </>
-                )} */}
+                )}
 
 
-                {step === 1 && (
+                {step === 2 && (
                     <>
                         <div className="w-full max-w-md flex items-center text-left gap-1 mb-5 cursor-pointer" onClick={() => navigate('/')}>
                             <IoIosArrowBack className="text-secondary text-xl" />
@@ -733,13 +733,23 @@ function Signup({ onAuthSuccess }) {
                                 I agree and I have read and accepted <Link to='/term' target="_blank" className="text-blue-500">Terms of services</Link> and <Link to='/policy' target="_blank" className="text-blue-500">Privacy Policy</Link>.
                             </p>
                         </div>
-                        <button
+                        {selectedRole === 'organizer' ? (
+                            <button
                             type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
                             className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isLoading || !user_code} // 👈 disables if loading OR empty user_code
                         >
                             {isLoading ? 'Saving...' : 'Continue'}
                         </button>
+                        ) : (
+                            <button
+                            type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
+                            className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled={isLoading} // 👈 disables if loading OR empty user_code
+                        >
+                            {isLoading ? 'Saving...' : 'Continue'}
+                        </button>
+                        )}                        
                         {message && <p className="font-outfit text-center text-sm mt-4 text-red-500">{message}</p>}
                         <p className="text-grey font-outfit mt-5 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                     </>

@@ -127,7 +127,8 @@ INSTALLED_APPS = [
     'verification',
     'storages',
     'attendees',
-    'transactions'
+    'transactions',
+    'comments',
 ]
 
 MIDDLEWARE = [

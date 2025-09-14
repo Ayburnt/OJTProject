@@ -18,6 +18,7 @@ function OrganizerDashboard() {
 
 
   useEffect(() => {
+    if (!userRole) return;
     const fetchEventDetails = async () => {
       if(userRole === 'organizer'){
         try {

@@ -1,23 +1,18 @@
 # events/permissions.py
-
 from rest_framework import permissions
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
-    Custom permission to allow organizers and co-organizers to edit an event.
+    Allow event owners and their co-organizers to edit;
+    everyone else has read-only access.
     """
     def has_object_permission(self, request, view, obj):
-        # Read-only permissions are always allowed for safe methods (GET, HEAD, OPTIONS).
+        # Allow GET/HEAD/OPTIONS for all
         if request.method in permissions.SAFE_METHODS:
             return True
 
-        # Check if the user is the primary organizer.
-        is_owner = obj.created_by == request.user
+        user = request.user
+        owner = obj.created_by
+        co_organizer = getattr(user, "added_by", None)
 
-        # Check if the user is a co-organizer (if they have an 'added_by' parent)
-        is_co_organizer = (
-            hasattr(request.user, 'added_by') and
-            request.user.added_by == obj.created_by
-        )
-
-        return is_owner or is_co_organizer
+        return user == owner or co_organizer == owner

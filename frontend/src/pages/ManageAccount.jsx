@@ -74,7 +74,7 @@ const ManageAccount = () => {
 
   const handleRegStaff = async (e) => {
     e.preventDefault();
-    setIsStaffLoading(true);    
+    setIsStaffLoading(true);
 
     if (!staffData.role || staffData.role === '') {
       toast.error("Select an account role.");
@@ -254,7 +254,7 @@ const ManageAccount = () => {
   const fetchStaffs = async () => {
     try {
       const res = await api.get(`staff-list/`);
-      setStaffList(res.data);      
+      setStaffList(res.data);
     } catch (err) {
       console.error("Failed to fetch staff accounts:", err);
     }
@@ -287,10 +287,10 @@ const ManageAccount = () => {
       fetchStaffs();
     } catch (err) {
       const message =
-      err.response?.data?.detail ||
-      err.response?.data?.message ||
-      "Failed to reactivate staff.";
-    toast.error(message, { autoClose: 5000 });
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Failed to reactivate staff.";
+      toast.error(message, { autoClose: 5000 });
     }
   };
 
@@ -428,9 +428,9 @@ const ManageAccount = () => {
                 </button>
               </Link>
 
-              {/* Button for Verification Status */}
-              {userData.verification_status === 'pending' ? (
-                <button
+              {userRole === 'organizer' && (
+                userData.verification_status === 'pending' ? (
+                  <button
                   disabled
                   className="w-full px-9 py-2 text-sm font-outfit text-gray-500 border border-gray-500 rounded-lg cursor-not-allowed"
                 >
@@ -451,8 +451,9 @@ const ManageAccount = () => {
                     {userData.verification_status === 'declined' ? 'Re-Verify Account' : 'Verify Account'}
                   </button>
                 </Link>
-              )}
-              
+              )
+              )}              
+
 
               {/* Delete Account Button */}
               <button
@@ -500,7 +501,9 @@ const ManageAccount = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
+                {userRole !== 'user' && (
+                  <>
+                  <div>
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">Organization</label>
                   <input
                     type="text"
@@ -526,6 +529,8 @@ const ManageAccount = () => {
                       } focus:outline-none`}
                   />
                 </div>
+                  </>
+                )}                                
                 <div>
                   <label className="block text-sm font-medium font-outfit text-gray-700 mb-1">First Name</label>
                   <input
@@ -579,56 +584,56 @@ const ManageAccount = () => {
 
             {userRole === 'organizer' && (
               <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">
-              <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
-              <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
-                {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
-                  activeStaffs.map((staff) => (
-                    <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
-                      <div>
-                        <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name} ({staff.role})</h3>
-                        <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
-                      </div>
-                      <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
-                    </div>
-                  ))
-                ) : (
-                  <h2>No active staff accounts</h2>
-                )}
-              </div>
-
-              {showInactive && (
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
-                    Inactive Staff Accounts
-                  </h3>
-                  <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
-                    {inactiveStaffs.map((staff) => (
-                      <div
-                        key={staff.id}
-                        className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
-                      >
+                <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
+                <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
+                  {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
+                    activeStaffs.map((staff) => (
+                      <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
                         <div>
-                          <h3 className="leading-none font-medium">
-                            {staff.first_name} {staff.last_name}
-                          </h3>
-                          <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+                          <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name} ({staff.role})</h3>
+                          <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
                         </div>
-                        <button
-                          onClick={() => handleReactivate(staff.id)}
-                          className="text-green-600 text-sm hover:underline cursor-pointer"
-                        >
-                          Reactivate
-                        </button>
+                        <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <h2>No active staff accounts</h2>
+                  )}
                 </div>
-              )}
 
-              <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>
-            </div>
+                {showInactive && (
+                  <div className="mt-6">
+                    <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
+                      Inactive Staff Accounts
+                    </h3>
+                    <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      {inactiveStaffs.map((staff) => (
+                        <div
+                          key={staff.id}
+                          className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
+                        >
+                          <div>
+                            <h3 className="leading-none font-medium">
+                              {staff.first_name} {staff.last_name}
+                            </h3>
+                            <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+                          </div>
+                          <button
+                            onClick={() => handleReactivate(staff.id)}
+                            className="text-green-600 text-sm hover:underline cursor-pointer"
+                          >
+                            Reactivate
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>
+              </div>
             )}
-                        
+
 
             {/* Notification Preferences */}
             <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">

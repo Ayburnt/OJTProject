@@ -68,7 +68,12 @@ const OrganizerEvent = () => {
 
   // Determine event status based on current date/time
   function getEventStatus(event) {
-    const now = new Date();
+    if(event.status === 'draft'){      
+      return "Draft";
+    } else if(event.status === 'pending') {
+      return "Pending";
+    } else {
+      const now = new Date();
     const start = new Date(`${event.start_date}T${event.start_time}`);
     const end = new Date(`${event.end_date}T${event.end_time}`);
 
@@ -76,6 +81,7 @@ const OrganizerEvent = () => {
     if (now >= start && now <= end) return "Ongoing";
     if (now > end) return "Done";
     return "All Events";
+    }
   }
 
   // Get status color for badge
