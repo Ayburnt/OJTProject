@@ -49,28 +49,57 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
     }
   };
 
-  const downloadCsv = async () => {
-    if (!currentEvent) return;
-    try {
-      const res = await api.get(
-        `/attendees/${currentEvent.event_code}/export-csv/`,
-        { responseType: "blob" }
-      );
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `${currentEvent.event_code}_attendees.csv`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      console.error("Error downloading CSV:", err);
-      alert("Failed to download CSV.");
-    }
-  };
+  const downloadCsv = () => {
+  if (!filteredAttendees || filteredAttendees.length === 0) {
+    alert("No attendees to export.");
+    return;
+  }
+
+  // Only the rows you're currently displaying
+  const visibleData = filteredAttendees;   // or paginatedAttendees if you only want the current page
+
+  const headers = [
+    "Reference Code",
+    "First Name",
+    "Last Name",
+    "Email",
+    "Ticket Type",
+    "Check-in Time"
+  ];
+
+  const rows = visibleData.map(a => [
+    a.attendee_code || "—",
+    a.firstname || "",
+    a.lastname || "",
+    a.email || "",
+    a.ticket_read?.ticket_name || "",
+    a.attendance?.check_in_time
+      ? new Date(a.attendance.check_in_time).toLocaleString()
+      : ""
+  ]);
+
+  // Build CSV
+  let csvContent =
+    headers.join(",") +
+    "\n" +
+    rows.map(r => r.map(value =>
+      `"${String(value).replace(/"/g, '""')}"`
+    ).join(",")).join("\n");
+
+  // Download
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute(
+    "download",
+    `${currentEvent?.event_code || "attendees"}_visible.csv`
+  );
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 
   const uploadCsv = () => fileInputRef.current.click();
 

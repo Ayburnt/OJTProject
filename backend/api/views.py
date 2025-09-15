@@ -979,6 +979,14 @@ class CurrentUserView(APIView):
         for field in editable_fields:
             if field in data:
                 setattr(user, field, data[field])
+        
+        if "org_logo" in request.FILES:          # <--- new
+            if user.org_logo and user.org_logo.name != "defaults/default-logo.png":                  # delete old logo if not default
+                try:
+                    user.org_logo.delete(save=False)
+                except Exception:
+                    pass
+            user.org_logo = request.FILES["org_logo"]
 
         user.save()
 
@@ -989,6 +997,11 @@ class CurrentUserView(APIView):
             "phone_number": user.phone_number,
             "company_name": user.company_name,
             "company_website": user.company_website,
+            "org_logo": (
+                request.build_absolute_uri(user.org_logo.url)
+                if user.org_logo
+                else None
+            ),
         }, status=status.HTTP_200_OK)
         
 @api_view(['POST'])

@@ -12,9 +12,9 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
           Thank you for registering! Keep your ticket links safe — you’ll need
           them for entry.
         </p>
-        <p className="mb-4">Here are your ticket(s):</p>
+        <p>Here are your ticket(s):</p>
 
-        <ul className="grid grid-cols-2 space-y-3 w-3/4">
+        <ul className="flex flex-row items-center justify-center gap-4 w-3/4">
           {ticketLinks.map((link, idx) => {
             const cleanLink = link?.trim();
             console.log(`Ticket ${idx + 1} link:`, cleanLink);
@@ -33,7 +33,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
           })}
         </ul>
 
-        <div>
+        <div className="mt-3">
           <p>Transaction Link: </p>
           <a
           href={`/transaction/${transacCode}`}

@@ -78,7 +78,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150, blank=True) # Updated max_length
     last_name = models.CharField(max_length=150, blank=True) # Updated max_length
     profile_picture = models.URLField(max_length=500, blank=True, null=True, default='https://ik.imagekit.io/cafedejur/sari-sari-events/default-profile.jpg?updatedAt=1753685867575')
-    org_logo = models.ImageField(default='defaults/default-logo.png')
+    org_logo = models.ImageField(upload_to="profile_logo/", default='defaults/default-logo.png')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='organizer') # Updated max_length and default
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -150,4 +150,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         # Delete related image files before deleting the model instance
         if self.qr_code_image:
             self.qr_code_image.delete(save=False)
+        if self.org_logo:
+            self.org_logo.delete(save=False)
         super().delete(*args, **kwargs)

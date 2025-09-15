@@ -45,7 +45,9 @@ const ManageAccount = () => {
   const [error, setError] = useState(null);
   const [isAddUser, setIsAddUser] = useState(false);
   const [isStaffLoading, setIsStaffLoading] = useState(false);
-  const { userCode, userRole } = useAuth();
+  const [isUploadLogo, setIsUploadLogo] = useState(false);
+  const [logoFile, setLogoFile] = useState(null);
+  const { userCode, userRole, orgLogo, setOrgLogo } = useAuth();
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -197,10 +199,6 @@ const ManageAccount = () => {
     setShowModal(true);
   };
 
-  // Profile picture upload
-  const handleProfileUpload = () => {
-    fileInputRef.current.click();
-  };
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
@@ -222,32 +220,32 @@ const ManageAccount = () => {
       handleShowModal("Failed to upload profile picture. Please try again.");
     }
   };
-
+  
   // Company logo upload
   const handleLogoUpload = () => {
-    logoInputRef.current.click();
+    setIsUploadLogo(true);
   };
 
-  const handleLogoFileChange = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+  const handleLogoFileChange = async () => {
+  if (!logoFile) return; // no file selected
 
-    const formData = new FormData();
-    formData.append("company_logo", file);
+  const formData = new FormData();
+  formData.append("org_logo", logoFile);
 
-    try {
-      const res = await api.patch("/me/", formData, { // Using /me/ endpoint for simplicity
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      setUserData(res.data);
-      handleShowModal("Company logo updated successfully!");
-    } catch (err) {
-      console.error("Failed to upload company logo:", err);
-      handleShowModal("Failed to upload company logo. Please try again.");
-    }
-  };
+  try {
+    const res = await api.patch("/me/", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    const newLogoUrl = res.data.org_logo;
+    setOrgLogo(newLogoUrl);
+    localStorage.setItem("orgLogo", newLogoUrl);
+    setIsUploadLogo(false);
+    window.location.reload();
+  } catch (err) {
+    console.error("Failed to upload company logo:", err);
+    handleShowModal("Failed to upload company logo. Please try again.");
+  }
+};
 
   const [staffList, setStaffList] = useState([]);
   const [showInactive, setShowInactive] = useState(false);
@@ -328,6 +326,50 @@ const handleReactivate = async (id) => {
         </Backdrop>
       )}
 
+      {isUploadLogo && (
+        <div className="fixed inset-0 z-100 py-10 h-screen flex items-center justify-center bg-black/50 font-outfit">
+          <div className="bg-white flex flex-col rounded-lg shadow-xl w-full max-w-sm xl:max-w-md text-center">
+            <div className='border-b-2 border-gray-300 py-3'>
+              <h1 className='font-semibold text-xl'>{userRole === 'organizer' ? 'Change Logo' : 'Change Profile'}</h1>
+            </div>
+            <div className='w-full px-4 md:px-7 py-5 flex flex-col items-center'>
+              <p className="text-sm text-gray-500 text-left w-full">Recommended size: 1:1 ratio (JPG or PNG)</p>
+              <div onClick={() => document.getElementById('logoFile').click()} className={`cursor-pointer w-full flex justify-center items-center aspect-square border-2 border-dashed rounded-xl relative overflow-hidden`}>
+                {logoFile ? (
+                  logoFile instanceof File ? (
+                    <img
+                      src={URL.createObjectURL(logoFile)}
+                      alt="Event Poster Preview"
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    <img
+                      src={logoFile} // Use string URL directly (e.g., from backend)
+                      alt="Event Poster Preview"
+                      className="object-cover w-full h-full"
+                    />
+                  )
+                ) : (
+                  <span className="text-gray-500">Upload an image here</span>
+                )}
+
+                <input id="logoFile" name="logoFile" type="file" accept="image/*" onChange={(e) => setLogoFile(e.target.files[0])} className="hidden"
+                />
+
+                {/* <button type="button" onClick={() => document.getElementById('logoFile').click()} className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-md hover:bg-teal-600 transition-colors duration-200 cursor-pointer">
+                  Upload
+                </button> */}
+              </div>
+
+              <div className='w-full mt-3 flex flex-row justify-end gap-2'>
+                <button onClick={() => { setIsUploadLogo(false); setLogoFile(null) }}>Cancel</button>
+                <button onClick={handleLogoFileChange} className='bg-secondary text-white font-semibold py-2 px-4 rounded-lg hover:bg-teal-600 transition-colors duration-200 cursor-pointer'>Save Changes</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {isAddUser && (
         <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/50 font-outfit">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-sm xl:max-w-lg px-6 py-10 text-center">
@@ -367,7 +409,102 @@ const handleReactivate = async (id) => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full md:ml-5 lg:ml-0">        
+      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-6xl mx-auto w-full md:ml-5 lg:ml-0">     
+        <div className="bg-white rounded-xl shadow-md p-6 mb-7 flex-1">
+                  <div className="flex flex-col lg:flex-row w-full items-center sm:items-start justify-between gap-6">
+                    <div className="flex flex-col md:flex-row items-center">
+                      {userData.qr_code_image && (
+                        <div className="w-2/4 md:w-1/4">
+                          <img src={userData.qr_code_image} alt="" className="aspect-square w-full" />
+                        </div>
+                      )}
+                      <div className="flex space-x-4 items-center">
+                        <div className="relative w-20 h-20 lg:w-24 lg:h-24 bg-gradient-to-br from-teal-400 to-blue-500 rounded-full flex items-center justify-center">
+                          <img
+                            src={orgLogo}
+                            className="rounded-full border-2 border-gray-500 w-full h-full object-cover"
+                            alt="Profile"
+                          />
+                          <button
+                            onClick={handleLogoUpload}
+                            className="absolute bottom-0 right-0 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 transition-colors"
+                            aria-label="Upload photo"
+                          >
+                            <FiUpload className="text-teal-500" />
+                          </button>
+                          {/* hidden input */}
+                          <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileChange}
+                            accept="image/*"
+                            className="hidden"
+                          />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold font-outfit text-gray-800 text-3xl">
+                            {userData.company_name}
+                          </h4>
+                          <p className="text-lg font-outfit text-gray-500">{userData.first_name} {userData.last_name}</p>
+                        </div>
+                      </div>
+                    </div>
+        
+                    <div className="grid grid-cols-1 gap-4 w-full sm:w-auto">
+                      <Link to="/change-password">
+                        <button
+                          className="w-full px-5.5 py-2 text-sm font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+                        >
+                          Change Password
+                        </button>
+                      </Link>
+        
+                      {userRole === 'organizer' && (
+                        userData.verification_status === 'pending' ? (
+                          <button
+                            disabled
+                            className="w-full px-9 py-2 text-sm font-outfit text-gray-500 border border-gray-500 rounded-lg cursor-not-allowed"
+                          >
+                            Verification Pending
+                          </button>
+                        ) : userData.verification_status === 'verified' ? (
+                          <button
+                            disabled
+                            className="w-full px-9 py-2 text-sm font-outfit text-green-600 border border-green-600 rounded-lg cursor-not-allowed"
+                          >
+                            Verified
+                          </button>
+                        ) : (
+                          <Link to={`/org/${userCode}/verification-form`}>
+                            <button
+                              className="w-full px-9 py-2 text-sm font-outfit text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+                            >
+                              {userData.verification_status === 'declined' ? 'Re-Verify Account' : 'Verify Account'}
+                            </button>
+                          </Link>
+                        )
+                      )}
+        
+        
+                      {/* Delete Account Button */}
+                      <button
+                        onClick={() => handleShowModal('Delete account functionality would go here!')}
+                        className="w-full px-4 py-2 text-sm font-outfit text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-colors cursor-pointer"
+                      >
+                        Delete Account
+                      </button>
+        
+                      {/* Hidden input for logo (remains the same) */}
+                      <input
+                        type="file"
+                        ref={logoInputRef}
+                        onChange={handleLogoFileChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                    </div>
+                  </div>
+                </div>   
         <div className="lg:grid-cols-3 gap-6 lg:gap-8">
           <div className="sm:col-span-2 space-y-10">
 

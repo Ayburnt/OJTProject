@@ -160,8 +160,7 @@ function EventDetailPage() {
     const fetchComments = async (eventId) => {
         try {
             const response = await api.get(`/comments/list-create/${eventId}/`);
-            setComments(response.data);
-            console.log(response.data)
+            setComments(response.data);            
         } catch (error) {
             console.error("Error fetching comments:", error);
         }
@@ -209,12 +208,26 @@ function EventDetailPage() {
             document.body.style.overflow = 'unset'; // or 'auto'
         };
     }, [isComments]);
+    
 
-    // Removed the handleRegister function to make the button have no function
-    // const handleRegister = () => {
-    //   console.log("Registered for the event!");
-    //   setIsRegistered(true);
-    // };
+    function timeAgo(date) {
+        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+        const intervals = [
+            { label: "year", seconds: 31536000 },
+            { label: "month", seconds: 2592000 },
+            { label: "week", seconds: 604800 },
+            { label: "day", seconds: 86400 },
+            { label: "h", seconds: 3600 },
+            { label: "m", seconds: 60 }
+        ];
+
+        for (const i of intervals) {
+            const count = Math.floor(seconds / i.seconds);
+            if (count >= 1) return `${count}${i.label}${count > 1 && i.label.length > 1 ? "s" : ""} ago`;
+        }
+        return "Just now";
+    }
+
 
 
     if (!eventDetails) {
@@ -301,39 +314,46 @@ function EventDetailPage() {
                             {Array.isArray(comments) && comments.length > 0 ? (
                                 comments.map((row) => (
                                     <div key={row.id} className='gap-2 flex flex-row w-full items-start justify-start'>
-                                        <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                        <img src={row.user.org_logo} className='aspect-square w-8 rounded-full' alt="" />
                                         <div className='flex flex-col items-start justify-start leading-none w-full'>
                                             <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
-                                                <p className='text-lg leading-none font-semibold'>{row.user.company_name || `${row.user.first_name} ${row.user.last_name}`}</p>
+                                                <div className='flex flex-row gap-2'>
+                                                    <p className='text-lg leading-none font-semibold'>{row.user.company_name || `${row.user.first_name} ${row.user.last_name}`}</p>
+                                                    <p className='text-sm text-grey'>{timeAgo(row.created_at)}</p>
+                                                </div>
                                                 <p className='text-left'>{row.text}</p>
                                             </div>
                                             <button className='cursor-pointer text-grey mt-1 text-sm leading-none' onClick={() => setReplyingTo((prev) => (prev?.id === row.id ? null : row))}>reply</button>
 
                                             {row.replies.length > 0 && (
                                                 <>
-                                                <button onClick={() =>
-                                                    setReplies(replies === row.id ? null : row.id)
-                                                } className='text-black/60 leading-8 cursor-pointer'>{replies === row.id
-                                                    ? "Hide replies"
-                                                    : `View ${row.replies.length === 1 ? "reply" : `all ${row.replies.length} replies`}`}</button>
-                                                    <div className='flex flex-col gap-4 px-4'> 
+                                                    <button onClick={() =>
+                                                        setReplies(replies === row.id ? null : row.id)
+                                                    } className='text-black/60 leading-8 cursor-pointer'>{replies === row.id
+                                                        ? "Hide replies"
+                                                        : `View ${row.replies.length === 1 ? "reply" : `all ${row.replies.length} replies`}`}</button>
+                                                    <div className='flex flex-col gap-4 px-4'>
                                                         {replies === row.id && (
-                                                row.replies.map((reply) => (
-                                                    <div key={reply.id} className='gap-2 flex flex-row w-full items-start justify-start'>
-                                                        <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
-                                                        <div className='flex flex-col items-start justify-start leading-none w-full'>
-                                                            <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
-                                                                <p className='text-lg leading-none font-semibold'>{reply.user.company_name || `${reply.user.first_name} ${reply.user.last_name}`}</p>
-                                                                <p className='text-left'>{reply.text}</p>
-                                                            </div>
-                                                        </div>
+                                                            row.replies.map((reply) => (
+                                                                <div key={reply.id} className='gap-2 flex flex-row w-full items-start justify-start'>
+                                                                    <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
+                                                                    <div className='flex flex-col items-start justify-start leading-none w-full'>
+                                                                        <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
+                                                                            <div className='flex flex-row gap-2'>
+                                                                                <p className='text-lg leading-none font-semibold'>{reply.user.company_name || `${reply.user.first_name} ${reply.user.last_name}`}</p>
+                                                                                <p className='text-sm text-grey'>{timeAgo(reply.created_at)}</p>
+                                                                            </div>
+
+                                                                            <p className='text-left'>{reply.text}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            ))
+                                                        )}
                                                     </div>
-                                                ))
+                                                </>
                                             )}
-                                                    </div>
-                                                    </>
-                                            )}
-                                        
+
 
                                             {replyingTo?.id === row.id && (
                                                 <form key={replyingTo.id} onSubmit={(e) => handleAddReply(e, replyingTo.id)} className='py-3 self-end w-full px-3 flex flex-row items-center gap-2 justify-between'>
@@ -348,7 +368,7 @@ function EventDetailPage() {
                                     </div>
                                 ))
                             ) : (
-                                <p>no comments</p>
+                                <p className='text-lg font-semibold text-gray-500'>No comments yet</p>
                             )}
                         </div>
 

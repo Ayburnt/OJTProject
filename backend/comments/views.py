@@ -15,7 +15,7 @@ class CommentListCreateAPIView(APIView):
         List all comments for a post.
         """
         comments = Comment.objects.filter(event_id=event_id, replied_to=None).order_by('-created_at')
-        serializer = CommentSerializer(comments, many=True)
+        serializer = CommentSerializer(comments, many=True, context={"request": request})
         return Response(serializer.data)
     
     def post(self, request, event_id, format=None):

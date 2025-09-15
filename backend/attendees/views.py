@@ -198,15 +198,17 @@ class ExportCSVView(APIView):
         response['Content-Disposition'] = f'attachment; filename="{event_code}_attendees.csv"'
 
         writer = csv.writer(response)
-        writer.writerow(['Registration Date', 'Full Name', 'Email', 'Ticket Type'])
+        writer.writerow(['Reference Code', 'Registration Date', 'First Name', 'Last Name', 'Email', 'Ticket Type', 'Price at Purchase'])
 
         for a in attendees:
             writer.writerow([
+                a.attendee_code,
                 a.created_at.strftime("%Y-%m-%d"),
                 a.firstname,
                 a.lastname,
                 a.email,
-                a.ticket_type.ticket_name if a.ticket_type else ""
+                a.ticket_type.ticket_name if a.ticket_type else "",
+                a.price_at_purchase,
             ])
 
         return response

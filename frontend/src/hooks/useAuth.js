@@ -121,6 +121,7 @@ export const useAuth = () => {
     userProfile,
     verificationStatus,
     orgLogo,
+    setOrgLogo,
     login,
     logout
   };
