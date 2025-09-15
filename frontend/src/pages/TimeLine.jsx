@@ -4,7 +4,6 @@ import { FiCalendar, FiMapPin, FiUsers } from "react-icons/fi";
 import { AiOutlineCheckCircle, AiOutlineClose } from "react-icons/ai";
 import api from '../api.js';
 import { useNavigate, useParams } from 'react-router-dom';
-import useAuth from '../hooks/useAuth.js';
 
 
 // Back Button Component
@@ -35,8 +34,8 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
 
   return (
     <div className="bg-white rounded-3xl shadow-xl p-6 mb-8 flex flex-col items-center md:flex-row md:space-x-6">
-      <div className="rounded-full overflow-hidden bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
-        <img src={profileData.org_logo} alt="" className='w-full object-contain' />
+      <div className="rounded-full overflow-hidden object-cover bg-slate-200 w-24 h-24 flex items-center justify-center mb-4 md:mb-0">
+        <img src={profileData.org_logo} alt="" className='w-full h-full object-cover' />
       </div>
       <div className="flex flex-col flex-1 min-w-0 text-center md:text-left">
         <h1 className="text-xl font-bold font-outfit mb-1 flex items-center justify-center md:justify-start text-gray-900">
@@ -45,7 +44,7 @@ const ProfileCard = ({ profileData, eventData, totalAttendees }) => {
             <AiOutlineCheckCircle className="w-5 h-5 ml-2 text-green-500" />
           )}
         </h1>
-        <p className="text-gray-500 font-outfit text-sm">{profileData.company_name}</p>
+        <p className="text-gray-500 font-outfit text-sm">{profileData.email}</p>
       </div>
       <div className="flex justify-around w-full md:w-auto md:space-x-8 mt-4 md:mt-0">
         <div className="text-center">
