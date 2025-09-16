@@ -1,20 +1,25 @@
-// src/pages/ViewAllEventsPage.jsx
+// src/pages/ViewEventByCategory.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import EventCard from "../components/EventCard";
+import { useLocation } from "react-router-dom";
 import api from '../api.js';
 
-function ViewAllEventsPage() {
+function ViewEventByCategory() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  const location = useLocation();
 
   const initialEventsToShow = 8;
   const eventsIncrement = 4;
 
   const [events, setEvents] = useState([]);
   const [eventsToShow, setEventsToShow] = useState(initialEventsToShow);
-  const [activeCategory, setActiveCategory] = useState('All');
+  const initialCategory = location.state?.category || 'All';
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
+
+
 
   // Fetch events from API
   useEffect(() => {
@@ -33,7 +38,10 @@ function ViewAllEventsPage() {
   const filteredEvents =
     activeCategory === 'All'
       ? events
-      : events.filter((event) => event.category === activeCategory);
+      : events.filter(ev =>
+        ev.category.toLowerCase() === activeCategory.toLowerCase()
+      );
+
 
   useEffect(() => {
     setEventsToShow(initialEventsToShow);
@@ -133,4 +141,4 @@ function ViewAllEventsPage() {
   );
 }
 
-export default ViewAllEventsPage;
+export default ViewEventByCategory;

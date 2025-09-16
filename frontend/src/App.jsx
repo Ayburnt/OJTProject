@@ -5,10 +5,13 @@ import SignUp from './pages/Signup.jsx';
 import Login from './pages/Login.jsx';
 import HeroSection from './components/HeroSection';
 import RecommendedEvents from './components/RecommendedEvents';
+import OrganizersList from './components/OrganizersList'
+import CategoriesList from './components/CategoriesList'
 import CallToActionSection from './components/CallToActionSection';
 import Footer from './components/Footer';
 import EventDetailPage from './pages/EventDetailPage';
 import ViewAllEventsPage from './pages/ViewAllEventsPage';
+import ViewEventByCategory from './pages/ViewEventByCategory'
 import OrganizerDashboard from './pages/OrganizerDashboard';
 import ForgotPass from './pages/ForgotPass.jsx';
 import OrganizerEvent from './pages/OrganizerEvent.jsx';
@@ -112,6 +115,8 @@ function App() {
               <>
                 <HeroSection />
                 <RecommendedEvents />
+                <OrganizersList />
+                <CategoriesList />
                 <CallToActionSection />
               </>
             }
@@ -119,6 +124,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} /> 
           <Route path="/Events" element={<ViewAllEventsPage />} />
+          <Route path="/:category/events" element={<ViewEventByCategory />} />
           <Route path="/events/:eventcode" element={<EventDetailPage />} /> 
           <Route path='/org/:userCode/dashboard' element={<PrivateRoute requiredRole={'organizer'}><OrganizerDashboard /></PrivateRoute>} />
           <Route path='/org/dashboard' element={<PrivateRoute requiredRole={'co-organizer'}><OrganizerDashboard /></PrivateRoute>} />

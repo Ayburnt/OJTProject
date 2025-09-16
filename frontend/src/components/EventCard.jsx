@@ -21,7 +21,7 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
     }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group">
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-[1.02] hover:shadow-2xl cursor-pointer group font-outfit">
       {/* Image */}
       <div className="relative w-full h-48 sm:h-52 overflow-hidden">
         <img

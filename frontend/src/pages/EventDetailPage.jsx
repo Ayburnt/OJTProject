@@ -6,6 +6,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import api from '../api.js';
 import useAuth from '../hooks/useAuth.js';
+import { BiCommentDetail } from "react-icons/bi";
 
 /* ---------- Share Modal ---------- */
 function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
@@ -307,7 +308,7 @@ function EventDetailPage() {
                     }}>
                         <div className='flex px-4 flex-row justify-between items-center w-full border-b-2 border-gray-200 py-5'>
                             <h1 className='font-semibold text-xl'>Comments</h1>
-                            <button onClick={() => setIsComments(false)}><IoCloseOutline /></button>
+                            <button onClick={() => setIsComments(false)} className='text-lg cursor-pointer'><IoCloseOutline /></button>
                         </div>
 
                         <div className='flex flex-col gap-4 mt-3 px-4 pb-5 overflow-y-auto'>
@@ -368,7 +369,10 @@ function EventDetailPage() {
                                     </div>
                                 ))
                             ) : (
-                                <p className='text-lg font-semibold text-gray-500'>No comments yet</p>
+                                <div className='w-full flex flex-col py-4 items-center justify-center'>
+                                    <BiCommentDetail className='text-7xl text-gray-500' />
+                                    <p className='text-lg font-semibold text-gray-500'>No comments yet</p>
+                                </div>                                
                             )}
                         </div>
 
@@ -418,7 +422,7 @@ function EventDetailPage() {
                             </a>
                             <a
                                 onClick={() => setIsComments(true)}
-                                className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                                className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
                             >
                                 Comments
                             </a>
