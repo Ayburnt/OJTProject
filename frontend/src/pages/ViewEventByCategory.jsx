@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import EventCard from "../components/EventCard";
 import { useLocation } from "react-router-dom";
 import api from '../api.js';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 
 function ViewEventByCategory() {
   useEffect(() => {
@@ -18,17 +20,20 @@ function ViewEventByCategory() {
   const [eventsToShow, setEventsToShow] = useState(initialEventsToShow);
   const initialCategory = location.state?.category || 'All';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
-
+  const [isLoading, setIsLoading] = useState(false);
 
 
   // Fetch events from API
   useEffect(() => {
     const fetchAllEvents = async () => {
+      setIsLoading(true);
       try {
         const res = await api.get(`/event-public-view/`);
         setEvents(res.data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -100,7 +105,17 @@ function ViewEventByCategory() {
           ))}
         </div>
 
-
+          {isLoading && (
+          <div className='flex flex-row w-full'>
+            <div className='bg-gray-100 p-3 shadow-lg rounded-xl'>
+              <Stack spacing={0}>
+                <Skeleton variant="rounded" animation='wave' width={250} height={150} />
+                <Skeleton variant="text" animation='wave' height={50} />
+                <Skeleton variant="text" animation='wave' height={30} />
+              </Stack>
+            </div>
+          </div>
+        )}
 
 
         {/* Event Grid */}
@@ -132,9 +147,11 @@ function ViewEventByCategory() {
             )}
           </>
         ) : (
-          <p className="text-center text-gray-600 text-lg">
-            No events available in this category. Please try another!
-          </p>
+          !isLoading && (
+            <p className="text-center text-gray-600 text-lg">
+              No events available in this category. Please try another!
+            </p>
+          )    
         )}
       </div>
     </div>

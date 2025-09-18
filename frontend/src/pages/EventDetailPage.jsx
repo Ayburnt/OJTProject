@@ -8,6 +8,7 @@ import api from '../api.js';
 import useAuth from '../hooks/useAuth.js';
 import { BiCommentDetail } from "react-icons/bi";
 import { Helmet } from 'react-helmet-async';
+import AdsSection from '../components/AdsSection.jsx';
 
 /* ---------- Share Modal ---------- */
 function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
@@ -294,7 +295,7 @@ function EventDetailPage() {
                 <meta name="twitter:image" content={eventDetails.event_poster} />
             </Helmet>
 
-            <div className="bg-gray-100 min-h-screen">
+            <div className="bg-gray-100 min-h-screen">                
                 {/* Poster Lightbox */}
                 {isPosterOpen && (
                     <div
@@ -402,13 +403,14 @@ function EventDetailPage() {
                     </div>
                 )}
 
+                <AdsSection/>
                 {/* Main Grid Layout */}
                 <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Section (Poster + Nav + Description + Tickets) */}
                     <div className="lg:col-span-2 space-y-6">
                         {/* Poster */}
                         <div
-                            className="relative w-full h-64 sm:h-80 md:h-[400px] overflow-hidden rounded-2xl cursor-pointer"
+                            className="relative w-full h-64 sm:h-80 md:h-[400px] overflow-hidden rounded-2xl cursor-pointer group"
                             onClick={() => setIsPosterOpen(true)}
                         >
                             <img
@@ -416,7 +418,13 @@ function EventDetailPage() {
                                 alt={eventDetails.title}
                                 className="w-full h-full object-cover"
                             />
+
+                            {/* Hover message */}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-lg font-medium transition-opacity duration-300">
+                                Click to preview
+                            </div>
                         </div>
+
 
                         {/* Navigation Tabs */}
                         <div className="bg-white rounded-lg shadow-md">

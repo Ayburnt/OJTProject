@@ -20,7 +20,9 @@ import { FaChevronUp, FaChevronDown } from "react-icons/fa";
 function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAttendees, loadingAttendees, setSelectedAttendee, attendees, setAttendees, searchAttendees, setSearchAttendees }) {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [sortColumn, setSortColumn] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc"); // "asc" or "desc"
+
 
   
   const handleChangePage = (event, newPage) => {
@@ -124,18 +126,63 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
     }
   };
 
-  const handleSortByLastName = () => {
-  const newOrder = sortOrder === "asc" ? "desc" : "asc";
+  const handleSort = (column) => {
+  let newOrder = "asc";
+  if (sortColumn === column && sortOrder === "asc") newOrder = "desc";
+
+  setSortColumn(column);
   setSortOrder(newOrder);
 
   const sorted = [...attendees].sort((a, b) => {
-    if (a.lastname.toLowerCase() < b.lastname.toLowerCase()) return newOrder === "asc" ? -1 : 1;
-    if (a.lastname.toLowerCase() > b.lastname.toLowerCase()) return newOrder === "asc" ? 1 : -1;
+    let valA, valB;
+
+    switch (column) {
+      case "reference":
+        valA = a.attendee_code;
+        valB = b.attendee_code;
+        break;
+      case "firstname":
+        valA = a.firstname;
+        valB = b.firstname;
+        break;
+      case "lastname":
+        valA = a.lastname;
+        valB = b.lastname;
+        break;
+      case "email":
+        valA = a.email;
+        valB = b.email;
+        break;
+      case "ticket":
+        valA = a.ticket_read?.ticket_name;
+        valB = b.ticket_read?.ticket_name;
+        break;
+      case "checkin":
+        valA = a.attendance?.check_in_time
+          ? new Date(a.attendance.check_in_time).getTime()
+          : 0;
+        valB = b.attendance?.check_in_time
+          ? new Date(b.attendance.check_in_time).getTime()
+          : 0;
+        break;
+      default:
+        valA = "";
+        valB = "";
+    }
+
+    // normalize strings
+    if (typeof valA === "string") valA = valA.trim().toLowerCase();
+    if (typeof valB === "string") valB = valB.trim().toLowerCase();
+
+    if (valA < valB) return newOrder === "asc" ? -1 : 1;
+    if (valA > valB) return newOrder === "asc" ? 1 : -1;
     return 0;
   });
 
   setAttendees(sorted);
 };
+
+
 
   
   return (
@@ -210,16 +257,36 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Reference Code</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>First Name</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }} onClick={handleSortByLastName}>
+                <TableCell onClick={() => handleSort("reference")} sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    Reference Code{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div>
+                </TableCell>
+                <TableCell onClick={() => handleSort("firstname")} sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    First Name{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div>
+                </TableCell>
+                <TableCell sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }} onClick={() => handleSort("lastname")}>
                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                     Last Name{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
                   </div></TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Email</TableCell>
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Ticket Type</TableCell>
+                <TableCell onClick={() => handleSort("email")} sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    Email{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div>
+                </TableCell>
+                <TableCell onClick={() => handleSort("ticket")} sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    Ticket Type{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div>
+                </TableCell>
                 {/* <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Paid</TableCell> */}
-                <TableCell sx={{fontFamily: 'Outfit, sans-serif'}}>Check-in Time</TableCell>
+                <TableCell onClick={() => handleSort("checkin")} sx={{fontFamily: 'Outfit, sans-serif', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    Check-In Time{sortOrder === "asc" ? <FaChevronUp className='text-gray-500 text-xs' /> : <FaChevronDown className='text-gray-500 text-xs' />}
+                  </div>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>

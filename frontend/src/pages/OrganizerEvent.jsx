@@ -10,6 +10,8 @@ import EventAttendees from '../components/EventAttendees.jsx';
 import EventDashboard from '../components/EventDashboard.jsx';
 import EventTransactions from '../components/EventTransactions.jsx';
 import { MdContentCopy } from "react-icons/md";
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 
 const OrganizerEvent = () => {
   const navigate = useNavigate();
@@ -19,8 +21,10 @@ const OrganizerEvent = () => {
   const { userCode, orgLogo, userRole } = useAuth();
   const [selectedPage, setSelectedPage] = useState('Dashboard');
   const [selectedEvent, setSelectedEvent] = useState('');
+  const [isSkeleton, setIsSkeleton] = useState(false);
 
-  const fetchEventDetails = async () => {
+  const fetchEventDetails = async () => {    
+    setIsSkeleton(true);
     if(userRole === 'organizer'){
       try {
       const res = await api.get(`/list-create/`);
@@ -28,6 +32,8 @@ const OrganizerEvent = () => {
       console.log('Events', res.data);
     } catch (err) {
       console.error("Error fetching events:", err);
+    } finally {
+      setIsSkeleton(false);
     }
     } else if(userRole === 'co-organizer'){
       try {
@@ -35,6 +41,8 @@ const OrganizerEvent = () => {
       setEvents(res.data);
     } catch (err) {
       console.error("Error fetching events:", err);
+    } finally{
+      setIsSkeleton(false);
     }
     }
   };
@@ -117,7 +125,7 @@ const OrganizerEvent = () => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loadingTransac, setLoadingTransac] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);  
 
   const fetchAttendees = async (event) => {
     setCurrentEvent(event);
@@ -285,7 +293,19 @@ const OrganizerEvent = () => {
             </div>
 
             {/* Event Cards */}
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>              
+              {isSkeleton && (
+                <div className='bg-gray-100 p-4 shadow-lg rounded-xl'>
+              <Stack spacing={0}>
+                <Skeleton variant="rounded" animation='wave' width={'100%'} height={150} />
+                <Skeleton variant="text" animation='wave' height={60} />
+                <Skeleton variant="text" animation='wave' height={30} />
+                <Skeleton variant="text" animation='wave' height={30} />
+                <Skeleton variant="text" animation='wave' height={30} />                
+              </Stack>
+            </div>     
+              )}                 
+
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event, i) => (
                   <EventCard
@@ -307,7 +327,9 @@ const OrganizerEvent = () => {
                   />
                 ))
               ) : (
-                <p className="text-gray-500">No events match your search or category.</p>
+                !isSkeleton && (
+                  <p className="text-gray-500">No events match your search or category.</p>
+                )                
               )}
             </div>
           </>
@@ -364,7 +386,10 @@ const OrganizerEvent = () => {
 
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
-                <div className="px-6 py-4 divide-y divide-gray-200 text-sm">
+                <div className="px-6 pb-4 divide-y divide-gray-200 text-sm">
+                  <div className="flex justify-center py-2 items-center">                    
+                    <img src={selectedAttendee.ticket_qr_image} className='w-[50%]' alt="" />
+                  </div>
                   <div className="flex justify-between py-2">
                     <span className="text-gray-500">Transaction Code</span>
                     <span className="text-gray-800 font-medium">{selectedAttendee.transaction_read.payment_ref}</span>
@@ -404,7 +429,7 @@ const OrganizerEvent = () => {
                     <span className="text-gray-800 font-medium">
                       {selectedAttendee.attendance?.checked_in_by.first_name} {selectedAttendee.attendance?.checked_in_by.last_name}
                     </span>
-                  </div>
+                  </div>                  
                 </div>
 
                 {selectedAttendee.responses?.length > 0 && (

@@ -127,10 +127,10 @@ function Signup({ onAuthSuccess }) {
         setMessage(""); // Clear general message
 
         if (!captchaToken) {
-        toast.error("Please complete the captcha before submitting.");
-        recaptchaRef.current.reset(); // Reset the captcha here
-        return;
-    }
+            toast.error("Please complete the captcha before submitting.");
+            recaptchaRef.current.reset(); // Reset the captcha here
+            return;
+        }
 
         if (!email || !password || !confirmPassword) {
             setStep2Err("Please fill in all fields.");
@@ -370,7 +370,7 @@ function Signup({ onAuthSuccess }) {
     // Modified handleGoogleSignUp to accept 'currentRole' from the ref
     const handleGoogleSignUp = async (response, currentRole) => {
 
-        
+
 
         setIsLoading(true);
         setMessage('');
@@ -428,7 +428,7 @@ function Signup({ onAuthSuccess }) {
             <form
                 className="w-[90%] bg-white md:shadow-2xl rounded-xl py-10 max-w-lg flex flex-col justify-center items-center font-outfit"
             >
-                
+
                 {step === 1 && (
                     <>
 
@@ -441,7 +441,7 @@ function Signup({ onAuthSuccess }) {
                             <img src="/sariLogo.png" alt="Sari-Sari Events Logo" />
                         </div>
 
-                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p> 
+                        <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p>
 
                         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full md:w-[90%] transition-colors duration-500 px-6">
                             <div
@@ -453,7 +453,7 @@ function Signup({ onAuthSuccess }) {
                                     setSelectedRole("organizer");
                                 }}>
 
-                                <HiOutlineCalendarDays className="text-[8rem]" /> 
+                                <HiOutlineCalendarDays className="text-[8rem]" />
                                 <p className={`uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p>
                             </div>
 
@@ -498,6 +498,17 @@ function Signup({ onAuthSuccess }) {
 
                         <h2 className="text-2xl font-bold font-outfit mb-4 text-center">Sign Up</h2>
 
+                        {/* This div is where the Google button will be rendered by the GSI script */}
+                        <div id="google-sign-up-button" className="flex justify-center">
+                            {/* Google button will appear here */}
+                        </div>
+
+                        <div className="flex items-center justify-center my-4 w-[80%] max-w-xs">
+                            <div className="flex-grow border-t border-gray-300"></div>
+                            <span className="mx-4 text-gray-500">or</span>
+                            <div className="flex-grow border-t border-gray-300"></div>
+                        </div>
+
                         <div className="w-[85%] md:w-[65%] flex flex-col items-center">
                             <div className="mb-4 w-full">
                                 <label htmlFor="email" className="block mb-2 font-outfit text-sm pl-1 font-medium leading-none">E-mail</label>
@@ -532,6 +543,14 @@ function Signup({ onAuthSuccess }) {
                                     value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
                                 {passwordErr && <p className="font-outfit text-red-500 text-sm mb-2">{passwordErr}</p>}
                             </div>
+                            <div className="flex justify-center">
+                                <ReCAPTCHA
+                                    ref={recaptchaRef}
+                                    sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
+                                    onChange={(token) => setCaptchaToken(token)}
+                                />
+                            </div>
+
                             <button
                                 className="w-[70%] bg-secondary text-white mt-2 py-1 font-outfit rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={handleEmailPass} // Call handleEmailPass for email check and OTP send
@@ -540,27 +559,9 @@ function Signup({ onAuthSuccess }) {
                                 {isLoading ? 'Processing...' : 'Sign up'}
                             </button>
 
-                            <div className="flex items-center justify-center my-4 w-[80%] max-w-xs">
-                                <div className="flex-grow border-t border-gray-300"></div>
-                                <span className="mx-4 text-gray-500">or</span>
-                                <div className="flex-grow border-t border-gray-300"></div>
-                            </div>
-
-                            {/* This div is where the Google button will be rendered by the GSI script */}
-                            <div id="google-sign-up-button" className="flex justify-center">
-                                {/* Google button will appear here */}
-                            </div>
                         </div>
 
-                        <div className="flex justify-center my-4">
-                            <ReCAPTCHA
-                                ref={recaptchaRef} 
-                                sitekey={import.meta.env.VITE_RECAPTCHA_SITE_KEY}
-                                onChange={(token) => setCaptchaToken(token)}
-                            />
-                        </div>
-
-                        <p className="text-grey font-outfit mt-10 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
+                        <p className="text-grey font-outfit mt-7 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                         {step2Err && <p className="text-center text-sm mt-4 text-red-500">{step2Err}</p>}
                     </>
                 )}
@@ -735,21 +736,21 @@ function Signup({ onAuthSuccess }) {
                         </div>
                         {selectedRole === 'organizer' ? (
                             <button
-                            type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
-                            className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isLoading || !user_code} // 👈 disables if loading OR empty user_code
-                        >
-                            {isLoading ? 'Saving...' : 'Continue'}
-                        </button>
+                                type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
+                                className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isLoading || !user_code} // 👈 disables if loading OR empty user_code
+                            >
+                                {isLoading ? 'Saving...' : 'Continue'}
+                            </button>
                         ) : (
                             <button
-                            type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
-                            className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                            disabled={isLoading} // 👈 disables if loading OR empty user_code
-                        >
-                            {isLoading ? 'Saving...' : 'Continue'}
-                        </button>
-                        )}                        
+                                type="submit" onClick={handleProfileCompletionSubmit} // Call handleProfileCompletionSubmit
+                                className="w-65 bg-secondary text-white py-2 rounded-lg transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                disabled={isLoading} // 👈 disables if loading OR empty user_code
+                            >
+                                {isLoading ? 'Saving...' : 'Continue'}
+                            </button>
+                        )}
                         {message && <p className="font-outfit text-center text-sm mt-4 text-red-500">{message}</p>}
                         <p className="text-grey font-outfit mt-5 text-sm">Already have an account? <Link className="text-secondary" to={'/login'}>Sign in</Link></p>
                     </>

@@ -99,6 +99,49 @@ function CEStep1({
 
         <div className="col-span-2">
             <label className="font-outfit text-sm leading-none m-0 text-gray-700">
+              List Event Publicly <br />
+              <span className='text-gray-400'>Would you like this event to be visible in the public view?</span>
+            </label>
+
+            <div className="grid grid-cols-2 gap-3">
+              {/* Single-day event */}
+              <input
+                type="radio"
+                id="broadcast_yes"
+                name="is_broadcast"
+                value="broadcast"
+                checked={formData.is_broadcast === "broadcast"}
+                onChange={handleEventChange}
+                className="hidden peer/broadcast"
+              />
+              <label
+                htmlFor="broadcast_yes"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/broadcast:bg-teal-500 peer-checked/broadcast:border-teal-500 peer-checked/broadcast:text-white hover:text-secondary"
+              >
+                <span className="text-sm font-medium">Yes</span>
+              </label>
+
+              {/* Multi-day event */}
+              <input
+                type="radio"
+                id="broadcast_no"
+                name="is_broadcast"
+                value="do-not-broadcast"
+                checked={formData.is_broadcast === "do-not-broadcast"}
+                onChange={handleEventChange}
+                className="hidden peer/do-not-broadcast"
+              />
+              <label
+                htmlFor="broadcast_no"
+                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/do-not-broadcast:bg-teal-500 peer-checked/do-not-broadcast:border-teal-500 peer-checked/do-not-broadcast:text-white hover:text-secondary"
+              >
+                <span className="text-sm font-medium">No</span>
+              </label>
+            </div>
+          </div>
+
+        <div className="col-span-2">
+            <label className="font-outfit text-sm leading-none m-0 text-gray-700">
               Set your audience
             </label>
 
@@ -137,7 +180,7 @@ function CEStep1({
                 <span className="text-sm font-medium">Private</span>
               </label>
             </div>
-          </div>
+          </div>          
 
           {formData.audience === 'private' && (
             <>
@@ -145,50 +188,7 @@ function CEStep1({
               inputValue={formData.private_code} inputOnChange={handleEventChange}
               inputPlaceholder='e.g., my-event-password'
               required={formData.audience === "private"}
-            />
-
-            <div className="col-span-2">
-            <label className="font-outfit text-sm leading-none m-0 text-gray-700">
-              Broadcast Event <br />
-              <span className='text-gray-400'>Manage how your event will appear and be shared.</span>
-            </label>
-
-            <div className="grid grid-cols-2 gap-3">
-              {/* Single-day event */}
-              <input
-                type="radio"
-                id="broadcast_yes"
-                name="is_broadcast"
-                value="broadcast"
-                checked={formData.is_broadcast === "broadcast"}
-                onChange={handleEventChange}
-                className="hidden peer/broadcast"
-              />
-              <label
-                htmlFor="broadcast_yes"
-                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/broadcast:bg-teal-500 peer-checked/broadcast:border-teal-500 peer-checked/broadcast:text-white hover:text-secondary"
-              >
-                <span className="text-sm font-medium">Broadcast</span>
-              </label>
-
-              {/* Multi-day event */}
-              <input
-                type="radio"
-                id="broadcast_no"
-                name="is_broadcast"
-                value="do-not-broadcast"
-                checked={formData.is_broadcast === "do-not-broadcast"}
-                onChange={handleEventChange}
-                className="hidden peer/do-not-broadcast"
-              />
-              <label
-                htmlFor="broadcast_no"
-                className="block w-full py-4 px-3 text-center text-gray-700 bg-white rounded-xl cursor-pointer border-2 border-gray-300 transition-all duration-200 hover:bg-gray-50 peer-checked/do-not-broadcast:bg-teal-500 peer-checked/do-not-broadcast:border-teal-500 peer-checked/do-not-broadcast:text-white hover:text-secondary"
-              >
-                <span className="text-sm font-medium">Do not broadcast</span>
-              </label>
-            </div>
-          </div>
+            />            
           </>
           )}
           
