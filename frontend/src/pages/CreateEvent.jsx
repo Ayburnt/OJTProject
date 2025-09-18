@@ -120,30 +120,46 @@ const CreateEventForm = () => {
         return;
       }
 
-      // Seating map: no aspect ratio validation
+      // File type check
+      if (!validTypes.includes(file.type)) {
+        if (name === 'event_poster') {
+          setIsPosterErr(true);
+          setPosterErr('Image must be PNG or JPG format.');
+        } else {
+          setIsPosterErr(true);
+          setPosterErr('Image must be PNG or JPG format.');
+        }
+        return;
+      }      
+
+      if (name === 'event_poster') {
+        setFormData(prev => ({ ...prev, event_poster: file }));
+        return;
+      }
+      
       if (name === 'seating_map') {
         setFormData(prev => ({ ...prev, seating_map: file }));
         return;
       }
 
-      // Poster: validate aspect ratio
-      if (name === 'event_poster') {
-        const img = new Image();
-        img.onload = () => {
-          const aspectRatio = img.width / img.height;
-          const ratio16by9 = 16 / 9;
+      // // Poster: validate aspect ratio
+      // if (name === 'event_poster') {
+      //   const img = new Image();
+      //   img.onload = () => {
+      //     const aspectRatio = img.width / img.height;
+      //     const ratio16by9 = 16 / 9;
 
-          if (img.width <= img.height) {
-            setIsPosterErr(true);
-            setPosterErr('Image must be landscape.');
-            return;
-          }
+      //     if (img.width <= img.height) {
+      //       setIsPosterErr(true);
+      //       setPosterErr('Image must be landscape.');
+      //       return;
+      //     }
 
-          setFormData(prev => ({ ...prev, event_poster: file }));
-        };
-        img.src = URL.createObjectURL(file);
-        return;
-      }
+      //     setFormData(prev => ({ ...prev, event_poster: file }));
+      //   };
+      //   img.src = URL.createObjectURL(file);
+      //   return;
+      // }
     } else {
       // Handle text fields or radio buttons
       setFormData(prev => {

@@ -197,7 +197,7 @@ function CEStep1({
       <FormSection title={ <>  EVENT IMAGE / POSTER{" "}
       <span className="text-red-500">*</span> </>}>
         <p className="text-sm text-gray-500 mb-4">Recommended size: 16:9 ratio (JPG or PNG)</p>
-        <div className={`flex justify-center items-center aspect-16/9 border-2 ${isPosterErr ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-xl relative overflow-hidden`}>
+        <div className={`flex justify-center items-center w-full min-h-100 border-2 ${isPosterErr ? 'border-red-500' : 'border-gray-300'} border-dashed rounded-xl relative overflow-hidden`}>
           {formData.event_poster ? (
             formData.event_poster instanceof File ? (
               <img

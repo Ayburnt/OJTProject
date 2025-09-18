@@ -7,7 +7,7 @@ import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth.js';
 
-function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees }) {
+function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees, setSelectedEvent }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
   const {userRole} = useAuth();
@@ -108,8 +108,8 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
       {/* Event card */}
       <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
         e.stopPropagation();
-        if(userRole === 'staff'){
-          console.log(selected.event_code);
+        setSelectedEvent(selected);
+        if(userRole === 'staff'){          
           navigate(`/events/${selected.event_code}`)
         } else{
           fetchAttendees(selected)

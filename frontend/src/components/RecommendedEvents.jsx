@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; 
-import EventCard from './EventCard'; 
+import { Link } from 'react-router-dom';
+import EventCard from './EventCard';
 import api from '../api.js';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 
 function RecommendedEvents() {
   const [events, setEvents] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchAllEvents = async () => {
+      setIsLoading(true);
       try {
         const res = await api.get(`/event-public-view/`);
         setEvents(res.data);
       } catch (err) {
         console.error(err);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -34,6 +40,18 @@ function RecommendedEvents() {
           </p>
         </div>
 
+        {isLoading && (
+          <div className='flex flex-row w-full'>
+            <div className='bg-gray-100 p-3 shadow-lg rounded-xl'>
+              <Stack spacing={0}>
+                <Skeleton variant="rounded" animation='wave' width={250} height={150} />
+                <Skeleton variant="text" animation='wave' height={50} />
+                <Skeleton variant="text" animation='wave' height={30} />
+              </Stack>
+            </div>
+          </div>
+        )}
+
         {/* Event Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7 md:gap-9 w-full">
           {limitedEvents.length > 0 ? (
@@ -49,9 +67,11 @@ function RecommendedEvents() {
               </Link>
             ))
           ) : (
-            <div className='w-full col-span-4 item-center'>
-           <p className="text-gray-300 text-3xl font-outfit italic text-center"> No events available</p>
-          </div>
+            !isLoading && (
+              <div className='w-full col-span-4 item-center'>
+                <p className="text-gray-300 text-3xl font-outfit italic text-center"> No events available</p>
+              </div>
+            )
           )}
         </div>
 

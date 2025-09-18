@@ -18,12 +18,14 @@ const OrganizerEvent = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const { userCode, orgLogo, userRole } = useAuth();
   const [selectedPage, setSelectedPage] = useState('Dashboard');
+  const [selectedEvent, setSelectedEvent] = useState('');
 
   const fetchEventDetails = async () => {
     if(userRole === 'organizer'){
       try {
       const res = await api.get(`/list-create/`);
       setEvents(res.data);
+      console.log('Events', res.data);
     } catch (err) {
       console.error("Error fetching events:", err);
     }
@@ -126,7 +128,7 @@ const OrganizerEvent = () => {
       const attendeesData = Array.isArray(res.data)
         ? res.data
         : res.data.attendees || [];
-      console.log(res.data)
+      console.log('Attendees: ', res.data);
       setAttendees(attendeesData);
     } catch (err) {
       console.error("Error fetching attendees:", err);
@@ -138,7 +140,7 @@ const OrganizerEvent = () => {
     try {
       const res1 = await api.get(`transactions/list/${event.event_code}/`);
       setTransactions(res1.data);
-      console.log(res1.data);
+      console.log('Transactions: ', res1.data);
     } catch (err) {
       console.error("Error fetching transactions:", err);
       setTransactions([]);
@@ -288,6 +290,7 @@ const OrganizerEvent = () => {
                 filteredEvents.map((event, i) => (
                   <EventCard
                     key={i}
+                    setSelectedEvent={setSelectedEvent}
                     eventPoster={event.event_poster}
                     eventStatus={getEventStatus(event)}
                     eventStatusColor={getStatusColor(getEventStatus(event))}
@@ -332,7 +335,9 @@ const OrganizerEvent = () => {
             </div>
 
             {selectedPage === 'Dashboard' ? (
-              <EventDashboard />
+              <div className='w-full flex items-center justify-center'>
+                <EventDashboard event={selectedEvent} attendees={attendees} transactions={transactions} />
+              </div>              
             ) : selectedPage === 'Transactions' ? (
               <EventTransactions transactions={transactions} setAttendees={setAttendees} setTransactions={setTransactions} setSelectedTransaction={setSelectedTransaction} filteredTransactions={filteredTransactions} loadingTransac={loadingTransac} searchTransactions={searchTransactions} setSearchTransactions={setSearchTransactions} currentEvent={currentEvent} />
             ) : (
