@@ -295,7 +295,7 @@ function EventDetailPage() {
                 <meta name="twitter:image" content={eventDetails.event_poster} />
             </Helmet>
 
-            <div className="bg-gray-100 min-h-screen">                
+            <div className="bg-gray-100 min-h-screen">
                 {/* Poster Lightbox */}
                 {isPosterOpen && (
                     <div
@@ -403,7 +403,7 @@ function EventDetailPage() {
                     </div>
                 )}
 
-                <AdsSection/>
+                <AdsSection />
                 {/* Main Grid Layout */}
                 <div className="container mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Left Section (Poster + Nav + Description + Tickets) */}
@@ -428,22 +428,22 @@ function EventDetailPage() {
 
                         {/* Navigation Tabs */}
                         <div className="bg-white rounded-lg shadow-md">
-                            <nav className="flex justify-around items-center py-3 px-4">
+                            <nav className="grid grid-cols-3 w-full items-center py-4 place-items-center">
                                 <a
                                     href="#description-section"
-                                    className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                                    className="text-base md:text-lg font-semibold text-gray-700 hover:text-teal-600 rounded-md transition-colors"
                                 >
                                     Description
                                 </a>
                                 <a
                                     href="#tickets-section"
-                                    className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors"
+                                    className="text-base md:text-lg font-semibold text-gray-700 hover:text-teal-600 rounded-md transition-colors"
                                 >
                                     Tickets
                                 </a>
                                 <a
                                     onClick={() => setIsComments(true)}
-                                    className="px-4 py-2 text-lg font-semibold text-gray-700 hover:text-teal-600 hover:bg-gray-50 rounded-md transition-colors cursor-pointer"
+                                    className="text-base md:text-lg font-semibold text-gray-700 hover:text-teal-600 rounded-md transition-colors cursor-pointer"
                                 >
                                     Comments
                                 </a>
