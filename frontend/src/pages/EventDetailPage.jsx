@@ -138,12 +138,13 @@ function EventDetailPage() {
     const [replies, setReplies] = useState(null);
 
     const navigate = useNavigate();
-    const { eventcode } = useParams();
+    const { eventcode } = useParams();    
 
     useEffect(() => {
-        window.scrollTo(0, 0);
-        document.title = `Event | Sari-Sari Events`;
-    }, []);
+  if (eventDetails?.title) {
+    document.title = `${eventDetails.title} | Sari-Sari Events`;
+  }
+}, [eventDetails]);
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -279,21 +280,34 @@ function EventDetailPage() {
 
     // Construct a shareable URL (uses current page URL by default)
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
-    const qrUrl = eventDetails.event_qr_image; // from backend
+    const qrUrl = eventDetails.event_qr_image; // from backend    
 
 
     return (
         <>
             <Helmet>
-                <title>{eventDetails.title}</title>
-                <meta property="og:title" content={eventDetails.title} />
-                <meta property="og:description" content={eventDetails.description} />
-                <meta property="og:image" content={eventDetails.event_poster} />
-                <meta property="og:url" content={`https://event.sari-sari.com/events/${eventDetails.event_code}`} />
-                <meta property="og:type" content="website" />
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:image" content={eventDetails.event_poster} />
-            </Helmet>
+  <title>
+    {eventDetails
+      ? `${eventDetails.title} | Sari-Sari Events`
+      : 'Loading event… | Sari-Sari Events'}
+  </title>
+
+  {eventDetails && (
+    <>
+      <meta property="og:title" content={eventDetails.title} />
+      <meta property="og:description" content={eventDetails.description} />
+      <meta property="og:image" content={eventDetails.event_poster} />
+      <meta
+        property="og:url"
+        content={`https://event.sari-sari.com/events/${eventDetails.event_code}`}
+      />
+      <meta property="og:type" content="website" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:image" content={eventDetails.event_poster} />
+    </>
+  )}
+</Helmet>
+
 
             <div className="bg-gray-100 min-h-screen">
                 {/* Poster Lightbox */}

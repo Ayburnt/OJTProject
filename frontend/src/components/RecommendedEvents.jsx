@@ -15,6 +15,7 @@ function RecommendedEvents() {
       try {
         const res = await api.get(`/event-public-view/`);
         setEvents(res.data);
+        console.log(res.data);
       } catch (err) {
         console.error(err);
       } finally {

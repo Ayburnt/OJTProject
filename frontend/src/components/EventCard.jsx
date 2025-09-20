@@ -46,6 +46,10 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
           <span className="truncate">{formatEventDateTime(eventDate.start_date, eventDate.start_time, eventDate.end_date, eventDate.end_time)}</span>
         </div>
 
+        <div className="flex items-center text-sm text-teal-100 mb-1">
+          <span className="truncate">{eventDate.venue_specific + ', ' || ''} {eventDate.venue_address}</span>
+        </div>
+
         {/* Creator */}
         <div className="text-sm text-teal-100 italic">
           By {eventCreator || "Unknown Organizer"}
