@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 function CEStep3({
   formData,
@@ -10,22 +11,89 @@ function CEStep3({
   isSeatingMapErr,
   seatingMapErr,
   handleAddTicket,
-  handleRemoveTicket
+  handleRemoveTicket,
+  selectedTier,
 }) {
   const [hasSeatingMap, setHasSeatingMap] = useState(false);
 
   const handleSeatingMapChange = (e) => {
-  const isChecked = e.target.value === 'true';
-  setHasSeatingMap(isChecked);
+    const isChecked = e.target.value === 'true';
+    setHasSeatingMap(isChecked);
 
-  // If "No" is selected, clear the seating map from formData
-  if (!isChecked) {
-    setFormData((prevData) => ({
-      ...prevData,
-      seating_map: null,
-    }));
-  }
+    // If "No" is selected, clear the seating map from formData
+    if (!isChecked) {
+      setFormData((prevData) => ({
+        ...prevData,
+        seating_map: null,
+      }));
+    }
+  };
+
+  // max number of ticket TYPES per tier
+const ticketTypeLimits = {
+  Free: 1,
+  Basic: 3,
+  Premium: 10,
+  Mega: Infinity,
 };
+
+// max TOTAL quantity of tickets across all types
+const totalQuantityLimits = {
+  Free: 500,
+  Basic: 1000,
+  Premium: 5000,
+  Mega: Infinity,
+};
+
+const maxTicketTypes = ticketTypeLimits[selectedTier] ?? Infinity;
+const maxTotalQty = totalQuantityLimits[selectedTier] ?? Infinity;
+
+const getCurrentTotalQty = () =>
+  formData.ticket_types.reduce(
+    (sum, t) => sum + (parseInt(t.quantity_total, 10) || 0),
+    0
+  );
+
+
+  const handleAddTicketWithLimit = () => {
+  const currentTotalQty = getCurrentTotalQty();
+
+  if (formData.ticket_types.length >= maxTicketTypes && maxTicketTypes !== Infinity) {
+    toast.error(
+      `The ${selectedTier} plan allows up to ${maxTicketTypes} ticket type${
+        maxTicketTypes > 1 ? "s" : ""
+      }.`
+    );
+    return;
+  }
+
+  if (currentTotalQty >= maxTotalQty && maxTotalQty !== Infinity) {
+    toast.error(
+      `The ${selectedTier} plan allows a maximum of ${maxTotalQty.toLocaleString()} tickets in total.`
+    );
+    return;
+  }
+
+  addTicketType(); // your prop
+};
+
+
+const handleQuantityChange = (index, e) => {
+  const value = parseInt(e.target.value, 10) || 0;
+  const otherQty = formData.ticket_types
+    .filter((_, i) => i !== index)
+    .reduce((sum, t) => sum + (parseInt(t.quantity_total, 10) || 0), 0);
+
+  if (maxTotalQty !== Infinity && otherQty + value > maxTotalQty) {
+    toast.error(
+      `Total quantity for the ${selectedTier} plan cannot exceed ${maxTotalQty.toLocaleString()}.`
+    );
+    return;
+  }
+
+  handleTicketChange(index, e);
+};
+
 
   return (
     <FormSection title="TICKETING FOR EVENT">
@@ -70,46 +138,46 @@ function CEStep3({
 
       {hasSeatingMap && (
         <>
-        <p className="text-sm text-gray-500 mb-4">Seating Map Visual</p>
-      <div
-        className={`flex justify-center items-center aspect-16/9 border-2 ${isSeatingMapErr ? 'border-red-500' : 'border-gray-300'
-          } border-dashed rounded-xl relative overflow-hidden`}
-      >
-        {formData.seating_map ? (
-          <img
-            src={typeof formData.seating_map === 'object' && formData.seating_map instanceof File
-              ? URL.createObjectURL(formData.seating_map)
-              : formData.seating_map
-            }
-            alt="Seating Map Preview"
-            className="object-cover w-full h-full"
-          />
-        ) : (
-          <span className="text-gray-500">Upload an image here</span>
-        )}
+          <p className="text-sm text-gray-500 mb-4">Seating Map Visual</p>
+          <div
+            className={`flex justify-center items-center aspect-16/9 border-2 ${isSeatingMapErr ? 'border-red-500' : 'border-gray-300'
+              } border-dashed rounded-xl relative overflow-hidden`}
+          >
+            {formData.seating_map ? (
+              <img
+                src={typeof formData.seating_map === 'object' && formData.seating_map instanceof File
+                  ? URL.createObjectURL(formData.seating_map)
+                  : formData.seating_map
+                }
+                alt="Seating Map Preview"
+                className="object-cover w-full h-full"
+              />
+            ) : (
+              <span className="text-gray-500">Upload an image here</span>
+            )}
 
 
-        <input
-          id="seating_map"
-          name="seating_map"
-          type="file"
-          accept="image/*"
-          onChange={handleEventChange}
-          className="hidden"
-          required={hasSeatingMap === true}
-        />
-        <button
-          type="button"
-          onClick={() => document.getElementById('seating_map').click()}
-          className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer"
-        >
-          Upload
-        </button>
-      </div>
-      </>
+            <input
+              id="seating_map"
+              name="seating_map"
+              type="file"
+              accept="image/*"
+              onChange={handleEventChange}
+              className="hidden"
+              required={hasSeatingMap === true}
+            />
+            <button
+              type="button"
+              onClick={() => document.getElementById('seating_map').click()}
+              className="absolute bottom-4 right-4 bg-teal-500 text-white font-semibold py-2 px-4 rounded-xl hover:bg-teal-600 transition-colors duration-200 cursor-pointer"
+            >
+              Upload
+            </button>
+          </div>
+        </>
       )}
 
-      
+
 
       {formData.ticket_types.map((ticket, index) => (
         <div key={index} className="space-y-4 mb-6 p-4 border rounded-xl border-gray-200">
@@ -159,7 +227,7 @@ function CEStep3({
                 id={`ticket-quantity-${index}`}
                 name="quantity_total"
                 value={ticket.quantity_total}
-                onChange={(e) => handleTicketChange(index, e)}
+                onChange={(e) => handleQuantityChange(index, e)}
                 className="mt-1 block w-full bg-transparent border-0 border-b-2 border-gray-300 focus:border-b-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4"
               />
             </div>
@@ -180,12 +248,21 @@ function CEStep3({
       <div className="flex justify-start">
         <button
           type="button"
-          onClick={handleAddTicket}
-          className="flex items-center px-4 py-2 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700 transition-colors duration-200 cursor-pointer"
+          onClick={handleAddTicketWithLimit}
+          disabled={
+            maxTicketTypes !== Infinity && formData.ticket_types.length >= maxTicketTypes
+          }
+          className={`flex items-center px-4 py-2 font-semibold rounded-xl transition-colors duration-200 cursor-pointer
+      ${maxTicketTypes !== Infinity &&
+              formData.ticket_types.length >= maxTicketTypes
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-teal-600 text-white hover:bg-teal-700"
+            }`}
         >
           <span className="text-xl mr-2">+</span> Add Another Ticket Type
         </button>
       </div>
+
     </FormSection>
   );
 }

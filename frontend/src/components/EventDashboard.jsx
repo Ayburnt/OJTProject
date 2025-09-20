@@ -53,7 +53,7 @@ export default function OrganizerEventDashboard({ event, attendees, transactions
           </div>
           <div>
             <h1 className="text-2xl font-bold">{event.title}</h1>
-            <p className="text-gray-600 mt-1">{event.description}</p>
+            <p className="text-gray-600 mt-1 leading-relaxed whitespace-pre-line">{event.description}</p>
             <p className="mt-2 font-medium">
               {formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
             </p>

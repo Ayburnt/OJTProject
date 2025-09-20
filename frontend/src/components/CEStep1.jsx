@@ -1,4 +1,5 @@
 import React from 'react';
+import CESubscription from './CESubscription';
 
 const FormSection = ({ title, children }) => (
   <div className="p-4 md:p-6 rounded-2xl mb-6 bg-white shadow-sm">
@@ -39,10 +40,15 @@ function CEStep1({
   formData,
   handleEventChange,
   isPosterErr,
-  posterErr
+  posterErr,
+  selectedTier,
+  setSelectedTier,
+  selectedPrice,
+  setSelectedPrice
 }) {
   return (
     <>
+      <CESubscription setSelectedPrice={setSelectedPrice} selectedPrice={selectedPrice} selectedTier={selectedTier} setSelectedTier={setSelectedTier} />
       <FormSection title="EVENT DETAILS">
         <InputField label='Event Title' inputType='text' inputName='title'
           inputValue={formData.title} inputOnChange={handleEventChange}

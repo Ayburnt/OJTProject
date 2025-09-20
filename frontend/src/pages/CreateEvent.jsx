@@ -37,6 +37,8 @@ const CreateEventForm = () => {
   const navigate = useNavigate();
   const { userCode, userRole } = useAuth();
   const totalSteps = 4;
+  const [selectedTier, setSelectedTier] = useState('Free');
+  const [selectedPrice, setSelectedPrice] = useState(0.00);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -130,13 +132,13 @@ const CreateEventForm = () => {
           setPosterErr('Image must be PNG or JPG format.');
         }
         return;
-      }      
+      }
 
       if (name === 'event_poster') {
         setFormData(prev => ({ ...prev, event_poster: file }));
         return;
       }
-      
+
       if (name === 'seating_map') {
         setFormData(prev => ({ ...prev, seating_map: file }));
         return;
@@ -312,7 +314,7 @@ const CreateEventForm = () => {
     } else if (!hasPaidTickets) {
       form.append("status", "published");
     } else if (hasPaidTickets) {
-      if(userRole === 'organizer'){
+      if (userRole === 'organizer') {
         if (verificationStatus === "verified") {
           form.append("status", "pending");
           setIsLoading(false);
@@ -323,7 +325,7 @@ const CreateEventForm = () => {
           setIsVerifiedConfirm(true);
           return;
         }
-      } else if(userRole === 'co-organizer'){
+      } else if (userRole === 'co-organizer') {
         if (verificationStatus === "verified") {
           form.append("status", "pending");
           setIsLoading(false);
@@ -404,18 +406,32 @@ const CreateEventForm = () => {
 
     if (userRole === 'organizer') {
       try {
-        await api.post("/list-create/", form, {
+        const { data: eventData } = await api.post("/list-create/", form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setIsLoading(false);
-        if (redirectTo) {
-          navigate(redirectTo);
-        } else {
-          if (userRole === 'organizer') {
-            navigate(`/org/${userCode}/my-event`);
+
+        try {
+          await api.post("/subscriptions/subscribe/", {
+            tier_name: selectedTier,
+            price: selectedPrice,
+            event: eventData.id,
+          });
+
+          setIsLoading(false);
+          if (redirectTo) {
+            navigate(redirectTo);
           } else {
-            navigate(`/org/my-event`);
+            if (userRole === 'organizer') {
+              navigate(`/org/${userCode}/my-event`);
+            } else {
+              navigate(`/org/my-event`);
+            }
           }
+        } catch (subErr) {
+          console.error("Error creating subscription:", subErr.response?.data || subErr.message);
+          setAlert({ show: true, message: "Subscription failed. Please try again." });
+        } finally{
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Error creating event:", err.response?.data || err.message);
@@ -442,21 +458,38 @@ const CreateEventForm = () => {
           // Generic fallback
           setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
-      }
+      }finally{
+          setIsLoading(false);
+        }
+
     } else {
       try {
-        await api.post("/list-create/co-org/", form, {
+        const { data: eventData } = await api.post("/list-create/co-org/", form, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        setIsLoading(false);
-        if (redirectTo) {
-          navigate(redirectTo);
-        } else {
-          if (userRole === 'organizer') {
-            navigate(`/org/${userCode}/my-event`);
+
+        try {
+          await api.post("/subscriptions/subscribe/", {
+            tier_name: selectedTier,
+            price: selectedPrice,
+            event: eventData.id,
+          });
+
+          setIsLoading(false);
+          if (redirectTo) {
+            navigate(redirectTo);
           } else {
-            navigate(`/org/my-event`);
+            if (userRole === 'organizer') {
+              navigate(`/org/${userCode}/my-event`);
+            } else {
+              navigate(`/org/my-event`);
+            }
           }
+        } catch (subErr) {
+          console.error("Error creating subscription:", subErr.response?.data || subErr.message);
+          setAlert({ show: true, message: "Subscription failed. Please try again." });
+        }finally{
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Error creating event:", err.response?.data || err.message);
@@ -483,7 +516,9 @@ const CreateEventForm = () => {
           // Generic fallback
           setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
-      }
+      }finally{
+          setIsLoading(false);
+        }
     }
   };
 
@@ -687,13 +722,13 @@ const CreateEventForm = () => {
 
           <form encType="multipart/form-data" className="space-y-6">
             {step === 1 && (
-              <CEStep1 formData={formData} handleEventChange={handleEventChange} isPosterErr={isPosterErr} posterErr={posterErr} />
+              <CEStep1 formData={formData} handleEventChange={handleEventChange} isPosterErr={isPosterErr} posterErr={posterErr} selectedPrice={selectedPrice} setSelectedPrice={setSelectedPrice} selectedTier={selectedTier} setSelectedTier={setSelectedTier} />
             )}
             {step === 2 && (
               <CEStep2 formData={formData} setFormData={setFormData} handleLocationChange={handleLocationChange} handleEventChange={handleEventChange} handleCheckboxChange={handleCheckboxChange} handleTimeChange={handleTimeChange} />
             )}
             {step === 3 && (
-              <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />
+              <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} selectedTier={selectedTier} />
             )}
             {step === 4 && (
               <CEStep4 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} />

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Event, Ticket_Type, Reg_Form_Template, Reg_Form_Question, Question_Option
 from django.db import transaction
 from api.models import CustomUser
+from subscriptions.serializers import SubscriptionSerializer
 
 # Serializer for Question_Option
 class QuestionOptionSerializer(serializers.ModelSerializer):
@@ -83,6 +84,7 @@ class EventSerializer(serializers.ModelSerializer):
     event_poster_url = serializers.SerializerMethodField(read_only=True)
     seating_map_url = serializers.SerializerMethodField(read_only=True)
     event_qr_image_url = serializers.SerializerMethodField(read_only=True)
+    subscription = SubscriptionSerializer(read_only=True)
 
     class Meta:
         model = Event

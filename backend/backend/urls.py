@@ -18,6 +18,8 @@ urlpatterns = [
     path("api/transactions/", include("transactions.urls")),
     path('api/comments/', include('comments.urls')),    
 
+    path('api/subscriptions/', include('subscriptions.urls')),
+
 ]
 
 if settings.DEBUG:
