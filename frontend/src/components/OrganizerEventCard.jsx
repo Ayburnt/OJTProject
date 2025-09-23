@@ -6,6 +6,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth.js';
+import Tooltip from '@mui/material/Tooltip';
 
 function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees, setSelectedEvent }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -69,10 +70,10 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
             </button>
 
             <h2 className="font-outfit text-lg font-semibold mb-2 text-gray-800">
-              Are you sure you want to delete this event?
-            </h2>
+              Do you really want to delete this event?
+            </h2>            
             <p className="font-outfit mb-6 text-base text-gray-600">
-              Type <span className='font-bold italic'>{`'${eventCode}'`}</span> to confirm.
+              This action cannot be undone. Please type <span className='font-bold italic'>{`'${eventCode}'`}</span> to confirm.
             </p>
 
             <input
@@ -86,8 +87,11 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
             <div className="flex justify-center gap-4">
               <button
                 type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50"
+                onClick={() => {
+                  setConfirmDelete(false);
+                  setTypedCode('');
+                }}
+                className="px-6 py-3 border-2 border-teal-600 text-teal-600 font-semibold rounded-xl hover:bg-teal-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -96,7 +100,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
                 type="button"
                 disabled={typedCode !== eventCode}
                 onClick={handleDelete}
-                className={`px-6 py-3 font-semibold rounded-xl ${typedCode === eventCode ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
+                className={`px-6 py-3 font-semibold rounded-xl ${typedCode === eventCode ? 'bg-red-600 text-white hover:bg-red-700 cursor-pointer' : 'bg-gray-300 text-gray-600 cursor-not-allowed'}`}
               >
                 Delete
               </button>
@@ -106,6 +110,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
       )}
 
       {/* Event card */}
+      
       <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
         e.stopPropagation();
         setSelectedEvent(selected);
@@ -115,6 +120,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
           fetchAttendees(selected)
         }        
       }}>
+        <Tooltip title="Click to view data" placement="top" arrow>
         <div className='overflow-hidden rounded-lg aspect-video'>
           <img src={eventPoster} alt="" className='object-cover' />
         </div>
@@ -128,6 +134,8 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
         <p className={eDetailsStyle}><GoCalendar />{eventDate}</p>
         <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
         <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
+
+        </Tooltip>
         
         {(userRole === 'organizer' || userRole === 'co-organizer') && (
           <div className='flex flex-row gap-3 mt-3 w-full'>
@@ -142,6 +150,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
           </button>
 
           <div className='flex flex-row gap-3'>
+            <Tooltip title="Edit event" placement="bottom" arrow>
             <button
               className='text-secondary text-lg cursor-pointer outline-none'
               onClick={(e) => {
@@ -150,6 +159,9 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
             >
               <RiEditLine />
             </button>
+            </Tooltip>
+
+                <Tooltip title="Delete event" placement="bottom" arrow>
             <button
               className='text-red-600 text-lg outline-none cursor-pointer'
               onClick={(e) => {
@@ -158,12 +170,13 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
             >
               <RiDeleteBin6Line />
             </button>
+            </Tooltip>
           </div>
         </div>
         )}            
 
 
-      </div>
+      </div>      
     </>
   );
 }

@@ -180,7 +180,7 @@ export default function CreateEventRegForm({ formData, setFormData, handleEventC
                     <option value="long">Long answer</option>
                     <option value="radio">Multiple choice</option>
                     <option value="checkbox">Checkboxes</option>
-                    <option value="file-upload">File Upload</option>
+                    {/* <option value="file-upload">File Upload</option> */}
                   </select>
 
                   {/* File Upload Settings (show only if file-upload is selected) */}

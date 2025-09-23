@@ -153,7 +153,7 @@ function AdminEventControl() {
     <CgProfile className="text-xl mr-2" />
     Admin
   </div>
-   <p className="text-xs text-gray-500 my-4">pangit ka daw po............</p>
+   <p className="text-xs text-gray-500 my-4">private comment here............</p>
  <div className="flex items-center gap-2">
   <textarea
     placeholder=""

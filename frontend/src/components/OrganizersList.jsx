@@ -5,6 +5,7 @@ import api from '../api.js';
 import { FaArrowRight } from "react-icons/fa";
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+import Tooltip from '@mui/material/Tooltip';
 
 function OrganizersList() {
   const [organizers, setOrganizers] = useState([]);
@@ -56,10 +57,12 @@ function OrganizersList() {
         <div className="flex flex-row w-full gap-4 md:gap-7 pb-8 overflow-x-auto overflow-y-hidden mt-4 no-scrollbar scroll-smooth snap-x snap-mandatory">
           {limitedOrgs.length > 0 ? (
             limitedOrgs.map((org, i) => (
+              <Tooltip key={i} title={`Go to ${org.company_name}`} placement="top" arrow>
               <div key={i} onClick={() => navigate(`/org/${org.user_code}`)} className="cursor-pointer hover:bg-gray-100 transition-all duration-300 flex flex-col w-45 p-3 bg-gray-200 rounded-xl shadow-xl/30 flex-shrink-0 snap-start">
                 <img src={org.org_logo} alt="" className='aspect-square w-full rounded-lg object-cover' />
                 <p className='font-bold text-black/70'>{org.company_name}</p>
               </div>
+              </Tooltip>
             ))
           ) : (
             !isLoading && (

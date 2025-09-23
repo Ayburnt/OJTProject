@@ -165,7 +165,7 @@ export default function Ticket() {
                     </div>
 
                     {/* Right Card: Event Confirmation / Ticket */}
-                    <div className="flex flex-col items-start w-full gap-7">
+                    <div className="flex flex-col items-start gap-7 w-full lg:w-2/3">
                         {Array.isArray(attendee) && attendee.length > 0 && (
                             attendee.map((row) => (
                                 <div key={row.id} className="bg-white rounded-2xl shadow-lg w-full flex flex-col">

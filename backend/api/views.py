@@ -1135,3 +1135,15 @@ class StaffSoftReactivateView(APIView):
 
         return Response({"detail": "Staff account reactivated successfully."}, status=status.HTTP_200_OK)
     
+class AccountsView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        user = request.user
+        if user.role != 'admin':
+            return Response({'detail': 'Only admin can view accounts.'}, status=status.HTTP_403_FORBIDDEN)
+
+        accounts = CustomUser.objects.filter(is_active=True).filter(Q(role='staff') | Q(role='co-organizer') | Q(role='organizer'))
+        serializer = UserSerializer(accounts, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)

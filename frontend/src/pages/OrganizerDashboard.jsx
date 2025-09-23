@@ -3,10 +3,15 @@ import OrganizerNav from '../components/OrganizerNav';
 import { CgProfile } from 'react-icons/cg';
 import { Link } from "react-router-dom";
 import useAuth from '../hooks/useAuth';
-import Chatbot from '../pages/Chatbot'; // Import the new Chatbot component
+import Chatbot from '../pages/Chatbot';
 import api from '../api.js'
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 
-function OrganizerDashboard() {  
+
+function OrganizerDashboard() {
   const { isLoggedIn, userCode, userFirstName, userRole, orgLogo } = useAuth();
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState({
@@ -16,104 +21,108 @@ function OrganizerDashboard() {
     upcomingEvents: 0,
   });
 
+  const [revenueData, setRevenueData] = useState([]);
+  const [attendeesData, setAttendeesData] = useState([]);
+
+
 
   useEffect(() => {
     if (!userRole) return;
     const fetchEventDetails = async () => {
-      if(userRole === 'organizer'){
+      if (userRole === 'organizer') {
         try {
-        const res = await api.get(`/list-create/`);
-        const events = res.data;
+          const res = await api.get(`/list-create/`);
+          const events = res.data;
 
-        // Compute stats
-        let totalRevenue = 0;
-        let totalAttendees = 0;
-        let upcomingEvents = 0;
+          // Compute stats
+          let totalRevenue = 0;
+          let totalAttendees = 0;
+          let upcomingEvents = 0;
 
-        events.forEach(event => {
-          // attendees = total - available for each ticket
-          const attendees = event.ticket_types.reduce(
-            (sum, t) => sum + (t.quantity_total - t.quantity_available),
-            0
-          );
+          events.forEach(event => {
+            // attendees = total - available for each ticket
+            const attendees = event.ticket_types.reduce(
+              (sum, t) => sum + (t.quantity_total - t.quantity_available),
+              0
+            );
 
-          // revenue = sum of (sold tickets × price)
-          const revenue = event.ticket_types.reduce(
-            (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
-            0
-          );
+            // revenue = sum of (sold tickets × price)
+            const revenue = event.ticket_types.reduce(
+              (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
+              0
+            );
 
-          totalAttendees += attendees;
-          totalRevenue += revenue;
+            totalAttendees += attendees;
+            totalRevenue += revenue;
 
-          // Check upcoming events
-          const now = new Date();
-          const start = new Date(`${event.start_date}T${event.start_time}`);
-          if (event.status === "published" && now < start) {
-            upcomingEvents += 1;
-          }
-        });
+            // Check upcoming events
+            const now = new Date();
+            const start = new Date(`${event.start_date}T${event.start_time}`);
+            if (event.status === "published" && now < start) {
+              upcomingEvents += 1;
+            }
+          });
 
-        setStats({
-          totalRevenue,
-          totalAttendees,
-          totalEvents: events.length,
-          upcomingEvents,
-        });
+          setStats({
+            totalRevenue,
+            totalAttendees,
+            totalEvents: events.length,
+            upcomingEvents,
+          });
 
-        setEvents(events);
-        console.log(events);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      }
-      } else{
+          setEvents(events);
+          console.log(events);
+        } catch (err) {
+          console.error("Error fetching events:", err);
+        }
+      } else {
         try {
-        const res = await api.get(`/list-create/co-org/`);
-        const events = res.data;
+          const res = await api.get(`/list-create/co-org/`);
+          const events = res.data;
 
-        // Compute stats
-        let totalRevenue = 0;
-        let totalAttendees = 0;
-        let upcomingEvents = 0;
+          // Compute stats
+          let totalRevenue = 0;
+          let totalAttendees = 0;
+          let upcomingEvents = 0;
 
-        events.forEach(event => {
-          // attendees = total - available for each ticket
-          const attendees = event.ticket_types.reduce(
-            (sum, t) => sum + (t.quantity_total - t.quantity_available),
-            0
-          );
+          events.forEach(event => {
+            // attendees = total - available for each ticket
+            const attendees = event.ticket_types.reduce(
+              (sum, t) => sum + (t.quantity_total - t.quantity_available),
+              0
+            );
 
-          // revenue = sum of (sold tickets × price)
-          const revenue = event.ticket_types.reduce(
-            (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
-            0
-          );
+            // revenue = sum of (sold tickets × price)
+            const revenue = event.ticket_types.reduce(
+              (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
+              0
+            );
 
-          totalAttendees += attendees;
-          totalRevenue += revenue;
+            totalAttendees += attendees;
+            totalRevenue += revenue;
 
-          // Check upcoming events
-          const now = new Date();
-          const start = new Date(`${event.start_date}T${event.start_time}`);
-          if (event.status === "published" && now < start) {
-            upcomingEvents += 1;
-          }
-        });
+            // Check upcoming events
+            const now = new Date();
+            const start = new Date(`${event.start_date}T${event.start_time}`);
+            if (event.status === "published" && now < start) {
+              upcomingEvents += 1;
+            }
+          });
 
-        setStats({
-          totalRevenue,
-          totalAttendees,
-          totalEvents: events.length,
-          upcomingEvents,
-        });
+          setStats({
+            totalRevenue,
+            totalAttendees,
+            totalEvents: events.length,
+            upcomingEvents,
+          });
 
-        setEvents(events);
-        console.log(events);
-      } catch (err) {
-        console.error("Error fetching events:", err);
+          setEvents(events);
+          console.log(events);
+        } catch (err) {
+          console.error("Error fetching events:", err);
+        }
       }
-      }
-      
+
     };
 
     fetchEventDetails();
@@ -136,6 +145,29 @@ function OrganizerDashboard() {
     document.title = "Organizer Dashboard | Sari-Sari Events";
   }, []);
 
+  // Use a useEffect hook to prepare and set chart data when events change
+  useEffect(() => {
+    // Prepare revenue data for the chart
+    const newRevenueData = events.map(event => ({
+      name: event.title,
+      revenue: event.ticket_types.reduce(
+        (sum, t) => sum + (t.price * (t.quantity_total - t.quantity_available)),
+        0
+      )
+    }));
+    setRevenueData(newRevenueData);
+
+    // Prepare attendees data for the chart
+    const newAttendeesData = events.map(event => ({
+      name: event.title,
+      attendees: event.ticket_types.reduce(
+        (sum, t) => sum + (t.quantity_total - t.quantity_available),
+        0
+      )
+    }));
+    setAttendeesData(newAttendeesData);
+
+  }, [events]); // This effect will re-run whenever the `events` state changes
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-primary font-outfit text-gray-800 overflow-hidden">
@@ -193,6 +225,52 @@ function OrganizerDashboard() {
           </div>
         </div>
 
+        {/* Charts Section */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Revenue per Event */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Revenue per Event</h3>
+            <ResponsiveContainer width="100%" height={270}>
+              <BarChart data={revenueData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" hide />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="revenue" fill="#14b8a6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Attendees Distribution */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h3 className="text-lg font-semibold">Attendees per Event</h3>
+            <ResponsiveContainer width="100%" height={270}>
+              <PieChart>
+                <Pie
+                  data={attendeesData}
+                  dataKey="attendees"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  fill="#14b8a6"
+                  label
+                >
+                  {attendeesData.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={["#14b8a6", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"][index % 5]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </section>
+
+
 
         {/* Recent Events */}
         <section className="bg-white rounded-xl shadow-md p-6 mb-6 font-outfit">
@@ -249,13 +327,10 @@ function OrganizerDashboard() {
                 )
               })
             ) : (
-              <p className="text-gray-500">No events available yet.</p>
+              <div className="border p-10 rounded-lg h-20 flex items-center justify-center text-gray-400 font-outfit">
+                <span>No upcoming events</span>
+              </div>
             )}
-
-            {/* Placeholder box */}
-            <div className="border p-10 rounded-lg h-20 flex items-center justify-center text-gray-400 font-outfit">
-              <span>No upcoming events</span>
-            </div>
           </div>
         </section>
       </main>

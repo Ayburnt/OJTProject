@@ -231,25 +231,25 @@ const ManageAccount = () => {
   };
 
   const handleLogoFileChange = async () => {
-  if (!logoFile) return; // no file selected
+    if (!logoFile) return; // no file selected
 
-  const formData = new FormData();
-  formData.append("org_logo", logoFile);
+    const formData = new FormData();
+    formData.append("org_logo", logoFile);
 
-  try {
-    const res = await api.patch("/me/", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    const newLogoUrl = res.data.org_logo;
-    setOrgLogo(newLogoUrl);
-    localStorage.setItem("orgLogo", newLogoUrl);
-    setIsUploadLogo(false);
-    window.location.reload();
-  } catch (err) {
-    console.error("Failed to upload company logo:", err);
-    handleShowModal("Failed to upload company logo. Please try again.");
-  }
-};
+    try {
+      const res = await api.patch("/me/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      const newLogoUrl = res.data.org_logo;
+      setOrgLogo(newLogoUrl);
+      localStorage.setItem("orgLogo", newLogoUrl);
+      setIsUploadLogo(false);
+      window.location.reload();
+    } catch (err) {
+      console.error("Failed to upload company logo:", err);
+      handleShowModal("Failed to upload company logo. Please try again.");
+    }
+  };
 
 
   const [staffList, setStaffList] = useState([]);
@@ -258,6 +258,7 @@ const ManageAccount = () => {
     try {
       const res = await api.get(`staff-list/`);
       setStaffList(res.data);
+      console.log(res.data);
     } catch (err) {
       console.error("Failed to fetch staff accounts:", err);
     }
@@ -636,9 +637,12 @@ const ManageAccount = () => {
                   {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
                     activeStaffs.map((staff) => (
                       <div key={staff.id} className='bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center'>
-                        <div>
-                          <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name} ({staff.role})</h3>
-                          <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
+                        <div className='flex flex-row items-center gap-2'>
+                          <img src={staff.org_logo} className='aspect-square w-8 object-contain rounded-full' alt="" />
+                          <div>
+                            <h3 className='leading-none font-medium'>{staff.first_name} {staff.last_name} ({staff.role})</h3>
+                            <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
+                          </div>
                         </div>
                         <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
                       </div>
@@ -648,36 +652,40 @@ const ManageAccount = () => {
                   )}
                 </div>
 
-                {showInactive && (
-                  <div className="mt-6">
-                    <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
-                      Inactive Staff Accounts
-                    </h3>
-                    <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
-                      {inactiveStaffs.map((staff) => (
-                        <div
-                          key={staff.id}
-                          className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
-                        >
-                          <div>
-                            <h3 className="leading-none font-medium">
-                              {staff.first_name} {staff.last_name}
-                            </h3>
-                            <p className="text-sm text-gray-500 font-light">{staff.email}</p>
-                          </div>
-                          <button
-                            onClick={() => handleReactivate(staff.id)}
-                            className="text-green-600 text-sm hover:underline cursor-pointer"
+                {inactiveStaffs.length > 0 && (
+                  showInactive && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">
+                        Inactive Staff Accounts
+                      </h3>
+                      <div className="font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2">
+                        {inactiveStaffs.map((staff) => (
+                          <div
+                            key={staff.id}
+                            className="bg-gray-100 p-2 border border-gray-300 rounded-lg flex flex-row justify-between items-center"
                           >
-                            Reactivate
-                          </button>
-                        </div>
-                      ))}
+                            <div>
+                              <h3 className="leading-none font-medium">
+                                {staff.first_name} {staff.last_name}
+                              </h3>
+                              <p className="text-sm text-gray-500 font-light">{staff.email}</p>
+                            </div>
+                            <button
+                              onClick={() => handleReactivate(staff.id)}
+                              className="text-green-600 text-sm hover:underline cursor-pointer"
+                            >
+                              Reactivate
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )
                 )}
 
-                <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>
+                {inactiveStaffs.length > 0 && (
+                  <button onClick={() => setShowInactive(!showInactive)} className='w-full mt-5 text-secondary cursor-pointer border border-gray-300 hover:text-secondary/90 bg-gray-200 rounded-lg py-2'>{showInactive ? "Show Less" : "See Inactive Accounts"}</button>
+                )}
               </div>
             )}
 

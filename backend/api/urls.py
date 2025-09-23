@@ -18,7 +18,8 @@ from .views import (
     RegisterStaffView,
     StaffListView,
     StaffSoftDeleteView,
-    StaffSoftReactivateView,    
+    StaffSoftReactivateView,
+    AccountsView,
 )
 
 urlpatterns = [
@@ -40,5 +41,6 @@ urlpatterns = [
     path("staff/<int:pk>/delete/", StaffSoftDeleteView.as_view(), name="staff-delete"),
     path("staff/<int:pk>/reactivate/", StaffSoftReactivateView.as_view(), name="staff-reactivate"),
     path('organizers/', OrganizerListView.as_view(), name='organizer-list'),
+    path('accounts/admin-view/', AccountsView.as_view(), name='accounts-admin-view'),
 
 ]

@@ -342,10 +342,10 @@ function Header() {
                     )}
                   </p>
                   <button
-                    onClick={() => navigate(`/user/account`)}
+                    onClick={() => navigate(`/admin-dashboard`)}
                     className="border-b border-gray-300 w-full font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
                   >
-                    Account
+                    Dashboard
                   </button>
                   <button
                     className="font-outfit block text-gray-700 hover:text-teal-600 transition-colors text-base py-1 cursor-pointer"
@@ -446,10 +446,10 @@ function Header() {
               ) : (
                 <>
                   <button
-                    onClick={() => navigate(`/user/account`)}
+                    onClick={() => navigate(`/admin-dashboard`)}
                     className="text-left text-gray-700 hover:text-teal-600 transition-colors text-base font-medium"
                   >
-                    Account
+                    Dashboard
                   </button>
                   <button
                     onClick={logout}
