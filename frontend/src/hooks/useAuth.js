@@ -76,6 +76,12 @@ export const useAuth = () => {
     setOrgLogo(user.org_logo);
   };
 
+  const updateVerificationStatus = (status) => {
+    localStorage.setItem(IS_VERIFIED, status);
+    setVerificationStatus(status);
+  };
+
+
   const clearAuthData = () => {
     localStorage.clear();
 
@@ -123,7 +129,8 @@ export const useAuth = () => {
     orgLogo,
     setOrgLogo,
     login,
-    logout
+    logout,
+    updateVerificationStatus
   };
 };
 

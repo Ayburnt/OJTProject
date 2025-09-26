@@ -135,6 +135,7 @@ const ManageAccount = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [captchaToken, setCaptchaToken] = useState(null);
+  const {updateVerificationStatus} = useAuth();
   const recaptchaRef = useRef();
 
   const fileInputRef = useRef(null); // for profile picture
@@ -144,7 +145,8 @@ const ManageAccount = () => {
     try {
       setLoading(true);
       const res = await api.get(`/me/`);
-      setUserData(res.data);
+      setUserData(res.data);      
+      updateVerificationStatus(res.data.verification_status);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch profile:', err);

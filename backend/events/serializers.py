@@ -277,7 +277,7 @@ class EventSerializer(serializers.ModelSerializer):
         if all_free:
             validated_data['status'] = 'published'
         elif not all_free and not is_verified:
-            validated_data['status'] = 'draft'      # paid tickets but organizer not verified
+            validated_data['status'] = 'pending'      # paid tickets but organizer not verified
         else:
             validated_data['status'] = 'pending'    # paid tickets + verified organizer
 

@@ -191,7 +191,8 @@ export default function VerificationForm() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [redirectTimer, setRedirectTimer] = useState(5);
+    const [redirectTimer, setRedirectTimer] = useState(5);    
+    const {userCode} = useAuth();
 
     // Initial state for organizer info
     const initialFormData = {
@@ -238,7 +239,7 @@ export default function VerificationForm() {
     
     // Manual redirect to manage account page
     const handleManualRedirect = () => {
-        window.location.href = "/manage-account";
+        window.location.href = `/org/${userCode}/account`;
     };
 
     const handleSubmit = async (e) => {

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import AdminNav from "../components/AdminNav";
 import api from '../api.js';
 import { FaArrowLeft } from "react-icons/fa6"; // Assuming you have this icon for the back button
+import {toast} from 'react-toastify';
+import useAuth from "../hooks/useAuth.js";
 
 function fileExt(url = "") {
   const parts = url.split(".");
@@ -65,6 +67,7 @@ export default function AdminReviewPage() {
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { updateVerificationStatus } = useAuth();
 
    useEffect(() => {
       document.title = "Admin Review Page | Sari-Sari Events";
@@ -92,16 +95,23 @@ export default function AdminReviewPage() {
 
     try {
       await api.patch(`/organizer-applications/${selected.id}/${status}/`);
-      alert(`${status === "accept" ? "Accepted" : "Declined"}: ${selected.organizer_name}`);
+      toast(`${status === "accept" ? "Accepted" : "Declined"}: ${selected.organizer_name}`);
+      
+      if (status === "accept") {
+        updateVerificationStatus("verified");
+      } else if (status === "decline") {
+        updateVerificationStatus("declined");
+      }
 
       // Optimistically update the UI by filtering out the handled request
       setPendingRequests((prevRequests) =>
         prevRequests.filter((req) => req.id !== selected.id)
       );
       setSelected(null);
+      
     } catch (err) {
       console.error(`Failed to ${status} request:`, err);
-      alert(`Failed to ${status} application.`);
+      toast.error(`Failed to ${status} application.`);
     }
   };
 

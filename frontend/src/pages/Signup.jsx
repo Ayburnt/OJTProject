@@ -443,9 +443,9 @@ function Signup({ onAuthSuccess }) {
 
                         <p className="font-outfit text-2xl text-center font-semibold text-black mb-10">Choose your role to get started</p>
 
-                        <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 w-full md:w-[90%] transition-colors duration-500 px-6">
+                        <div className="grid grid-cols-1 w-[75%] md:grid-cols-2 md:w-[85%] place-items-stretch gap-6">
                             <div
-                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 py-4
+                                className={`w-full max-w-sm flex items-center justify-start flex-col border-3 border-secondary rounded-xl cursor-pointer transition-all duration-400 p-3
                                 ${isOrganizer ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
                                 onClick={() => {
                                     setIsOrganizer(true);
@@ -454,11 +454,13 @@ function Signup({ onAuthSuccess }) {
                                 }}>
 
                                 <HiOutlineCalendarDays className="text-[8rem]" />
-                                <p className={`uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p>
+                                <p className={`leading-none uppercase font-outfit text-lg font-bold ${isOrganizer ? 'text-white' : 'text-secondary'}`}>organizer</p>
+
+                                <p className={`font-outfit text-center text-sm ${isOrganizer ? 'text-white' : 'text-secondary'}`}>Manage and oversee events</p>
                             </div>
 
                             <div
-                                className={`w-full max-w-sm flex items-center justify-center flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 py-4
+                                className={`w-full max-w-sm flex items-center justify-start flex-col border-3 border-[#009a94] rounded-xl cursor-pointer transition-all duration-400 p-3
                                 ${isAttendee ? 'bg-secondary text-white shadow-md scale-105' : 'bg-white text-secondary'}`}
                                 onClick={() => {
                                     setIsOrganizer(false);
@@ -467,7 +469,8 @@ function Signup({ onAuthSuccess }) {
                                 }}
                             >
                                 <HiOutlineIdentification className="text-[8rem]" />
-                                <p className={`uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>user</p>
+                                <p className={`leading-none uppercase font-outfit text-lg font-bold ${isAttendee ? 'text-white' : 'text-secondary'}`}>user</p>
+                                <p className={`font-outfit text-center text-sm ${isAttendee ? 'text-white' : 'text-secondary'}`}>Join and comment on events</p>
                             </div>
                         </div>
 

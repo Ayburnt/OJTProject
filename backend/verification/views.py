@@ -7,8 +7,9 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 from .models import OrganizerApplication
 from .serializers import OrganizerApplicationSerializer
+from django.contrib.auth import get_user_model   # ✅ added
 
-
+User = get_user_model()  # ✅ make User available
 class OrganizerApplicationViewSet(viewsets.GenericViewSet):
 
     queryset = OrganizerApplication.objects.all().select_related('user')
@@ -59,8 +60,11 @@ class OrganizerApplicationViewSet(viewsets.GenericViewSet):
         user.verification_status = 'verified'
         user.save(update_fields=['verification_status'])
 
+        # ✅ Update all accounts with added_by_id = this user's id
+        User.objects.filter(added_by_id=user.id).update(verification_status='verified')
+
         return Response({
-            "detail": "Application accepted, user verified.",
+            "detail": "Application accepted, user and related accounts verified.",
             "verification_status": user.verification_status
         })
 
@@ -74,7 +78,11 @@ class OrganizerApplicationViewSet(viewsets.GenericViewSet):
         user.verification_status = 'declined'
         user.save(update_fields=['verification_status'])
 
+        # ✅ Update all accounts with added_by_id = this user's id
+        User.objects.filter(added_by_id=user.id).update(verification_status='declined')
+
         return Response({
-            "detail": "Application declined, user marked as declined.",
+            "detail": "Application declined, user and related accounts marked as declined.",
             "verification_status": user.verification_status
         })
+

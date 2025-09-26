@@ -22,6 +22,20 @@ const OrganizerEvent = () => {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
   const [selectedEvent, setSelectedEvent] = useState('');
   const [isSkeleton, setIsSkeleton] = useState(false);
+  const {updateVerificationStatus} = useAuth();
+
+  const fetchProfile = async () => {
+      try {
+        const res = await api.get(`/me/`);
+        updateVerificationStatus(res.data.verification_status);
+      } catch (err) {
+        console.error('Failed to fetch profile:', err);        
+      }
+    };
+  
+    useEffect(() => {
+      fetchProfile();
+    }, []);
 
   const fetchEventDetails = async () => {    
     setIsSkeleton(true);

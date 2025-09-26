@@ -11,8 +11,6 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import ReCAPTCHA from "react-google-recaptcha";
 
-
-
 // A helper function to create a new, empty ticket object
 const createNewTicket = () => ({
   ticket_name: 'Standard',
@@ -320,7 +318,7 @@ const CreateEventForm = () => {
           setIsLoading(false);
           navigate(`/org/${userCode}/my-event`);
         } else {
-          form.append("status", "draft");
+          form.append("status", "pending");
           setIsLoading(false);
           setIsVerifiedConfirm(true);
           return;
@@ -331,7 +329,7 @@ const CreateEventForm = () => {
           setIsLoading(false);
           navigate(`/org/${userCode}/my-event`);
         } else {
-          form.append("status", "draft");
+          form.append("status", "pending");
           setIsLoading(false);
           setIsVerifiedConfirm(true);
           return;
@@ -430,7 +428,7 @@ const CreateEventForm = () => {
         } catch (subErr) {
           console.error("Error creating subscription:", subErr.response?.data || subErr.message);
           setAlert({ show: true, message: "Subscription failed. Please try again." });
-        } finally{
+        } finally {
           setIsLoading(false);
         }
       } catch (err) {
@@ -458,9 +456,9 @@ const CreateEventForm = () => {
           // Generic fallback
           setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
-      }finally{
-          setIsLoading(false);
-        }
+      } finally {
+        setIsLoading(false);
+      }
 
     } else {
       try {
@@ -488,7 +486,7 @@ const CreateEventForm = () => {
         } catch (subErr) {
           console.error("Error creating subscription:", subErr.response?.data || subErr.message);
           setAlert({ show: true, message: "Subscription failed. Please try again." });
-        }finally{
+        } finally {
           setIsLoading(false);
         }
       } catch (err) {
@@ -516,9 +514,9 @@ const CreateEventForm = () => {
           // Generic fallback
           setAlert({ show: true, message: "An unexpected error occurred. Please try again." });
         }
-      }finally{
-          setIsLoading(false);
-        }
+      } finally {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -609,9 +607,18 @@ const CreateEventForm = () => {
             <h2 className="text-lg font-semibold mb-2 text-gray-800">
               Verification Required
             </h2>
+
             <p className="mb-6 text-base text-gray-600">
-              To publish paid events, your account needs to be verified.
-              Your event will be saved as a <span className="font-semibold">draft</span> while you complete the verification process.
+              {userRole === 'organizer' ? (
+                <>
+                  To publish paid events, your organization needs to be verified.
+                  Your event will be saved as <span className="font-semibold">pending</span> while you complete the verification process.</>
+              ) : (
+                <>
+                  To publish paid events, your organization needs to be verified.
+                  Your event will be saved as <span className="font-semibold">pending</span> while you complete the verification process.
+                </>
+              )}
             </p>
             <div className="flex justify-center gap-4">
               <button
@@ -624,11 +631,17 @@ const CreateEventForm = () => {
               <button
                 type="button"
                 onClick={() => {
-                  handleSubmit(null, true, `/org/${userCode}/verification-form`);
+                  if (userRole === 'organizer') {
+                    handleSubmit(null, true, `/org/${userCode}/verification-form`);
+                  }else {
+                    handleSubmit(null, true, `/org/my-event`);
+                  }
                 }}
                 className="px-6 py-3 bg-teal-600 text-white font-semibold rounded-xl hover:bg-teal-700"
               >
-                Start Verification
+                {userRole === 'organizer' ? (
+                  'Start Verification'
+                ): ('Okay')}
               </button>
             </div>
           </div>

@@ -136,15 +136,19 @@ const ManageAccount = () => {
   const [modalMessage, setModalMessage] = useState('');
   const [captchaToken, setCaptchaToken] = useState(null);
   const recaptchaRef = useRef();
+  const {updateVerificationStatus} = useAuth();
 
   const fileInputRef = useRef(null); // for profile picture
   const logoInputRef = useRef(null); // for company logo
+  
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
       const res = await api.get(`/staff-info/`);
       setUserData(res.data);      
+      console.log('coorg',res.data);
+      updateVerificationStatus(res.data.verification_status);
       setError(null);
     } catch (err) {
       console.error('Failed to fetch profile:', err);
