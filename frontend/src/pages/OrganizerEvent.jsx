@@ -248,7 +248,7 @@ const OrganizerEvent = () => {
 
         {!currentEvent ? (
           <>
-            <div className="justify-center mb-5 hidden md:flex">
+            <div className="justify-center mb-1 hidden md:flex">
               <h1 className="text-2xl sm:text-3xl md:text-4xl font-light font-outfit text-gray-800">
                 Event Overview
               </h1>
@@ -256,6 +256,22 @@ const OrganizerEvent = () => {
 
             {/* Search & Buttons */}
             <div className="flex flex-col w-[90%] md:w-full items-center md:items-start justify-between gap-4 mb-8">
+            <Link
+                to={userRole === 'organizer' ? `/org/${userCode}/create-event` : `/org/create-event`}
+                className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
+              >
+                Create New Event
+              </Link>
+
+              <div className='flex flex-col-reverse md:flex-row w-full items-center justify-center gap-2'>        
+                
+                  <select className='text-sm w-full md:w-auto cursor-pointer bg-black/10 py-2 md:px-4 xl:px-8 2xl:px-10 outline-none rounded-lg' name="category" value={selectedCategory} id="" onChange={(e) => setSelectedCategory(e.target.value)}>
+                    <option value="All Events">All Events</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Ongoing">Ongoing</option>
+                    <option value="Done">Done</option>
+                  </select>                
+
               {/* Search bar */}
               <div className="relative w-full">
                 <input
@@ -281,9 +297,10 @@ const OrganizerEvent = () => {
                   />
                 </svg>
               </div>
+              </div>
 
               {/* Action buttons */}
-              <div className="flex flex-row w-full gap-3 items-center lg:w-[80%] xl:w-[70%] lg:justify-between overflow-x-auto hide-scrollbar text-sm">
+              {/* <div className="flex flex-row w-full gap-3 items-center lg:w-[80%] xl:w-[70%] lg:justify-between overflow-x-auto hide-scrollbar text-sm">
                 {["All Events", "Upcoming", "Ongoing", "Done"].map((cat) => (
                   <button
                     key={cat}
@@ -296,14 +313,8 @@ const OrganizerEvent = () => {
                     {cat}
                   </button>
                 ))}
-              </div>
-
-              <Link
-                to={userRole === 'organizer' ? `/org/${userCode}/create-event` : `/org/create-event`}
-                className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
-              >
-                Create New Event
-              </Link>
+              </div> */}
+              
             </div>
 
             {/* Event Cards */}

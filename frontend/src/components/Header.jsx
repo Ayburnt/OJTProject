@@ -263,7 +263,7 @@ function Header() {
                   <p className="font-outfit flex items-center justify-center gap-2 border-b border-gray-300 w-full text-center bg-secondary text-white text-base py-2">
                     {userFirstName} {userLastName}
                     {verificationStatus === "verified" && (
-                      <FaCheckCircle className="text-green-400" />
+                      <FaCheckCircle className="text-white" />
                     )}
                   </p>
                   <button

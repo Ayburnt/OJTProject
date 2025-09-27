@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { GoCalendar, GoLocation, GoPeople } from "react-icons/go";
 import api from '../api.js';
 import { useNavigate } from 'react-router-dom';
@@ -7,11 +7,13 @@ import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth.js';
 import Tooltip from '@mui/material/Tooltip';
+import { HiOutlineDocumentSearch } from "react-icons/hi";
+import { BsThreeDotsVertical } from "react-icons/bs";
 
 function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees, setSelectedEvent }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
-  const {userRole} = useAuth();
+  const { userRole } = useAuth();
   const navigate = useNavigate();
 
   // Delete API call
@@ -38,11 +40,11 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
       await api.patch(`/events/${eventCode}/toggle-selling/`, { is_selling: !isSelling });
       toast.success(isSelling ? "Registration closed!" : "Registration opened!", {
         autoClose: 3000,
-      }) 
+      })
       fetchEventDetails(); // refresh state after update
     } catch (err) {
       console.error(err);
-       toast.error("Failed to update registration status. Please try again.", {
+      toast.error("Failed to update registration status. Please try again.", {
         autoClose: 5000,
       })
     }
@@ -54,10 +56,25 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
 
   const eDetailsStyle = `font-outfit text-grey flex flex-row gap-3`;
 
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 
   return (
-    <>    
-      
+    <>
+
       {/* Delete confirmation modal */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
@@ -71,7 +88,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
 
             <h2 className="font-outfit text-lg font-semibold mb-2 text-gray-800">
               Do you really want to delete this event?
-            </h2>            
+            </h2>
             <p className="font-outfit mb-6 text-base text-gray-600">
               This action cannot be undone. Please type <span className='font-bold italic'>{`'${eventCode}'`}</span> to confirm.
             </p>
@@ -110,73 +127,112 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
       )}
 
       {/* Event card */}
-      
+
       <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
         e.stopPropagation();
         setSelectedEvent(selected);
-        if(userRole === 'staff'){          
+        if (userRole === 'staff') {
           navigate(`/events/${selected.event_code}`)
-        } else{
+        } else {
           fetchAttendees(selected)
-        }        
+        }
       }}>
         <Tooltip title="Click to view data" placement="top" arrow>
-        <div className='overflow-hidden rounded-lg aspect-video'>
-          <img src={eventPoster} alt="" className='object-cover' />
-        </div>
+          <div className='overflow-hidden rounded-lg aspect-video'>
+            <img src={eventPoster} alt="" className='object-cover' />
+          </div>
 
-        <div className='flex flex-row justify-between items-center w-full'>
-          <p className='font-outfit text-2xl truncate w-full'>{eventName}</p>
-          <p className={`font-outfit py-1 px-3 text-xs rounded-full ml-3 ${eventStatusColor}`}
-          >{eventStatus}</p>
-        </div>
+          <div className='flex flex-row justify-between items-center w-full'>
+            <p className='font-outfit text-2xl truncate w-full'>{eventName}</p>
+            <p className={`font-outfit py-1 px-3 text-xs rounded-full ml-3 ${eventStatusColor}`}
+            >{eventStatus}</p>
+          </div>
 
-        <p className={eDetailsStyle}><GoCalendar />{eventDate}</p>
-        <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
-        <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
+          <p className={eDetailsStyle}><GoCalendar />{eventDate}</p>
+          <p className={eDetailsStyle}><GoLocation />{eventLocation}</p>
+          <p className={eDetailsStyle}><GoPeople />{totalTickets} total tickets</p>
 
         </Tooltip>
-        
+
         {(userRole === 'organizer' || userRole === 'co-organizer') && (
-          <div className='flex flex-row gap-3 mt-3 w-full'>
-          <button
-            className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 
+          <div className='flex flex-row gap-3 w-full mt-2 items-center justify-between'>
+            <button
+              className={`font-outfit px-4 py-3 outline-none rounded-md text-white font-semibold cursor-pointer w-full 
     ${isSelling ? 'bg-red-600 hover:bg-red-700' : 'bg-secondary hover:bg-secondary/90'}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleTicketSelling()}}
-          >
-            {isSelling ? "Close registration" : "Open registration"}
-          </button>
-
-          <div className='flex flex-row gap-3'>
-            <Tooltip title="Edit event" placement="bottom" arrow>
-            <button
-              className='text-secondary text-lg cursor-pointer outline-none'
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/org/edit/${eventCode}`)}}
+                handleTicketSelling()
+              }}
             >
-              <RiEditLine />
+              {isSelling ? "Close registration" : "Open registration"}
             </button>
-            </Tooltip>
 
-                <Tooltip title="Delete event" placement="bottom" arrow>
-            <button
-              className='text-red-600 text-lg outline-none cursor-pointer'
-              onClick={(e) => {
-                e.stopPropagation();
-                setConfirmDelete(true)}}
-            >
-              <RiDeleteBin6Line />
-            </button>
-            </Tooltip>
+
+
+            <div className="relative inline-block" ref={menuRef}>
+              {/* Toggle button */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setOpen(!open)
+                }}
+              >
+                <BsThreeDotsVertical className='text-2xl cursor-pointer' />
+              </button>
+
+              {/* Popup container */}
+              {open && (
+                <div className="absolute right-0 bottom-full w-40 bg-white border border-gray-200 rounded-lg shadow-lg/40 z-10">
+                  <ul className="py-1">
+                    <li>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedEvent(selected);
+                          if (userRole === 'staff') {
+                            navigate(`/events/${selected.event_code}`)
+                          } else {
+                            fetchAttendees(selected)
+                          }
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center cursor-pointer"
+                      >
+                        <HiOutlineDocumentSearch />View Details
+                      </button>
+                    </li>
+                    <div className="border-t border-gray-300"></div>
+                    <li>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/org/edit/${eventCode}`)
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center cursor-pointer"
+                      >
+                        <RiEditLine />Edit Event
+                      </button>
+                    </li>
+                    <div className="border-t border-gray-300"></div>
+                    <li>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setConfirmDelete(true)
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center text-red-600 cursor-pointer"
+                      >
+                        <RiDeleteBin6Line />Delete Event
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              )}
+            </div>           
           </div>
-        </div>
-        )}            
+        )}
 
 
-      </div>      
+      </div>
     </>
   );
 }

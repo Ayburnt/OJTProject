@@ -42,16 +42,14 @@ export default function OrganizerEventDashboard({ event, attendees, transactions
       <div className="py-6 space-y-6 w-full">
 
         {/* HEADER */}
-        <div className="flex flex-col lg:flex-row gap-4">
-          <div className="w-full h-full flex items-start justify-center rounded-xl overflow-hidden bg-black/60">
-            <img
+        <div className="grid grid-cols-1 lg:grid-rows-1 lg:grid-cols-3 gap-4 place-items-start">
+          <img
               src={event.event_poster_url}
               alt={event.title}
-              className="object-contain w-full max-h-80 shadow cursor-pointer"
+              className="object-contain w-full max-h-80 shadow cursor-pointer rounded-lg"
               onClick={() => setIsPosterOpen(true)}
             />
-          </div>
-          <div>
+          <div className="col-span-2">
             <h1 className="text-2xl font-bold">{event.title}</h1>
             <p className="text-gray-600 mt-1 leading-relaxed whitespace-pre-line">{event.description}</p>
             <p className="mt-2 font-medium">
