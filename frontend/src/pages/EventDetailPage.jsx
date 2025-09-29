@@ -138,13 +138,13 @@ function EventDetailPage() {
     const [replies, setReplies] = useState(null);
 
     const navigate = useNavigate();
-    const { eventcode } = useParams();    
+    const { eventcode } = useParams();
 
     useEffect(() => {
-  if (eventDetails?.title) {
-    document.title = `${eventDetails.title} | Sari-Sari Events`;
-  }
-}, [eventDetails]);
+        if (eventDetails?.title) {
+            document.title = `${eventDetails.title} | Sari-Sari Events`;
+        }
+    }, [eventDetails]);
 
     useEffect(() => {
         const fetchEvent = async () => {
@@ -286,27 +286,27 @@ function EventDetailPage() {
     return (
         <>
             <Helmet>
-  <title>
-    {eventDetails
-      ? `${eventDetails.title} | Sari-Sari Events`
-      : 'Loading event… | Sari-Sari Events'}
-  </title>
+                <title>
+                    {eventDetails
+                        ? `${eventDetails.title} | Sari-Sari Events`
+                        : 'Loading event… | Sari-Sari Events'}
+                </title>
 
-  {eventDetails && (
-    <>
-      <meta property="og:title" content={eventDetails.title} />
-      <meta property="og:description" content={eventDetails.description} />
-      <meta property="og:image" content={eventDetails.event_poster} />
-      <meta
-        property="og:url"
-        content={`https://event.sari-sari.com/events/${eventDetails.event_code}`}
-      />
-      <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:image" content={eventDetails.event_poster} />
-    </>
-  )}
-</Helmet>
+                {eventDetails && (
+                    <>
+                        <meta property="og:title" content={eventDetails.title} />
+                        <meta property="og:description" content={eventDetails.description} />
+                        <meta property="og:image" content={eventDetails.event_poster} />
+                        <meta
+                            property="og:url"
+                            content={`https://event.sari-sari.com/events/${eventDetails.event_code}`}
+                        />
+                        <meta property="og:type" content="website" />
+                        <meta name="twitter:card" content="summary_large_image" />
+                        <meta name="twitter:image" content={eventDetails.event_poster} />
+                    </>
+                )}
+            </Helmet>
 
 
             <div className="bg-gray-100 min-h-screen">
@@ -501,8 +501,14 @@ function EventDetailPage() {
                                                 </p>
                                             </div>
                                             <span className="text-2xl font-bold text-orange-600">
-                                                {Number(ticket.price) === 0 ? 'Free' : `$${Number(ticket.price).toFixed(2)}`}
+                                                {Number(ticket.price) === 0
+                                                    ? 'Free'
+                                                    : `₱${Number(ticket.price).toLocaleString('en-PH', {
+                                                        minimumFractionDigits: 2,
+                                                        maximumFractionDigits: 2,
+                                                    })}`}
                                             </span>
+
                                         </div>
                                     ))}
                                 </div>
