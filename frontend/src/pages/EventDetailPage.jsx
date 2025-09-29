@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, FaCheckCircle, FaCheckSquare, FaLaptop } from 'react-icons/fa';
+import { FaXTwitter } from "react-icons/fa6";
 import { FaRegUser } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
@@ -47,6 +48,7 @@ function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
                 </h3>
                 {/* Social buttons */}
                 <div className="flex items-center justify-center gap-6 mb-4">
+                    {/* Facebook */}
                     <a
                         href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
                         target="_blank"
@@ -55,22 +57,28 @@ function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
                     >
                         <FaFacebook size={34} className="text-[#1877F2]" />
                     </a>
+
+                    {/* Messenger (mobile deep link & web fallback) */}
                     <a
-                        href={`fb-messenger://share/?link=${shareUrl}`}
+                        href={`https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=YOUR_FACEBOOK_APP_ID&redirect_uri=${encodedUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Share on Messenger"
                     >
                         <FaFacebookMessenger size={34} className="text-[#00B2FF]" />
                     </a>
+
+                    {/* X (Twitter) */}
                     <a
                         href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent(title || '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label="Share on X/Twitter"
                     >
-                        <FaTwitter size={34} className="text-[#1DA1F2]" />
+                        <FaXTwitter size={34} className="text-black" />
                     </a>
+
+                    {/* LinkedIn */}
                     <a
                         href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodeURIComponent(title || '')}`}
                         target="_blank"
@@ -80,6 +88,7 @@ function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
                         <FaLinkedin size={34} className="text-[#0A66C2]" />
                     </a>
                 </div>
+
                 <p className="text-center text-gray-500 mb-3">or share link</p>
                 {/* Copyable link */}
                 <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">

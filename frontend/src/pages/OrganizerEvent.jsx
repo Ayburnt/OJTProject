@@ -12,6 +12,126 @@ import EventTransactions from '../components/EventTransactions.jsx';
 import { MdContentCopy } from "react-icons/md";
 import Skeleton from '@mui/material/Skeleton';
 import Stack from '@mui/material/Stack';
+import { FaCalendarAlt, FaMapMarkerAlt, FaShareAlt, FaCar, FaUserLock, FaFacebook, FaFacebookMessenger, FaTwitter, FaLinkedin, FaCheckCircle, FaCheckSquare, FaLaptop } from 'react-icons/fa';
+import { FaXTwitter } from "react-icons/fa6";
+
+function ShareModal({ isOpen, onClose, shareUrl, qrUrl, title }) {
+  const [copied, setCopied] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (e) {
+      console.error('Copy failed:', e);
+    }
+  };
+
+  const encodedUrl = encodeURIComponent(shareUrl);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-[95%] max-w-lg p-6">
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 text-gray-500 hover:text-gray-700"
+          aria-label="Close share modal"
+        >
+          ×
+        </button>
+        <h3 className="text-xl font-semibold text-center mb-5">
+          Let your friends know!
+        </h3>
+        {/* Social buttons */}
+        <div className="flex items-center justify-center gap-6 mb-4">
+          {/* Facebook */}
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Share on Facebook"
+          >
+            <FaFacebook size={34} className="text-[#1877F2]" />
+          </a>
+
+          {/* Messenger (mobile deep link & web fallback) */}
+          <a
+            href={`https://www.facebook.com/dialog/send?link=${encodedUrl}&app_id=YOUR_FACEBOOK_APP_ID&redirect_uri=${encodedUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Share on Messenger"
+          >
+            <FaFacebookMessenger size={34} className="text-[#00B2FF]" />
+          </a>
+
+          {/* X (Twitter) */}
+          <a
+            href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodeURIComponent(title || '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Share on X/Twitter"
+          >
+            <FaXTwitter size={34} className="text-black" />
+          </a>
+
+          {/* LinkedIn */}
+          <a
+            href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodeURIComponent(title || '')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Share on LinkedIn"
+          >
+            <FaLinkedin size={34} className="text-[#0A66C2]" />
+          </a>
+        </div>
+
+        <p className="text-center text-gray-500 mb-3">or share link</p>
+        {/* Copyable link */}
+        <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
+          <input
+            type="text"
+            readOnly
+            value={shareUrl}
+            className="flex-1 px-3 py-3 text-sm md:text-base outline-none"
+          />
+          <button
+            onClick={handleCopy}
+            className="px-4 py-3 text-orange-600 font-semibold hover:bg-orange-50 transition-colors"
+          >
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+        {/* QR below link */}
+        {qrUrl && (
+          <div className="mt-5 flex flex-col items-center">
+            <a
+              href={qrUrl}
+              download="event-qr.png"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block"
+              title="Open / download QR"
+            >
+              <img
+                src={qrUrl}
+                alt="Event QR code"
+                className="w-44 h-44 object-contain rounded-lg border"
+              />
+            </a>
+            <p className="text-xs text-gray-500 mt-2">QR code (click to open/download)</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const OrganizerEvent = () => {
   const navigate = useNavigate();
@@ -22,42 +142,45 @@ const OrganizerEvent = () => {
   const [selectedPage, setSelectedPage] = useState('Dashboard');
   const [selectedEvent, setSelectedEvent] = useState('');
   const [isSkeleton, setIsSkeleton] = useState(false);
-  const {updateVerificationStatus} = useAuth();
+  const { updateVerificationStatus } = useAuth();
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [shareData, setShareData] = useState({ url: "", qr: "", title: "" });
+
 
   const fetchProfile = async () => {
-      try {
-        const res = await api.get(`/me/`);
-        updateVerificationStatus(res.data.verification_status);
-      } catch (err) {
-        console.error('Failed to fetch profile:', err);        
-      }
-    };
-  
-    useEffect(() => {
-      fetchProfile();
-    }, []);
+    try {
+      const res = await api.get(`/me/`);
+      updateVerificationStatus(res.data.verification_status);
+    } catch (err) {
+      console.error('Failed to fetch profile:', err);
+    }
+  };
 
-  const fetchEventDetails = async () => {    
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchEventDetails = async () => {
     setIsSkeleton(true);
-    if(userRole === 'organizer'){
+    if (userRole === 'organizer') {
       try {
-      const res = await api.get(`/list-create/`);
-      setEvents(res.data);
-      console.log('Events', res.data);
-    } catch (err) {
-      console.error("Error fetching events:", err);
-    } finally {
-      setIsSkeleton(false);
-    }
-    } else if(userRole === 'co-organizer'){
+        const res = await api.get(`/list-create/`);
+        setEvents(res.data);
+        console.log('Events', res.data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setIsSkeleton(false);
+      }
+    } else if (userRole === 'co-organizer') {
       try {
-      const res = await api.get(`/list-create/co-org/`);
-      setEvents(res.data);
-    } catch (err) {
-      console.error("Error fetching events:", err);
-    } finally{
-      setIsSkeleton(false);
-    }
+        const res = await api.get(`/list-create/co-org/`);
+        setEvents(res.data);
+      } catch (err) {
+        console.error("Error fetching events:", err);
+      } finally {
+        setIsSkeleton(false);
+      }
     }
   };
 
@@ -89,22 +212,34 @@ const OrganizerEvent = () => {
     }
   }
 
+  const handleShareEvent = (event) => {
+    const shareUrl = `${window.location.origin}/events/${event.event_code}`;    
+
+    setShareData({
+      url: shareUrl,
+      qr: event.event_qr_image,
+      title: event.title,
+    });
+    setIsShareOpen(true);
+  };
+
+
 
   // Determine event status based on current date/time
   function getEventStatus(event) {
-    if(event.status === 'draft'){      
+    if (event.status === 'draft') {
       return "Draft";
-    } else if(event.status === 'pending') {
+    } else if (event.status === 'pending') {
       return "Pending";
     } else {
       const now = new Date();
-    const start = new Date(`${event.start_date}T${event.start_time}`);
-    const end = new Date(`${event.end_date}T${event.end_time}`);
+      const start = new Date(`${event.start_date}T${event.start_time}`);
+      const end = new Date(`${event.end_date}T${event.end_time}`);
 
-    if (now < start) return "Upcoming";
-    if (now >= start && now <= end) return "Ongoing";
-    if (now > end) return "Done";
-    return "All Events";
+      if (now < start) return "Upcoming";
+      if (now >= start && now <= end) return "Ongoing";
+      if (now > end) return "Done";
+      return "All Events";
     }
   }
 
@@ -139,7 +274,7 @@ const OrganizerEvent = () => {
   const [selectedAttendee, setSelectedAttendee] = useState(null);
   const [transactions, setTransactions] = useState([]);
   const [loadingTransac, setLoadingTransac] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);  
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
   const fetchAttendees = async (event) => {
     setCurrentEvent(event);
@@ -256,47 +391,47 @@ const OrganizerEvent = () => {
 
             {/* Search & Buttons */}
             <div className="flex flex-col w-[90%] md:w-full items-center md:items-start justify-between gap-4 mb-8">
-            <Link
+              <Link
                 to={userRole === 'organizer' ? `/org/${userCode}/create-event` : `/org/create-event`}
                 className='bg-secondary text-center text-white mt-8 w-full py-3 rounded-lg font-outfit md:self-start md:w-auto md:px-5 cursor-pointer hover:bg-secondary/80 hover:text-white'
               >
                 Create New Event
               </Link>
 
-              <div className='flex flex-col-reverse md:flex-row w-full items-center justify-center gap-2'>        
-                
-                  <select className='text-sm w-full md:w-auto cursor-pointer bg-black/10 py-2 md:px-4 xl:px-8 2xl:px-10 outline-none rounded-lg' name="category" value={selectedCategory} id="" onChange={(e) => setSelectedCategory(e.target.value)}>
-                    <option value="All Events">All Events</option>
-                    <option value="Upcoming">Upcoming</option>
-                    <option value="Ongoing">Ongoing</option>
-                    <option value="Done">Done</option>
-                  </select>                
+              <div className='flex flex-col-reverse md:flex-row w-full items-center justify-center gap-2'>
 
-              {/* Search bar */}
-              <div className="relative w-full">
-                <input
-                  type="text"
-                  placeholder="Search events by name or venue..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border-b-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
-                />
+                <select className='text-sm w-full md:w-auto cursor-pointer bg-black/10 py-2 md:px-4 xl:px-8 2xl:px-10 outline-none rounded-lg' name="category" value={selectedCategory} id="" onChange={(e) => setSelectedCategory(e.target.value)}>
+                  <option value="All Events">All Events</option>
+                  <option value="Upcoming">Upcoming</option>
+                  <option value="Ongoing">Ongoing</option>
+                  <option value="Done">Done</option>
+                </select>
 
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                {/* Search bar */}
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    placeholder="Search events by name or venue..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border-b-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
                   />
-                </svg>
-              </div>
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
               </div>
 
               {/* Action buttons */}
@@ -314,22 +449,22 @@ const OrganizerEvent = () => {
                   </button>
                 ))}
               </div> */}
-              
+
             </div>
 
             {/* Event Cards */}
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>              
+            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
               {isSkeleton && (
                 <div className='bg-gray-100 p-4 shadow-lg rounded-xl'>
-              <Stack spacing={0}>
-                <Skeleton variant="rounded" animation='wave' width={'100%'} height={150} />
-                <Skeleton variant="text" animation='wave' height={60} />
-                <Skeleton variant="text" animation='wave' height={30} />
-                <Skeleton variant="text" animation='wave' height={30} />
-                <Skeleton variant="text" animation='wave' height={30} />                
-              </Stack>
-            </div>     
-              )}                 
+                  <Stack spacing={0}>
+                    <Skeleton variant="rounded" animation='wave' width={'100%'} height={150} />
+                    <Skeleton variant="text" animation='wave' height={60} />
+                    <Skeleton variant="text" animation='wave' height={30} />
+                    <Skeleton variant="text" animation='wave' height={30} />
+                    <Skeleton variant="text" animation='wave' height={30} />
+                  </Stack>
+                </div>
+              )}
 
               {filteredEvents.length > 0 ? (
                 filteredEvents.map((event, i) => (
@@ -349,20 +484,21 @@ const OrganizerEvent = () => {
                     fetchEventDetails={fetchEventDetails}
                     selected={event}
                     fetchAttendees={fetchAttendees}
+                    onShare={() => handleShareEvent(event)} // ⬅ new prop
                   />
                 ))
               ) : (
                 !isSkeleton && (
                   <p className="text-gray-500">No events match your search or category.</p>
-                )                
+                )
               )}
             </div>
           </>
         ) : (
-          <div className='flex w-full flex-col'>            
+          <div className='flex w-full flex-col'>
 
             {/* Search & Buttons */}
-            <div className="flex flex-col md:w-full items-center justify-between gap-4 mb-5 mt-5">              
+            <div className="flex flex-col md:w-full items-center justify-between gap-4 mb-5 mt-5">
 
               {/* Action buttons */}
               <div className="flex flex-row w-full gap-5 justify-center items-center overflow-x-auto hide-scrollbar text-sm">
@@ -384,7 +520,7 @@ const OrganizerEvent = () => {
             {selectedPage === 'Dashboard' ? (
               <div className='w-full flex items-center justify-center'>
                 <EventDashboard event={selectedEvent} attendees={attendees} transactions={transactions} />
-              </div>              
+              </div>
             ) : selectedPage === 'Transactions' ? (
               <EventTransactions transactions={transactions} setAttendees={setAttendees} setTransactions={setTransactions} setSelectedTransaction={setSelectedTransaction} filteredTransactions={filteredTransactions} loadingTransac={loadingTransac} searchTransactions={searchTransactions} setSearchTransactions={setSearchTransactions} currentEvent={currentEvent} />
             ) : (
@@ -412,7 +548,7 @@ const OrganizerEvent = () => {
               {/* Scrollable Content */}
               <div className="flex-1 overflow-y-auto">
                 <div className="px-6 pb-4 divide-y divide-gray-200 text-sm">
-                  <div className="flex justify-center py-2 items-center">                    
+                  <div className="flex justify-center py-2 items-center">
                     <img src={selectedAttendee.ticket_qr_image} className='w-[50%]' alt="" />
                   </div>
                   <div className="flex justify-between py-2">
@@ -454,7 +590,7 @@ const OrganizerEvent = () => {
                     <span className="text-gray-800 font-medium">
                       {selectedAttendee.attendance?.checked_in_by.first_name} {selectedAttendee.attendance?.checked_in_by.last_name}
                     </span>
-                  </div>                  
+                  </div>
                 </div>
 
                 {selectedAttendee.responses?.length > 0 && (
@@ -476,11 +612,11 @@ const OrganizerEvent = () => {
               <div className="border-t border-gray-200">
                 <div className='w-full flex items-center justify-center'>
                   <div className='w-[90%] justify-between flex flex-row'>
-                  <span className="text-gray-600">Price:</span>
-                  <span className="text-gray-800 font-medium">₱{selectedAttendee.ticket_read?.price}</span>
-                </div>      
-                </div>                          
-                <div className="flex items-center justify-between px-6 py-4 text-sm">                  
+                    <span className="text-gray-600">Price:</span>
+                    <span className="text-gray-800 font-medium">₱{selectedAttendee.ticket_read?.price}</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between px-6 py-4 text-sm">
                   <span className="text-gray-600">Ticket Link:</span>
                   <button
                     className="flex items-center gap-2 text-blue-600 hover:underline font-medium"
@@ -542,28 +678,28 @@ const OrganizerEvent = () => {
                       selectedTransaction.status === 'Success' ? 'text-green-600' :
                         'text-red-500'
                       } text-gray-800 font-medium`}>{selectedTransaction.status}</span>
-                  </div>                  
-                </div>                
+                  </div>
+                </div>
               </div>
 
               {/* Sticky Footer */}
               <div className="border-t border-gray-200">
                 {groupTickets(selectedTransaction.attendees)?.map(([ticketName, info], idx) => (
-                    <div key={idx} className="flex justify-between py-2 px-6">
-                      <span className="text-gray-800 font-medium">
-                        {ticketName} <span className="text-gray-500">x{info.count}</span>
-                      </span>
-                      <span className="text-gray-600">
-                        ₱{info.subtotal.toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-
-                  {/* Show grand total */}
-                  <div className="flex justify-between py-2 px-6 border-t mt-2 pt-2 font-semibold">
-                    <span>Total</span>
-                    <span>₱{selectedTransaction.amount}</span>
+                  <div key={idx} className="flex justify-between py-2 px-6">
+                    <span className="text-gray-800 font-medium">
+                      {ticketName} <span className="text-gray-500">x{info.count}</span>
+                    </span>
+                    <span className="text-gray-600">
+                      ₱{info.subtotal.toFixed(2)}
+                    </span>
                   </div>
+                ))}
+
+                {/* Show grand total */}
+                <div className="flex justify-between py-2 px-6 border-t mt-2 pt-2 font-semibold">
+                  <span>Total</span>
+                  <span>₱{selectedTransaction.amount}</span>
+                </div>
                 <div className="flex items-center justify-between px-6 py-4 text-sm">
                   <span className="text-gray-600">Print Tickets:</span>
                   <button
@@ -582,6 +718,15 @@ const OrganizerEvent = () => {
           </div>
         )}
       </div>
+
+      <ShareModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        shareUrl={shareData.url}
+        qrUrl={shareData.qr}
+        title={shareData.title}
+      />
+
 
       <Chatbot />
     </div>

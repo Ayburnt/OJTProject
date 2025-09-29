@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 function CEStep3({
   formData,
@@ -14,6 +15,8 @@ function CEStep3({
   handleRemoveTicket,
   selectedTier,
 }) {
+  const location = useLocation();
+  const isEditPage = location.pathname.startsWith("/org/edit/");
   const [hasSeatingMap, setHasSeatingMap] = useState(false);
 
   const handleSeatingMapChange = (e) => {
@@ -200,7 +203,8 @@ const handleQuantityChange = (index, e) => {
                 name="ticket_type"
                 value={ticket.ticket_type}
                 onChange={(e) => handleTicketChange(index, e)}
-                className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer"
+                disabled={isEditPage}
+                className={`${isEditPage ? "cursor-not-allowed bg-gray-100 text-gray-500" : "bg-white cursor-pointer"} mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4`}
               >
                 <option value='free'>Free</option>
                 <option value='paid'>Paid</option>
@@ -209,13 +213,13 @@ const handleQuantityChange = (index, e) => {
             <div>
               <label htmlFor={`ticket-price-${index}`} className="block text-sm font-medium text-gray-700">Price(Php)</label>
               <input
-                disabled={ticket.ticket_type === 'free'}
+                disabled={ticket.ticket_type === 'free' || isEditPage}
                 type="number"
                 id={`ticket-price-${index}`}
                 name="price"
                 value={ticket.price}
                 onChange={(e) => handleTicketChange(index, e)}
-                className={`mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 ${ticket.ticket_type === 'free' && 'cursor-not-allowed'}`}
+                className={`mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 ${ticket.ticket_type === 'free' || isEditPage ? "cursor-not-allowed bg-gray-100 text-gray-500" : "bg-white cursor-pointer"}`}
               />
             </div>
           </div>
@@ -237,7 +241,8 @@ const handleQuantityChange = (index, e) => {
             <button
               type="button"
               onClick={() => handleRemoveTicket(index)}
-              className="bg-red-500 text-white text-sm font-semibold py-2 px-4 rounded-xl hover:bg-red-600 transition-colors duration-200 max-w-xs w-full sm:w-auto cursor-pointer"
+              disabled={isEditPage}
+              className={`${isEditPage ? 'bg-gray-400' : 'bg-red-500 hover:bg-red-600'} text-white text-sm font-semibold py-2 px-4 rounded-xl transition-colors duration-200 max-w-xs w-full sm:w-auto cursor-pointer`}
             >
               Remove Ticket Type
             </button>
@@ -250,11 +255,11 @@ const handleQuantityChange = (index, e) => {
           type="button"
           onClick={handleAddTicketWithLimit}
           disabled={
-            maxTicketTypes !== Infinity && formData.ticket_types.length >= maxTicketTypes
+            maxTicketTypes !== Infinity && formData.ticket_types.length >= maxTicketTypes || isEditPage
           }
           className={`flex items-center px-4 py-2 font-semibold rounded-xl transition-colors duration-200 cursor-pointer
       ${maxTicketTypes !== Infinity &&
-              formData.ticket_types.length >= maxTicketTypes
+              formData.ticket_types.length >= maxTicketTypes || isEditPage
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-teal-600 text-white hover:bg-teal-700"
             }`}

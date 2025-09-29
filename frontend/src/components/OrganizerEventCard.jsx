@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { GoCalendar, GoLocation, GoPeople } from "react-icons/go";
 import api from '../api.js';
 import { useNavigate } from 'react-router-dom';
-import { RiDeleteBin6Line } from "react-icons/ri";
+import { RiDeleteBin6Line, RiShareForwardLine } from "react-icons/ri";
 import { RiEditLine } from "react-icons/ri";
 import { toast } from 'react-toastify';
 import useAuth from '../hooks/useAuth.js';
@@ -10,11 +10,12 @@ import Tooltip from '@mui/material/Tooltip';
 import { HiOutlineDocumentSearch } from "react-icons/hi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 
-function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees, setSelectedEvent }) {
+function OrganizerEventCard({ onShare, fetchEventDetails, eventStatusColor, eventPoster, eventName, eventDate, eventLocation, ticketTypes, eventStatus, eventCode, userCode, selected, fetchAttendees, setSelectedEvent }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [typedCode, setTypedCode] = useState('');
   const { userRole } = useAuth();
   const navigate = useNavigate();
+  
 
   // Delete API call
   const handleDelete = async () => {
@@ -69,8 +70,7 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
-
+  }, []);  
 
   return (
     <>
@@ -184,6 +184,20 @@ function OrganizerEventCard({ fetchEventDetails, eventStatusColor, eventPoster, 
               {open && (
                 <div className="absolute right-0 bottom-full w-40 bg-white border border-gray-200 rounded-lg shadow-lg/40 z-10">
                   <ul className="py-1">
+                    <li>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (typeof onShare === "function") {
+                            onShare(selected);
+                          }
+                        }}
+                        className="w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center cursor-pointer"
+                      >
+                        <RiShareForwardLine />Share Event
+                      </button>
+                    </li>
+                    <div className="border-t border-gray-300"></div>
                     <li>
                       <button
                         onClick={(e) => {

@@ -47,7 +47,7 @@ function EventCard({ eventPoster, eventTitle, eventDate, eventLocation, eventCre
         </div>
 
         <div className="flex items-center text-sm text-teal-100 mb-1">
-          <span className="truncate">{eventDate.venue_specific + ', ' || ''} {eventDate.venue_address}</span>
+          <span className="truncate">{eventDate.venue_specific ? `${eventDate.venue_specific}, ` : ''} {eventDate.venue_address}</span>
         </div>
 
         {/* Creator */}
