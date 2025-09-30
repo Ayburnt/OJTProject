@@ -168,7 +168,7 @@ function Header() {
                               : `${event.start_date} - ${event.end_date}`}
                           </span>
                           <span className="text-xs text-gray-500">
-                            {truncate(event.venue_place, 50) || "Online Event"}
+                            {truncate(event.venue_place, 50) || (event.event_type)}
                           </span>
                         </div>
                       </Link>
