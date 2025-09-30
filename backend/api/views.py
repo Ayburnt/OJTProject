@@ -725,7 +725,7 @@ class SendOTPView(APIView):
                         },
                     }
                 )
-                print(f"SES Email sent! Message ID: {response['MessageId']}")
+                print(f"SES Email sent! Verification Code: {response['MessageId']} \n OTP: {otp}")
                 return Response({'detail': 'Verification code sent successfully.'}, status=status.HTTP_200_OK)
             except ClientError as e:
                 error_message = e.response.get('Error', {}).get('Message', 'An AWS SES error occurred.')
