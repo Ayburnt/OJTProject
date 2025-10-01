@@ -121,13 +121,13 @@ function ViewEventByCategory() {
         {/* Event Grid */}
         {filteredEvents.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-8">
               {displayedEvents.map((event, i) => (
                 <Link key={i} to={`/events/${event.event_code}`} className="block">
                   <EventCard
                     eventPoster={event.event_poster}
                     eventTitle={event.title}
-                    eventDate={event}
+                    eventInfo={event}
                     eventLocation={event.venue_place}
                     eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
                   />

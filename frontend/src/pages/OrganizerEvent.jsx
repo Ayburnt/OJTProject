@@ -453,7 +453,7 @@ const OrganizerEvent = () => {
             </div>
 
             {/* Event Cards */}
-            <div className='grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
+            <div className='grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-3 lg:gap-8 w-[95%] lg:w-full'>
               {isSkeleton && (
                 <div className='bg-gray-100 p-4 shadow-lg rounded-xl'>
                   <Stack spacing={0}>

@@ -70,6 +70,7 @@ function CEStep1({
             onChange={handleEventChange} required className="mt-1 block w-full bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-0 focus:outline-none transition-colors duration-200 py-2 px-4 cursor-pointer">
             <option value="">Select</option>
             <option value='corporate'>Corporate Event</option>
+            <option value='association'>Association Event</option>
             <option value='social'>Social Event</option>
             <option value='cultural'>Cultural Event</option>
             <option value='sports & Recreational'>Sports & Recreational Event</option>

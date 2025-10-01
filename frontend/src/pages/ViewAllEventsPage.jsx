@@ -26,6 +26,7 @@ function ViewAllEventsPage() {
       try {
         const res = await api.get(`/event-public-view/`);
         setEvents(res.data);
+        console.log(res.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -54,7 +55,7 @@ function ViewAllEventsPage() {
   const displayedEvents = filteredEvents.slice(0, eventsToShow);
   const hasMore = eventsToShow < filteredEvents.length;
 
-  const categories = ['All', 'Corporate', 'Social', 'Cultural', 'Sports & Recreational', 'Political & Government', 'Educational', 'Fundraising'];
+  const categories = ['All', 'Corporate', 'Association', 'Social', 'Cultural', 'Sports & Recreational', 'Political & Government', 'Educational', 'Fundraising'];
 
   return (
     <div className="bg-gray-100 min-h-screen py-10">
@@ -110,8 +111,6 @@ function ViewAllEventsPage() {
           </div>
         )}
 
-
-
         {/* Event Grid */}
         {filteredEvents.length > 0 ? (
           <>
@@ -121,7 +120,7 @@ function ViewAllEventsPage() {
                   <EventCard
                     eventPoster={event.event_poster}
                     eventTitle={event.title}
-                    eventDate={event}
+                    eventInfo={event}
                     eventLocation={event.venue_place}
                     eventCreator={`${event.created_by.first_name} ${event.created_by.last_name}`}
                   />

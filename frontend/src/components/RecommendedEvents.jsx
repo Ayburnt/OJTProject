@@ -15,7 +15,6 @@ function RecommendedEvents() {
       try {
         const res = await api.get(`/event-public-view/`);
         setEvents(res.data);
-        console.log(res.data);
       } catch (err) {
         console.error(err);
       } finally {
@@ -81,16 +80,16 @@ function RecommendedEvents() {
         )}
 
         {/* Event Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-7 md:gap-9 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-7 md:gap-9 w-full">
           {limitedEvents.length > 0 ? (
             limitedEvents.map((event, i) => (
-              <Link key={i} to={`/events/${event.event_code}`} className="block">
+              <Link key={i} to={`/events/${event.event_code}`} onClick={(e) => e.stopPropagation()} className="block">
                 <EventCard
                   eventPoster={event.event_poster}
                   eventTitle={event.title}
-                  eventDate={event}
+                  eventInfo={event}
                   eventLocation={event.venue_place}
-                  eventCreator={`${event.created_by.company_name}`}
+                  eventCreator={`${event.created_by.company_name}`}                                    
                 />
               </Link>
             ))

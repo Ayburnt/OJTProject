@@ -128,7 +128,7 @@ function OrganizerEventCard({ onShare, fetchEventDetails, eventStatusColor, even
 
       {/* Event card */}
 
-      <div className='shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
+      <div className='w-full shadow-lg rounded-xl px-5 pt-5 pb-6 flex flex-col items-start gap-2 bg-white hover:shadow-xl transition-all duration-300 leading-none border-2 border-gray-200 cursor-pointer hover:scale-101' onClick={(e) => {
         e.stopPropagation();
         setSelectedEvent(selected);
         if (userRole === 'staff') {
@@ -137,9 +137,9 @@ function OrganizerEventCard({ onShare, fetchEventDetails, eventStatusColor, even
           fetchAttendees(selected)
         }
       }}>
-        <Tooltip title="Click to view data" placement="top" arrow>
-          <div className='overflow-hidden rounded-lg aspect-video'>
-            <img src={eventPoster} alt="" className='object-cover' />
+        <Tooltip title="Click to view data" className='w-full' placement="top" arrow>
+          <div className='overflow-hidden rounded-lg aspect-video w-full'>
+            <img src={eventPoster} alt="" className='object-cover w-full' />
           </div>
 
           <div className='flex flex-row justify-between items-center w-full'>

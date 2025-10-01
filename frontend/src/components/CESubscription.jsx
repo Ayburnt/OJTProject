@@ -87,7 +87,11 @@ function CESubscription({selectedTier, setSelectedTier, selectedPrice, setSelect
                                 </ul>
                             </div>
 
-                            <button onClick={() => {setSelectedTier(tier.name); setSelectedPrice(tier.price)}} className={`mt-5 text-sm w-1/2 ${selectedTier === tier.name ? 'bg-transparent' : 'bg-secondary text-white'} self-center cursor-pointer py-2 border border-secondary rounded-lg`}>{selectedTier === tier.name ? 'Selected' : 'Select'}</button>
+                            <button onClick={() => {setSelectedTier(tier.name); setSelectedPrice(tier.price)}} 
+                            disabled={tier.name !== 'Free'}
+                            className={`mt-5 text-sm w-1/2 ${selectedTier === tier.name ? 'bg-transparent' :
+                            tier.name !== 'Free' ? 'bg-gray-300 text-gray-500 cursor-not-allowed' :
+                            'bg-secondary text-white'} self-center cursor-pointer py-2 border border-secondary rounded-lg`}>{selectedTier === tier.name ? 'Selected' : 'Select'}</button>
                         </div>
                     ))}
                 </div>

@@ -36,6 +36,10 @@ function CategoriesList() {
             names: "corporate",
             icon: <FaBriefcase className="text-teal-700 text-xl lg:text-3xl" />,
         },
+        association: {
+            names: "association",
+            icon: <FaBriefcase className="text-teal-700 text-xl lg:text-3xl" />,
+        },
         social: {
             names: "social",
             icon: <FaUsers className="text-[#FF965D] text-xl lg:text-3xl" />,

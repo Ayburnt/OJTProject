@@ -505,9 +505,11 @@ function EventDetailPage() {
                                                 <h4 className="text-lg font-semibold text-gray-800">
                                                     {ticket.ticket_name}
                                                 </h4>
-                                                <p className="text-sm text-gray-500">
-                                                    Available: {ticket.quantity_available}
+                                                {ticket.quantity_available <= 10 && (
+                                                    <p className="text-sm text-gray-500">
+                                                    Only {ticket.quantity_available} tickets available
                                                 </p>
+                                                )}                                                
                                             </div>
                                             <span className="text-2xl font-bold text-orange-600">
                                                 {Number(ticket.price) === 0

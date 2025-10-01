@@ -14,7 +14,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
         </p>
         <p>Here are your ticket(s):</p>
 
-        <ul className="flex flex-row items-center justify-center gap-4 w-3/4">
+        <ul className="flex flex-row flex-wrap items-center justify-center space-x-4 space-y-1 w-3/4">
           {ticketLinks.map((link, idx) => {
             const cleanLink = link?.trim();
             console.log(`Ticket ${idx + 1} link:`, cleanLink);
@@ -24,7 +24,7 @@ function RegisterSuccess({ setIsModalOpen, ticketLinks, transacCode }) {
                   href={`/attendee/${cleanLink}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 underline cursor-pointer hover:text-blue-800 font-outfit"
+                  className="text-blue-600 underline cursor-pointer hover:text-blue-800 font-outfit whitespace-nowrap"
                 >
                   Ticket {idx + 1}
                 </a>

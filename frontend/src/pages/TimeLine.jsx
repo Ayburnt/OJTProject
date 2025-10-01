@@ -186,7 +186,7 @@ const EventCard = ({ event }) => {
           </div>
           <div className="flex items-center font-outfit space-x-2 text-sm">
             <FiMapPin className="w-4 h-4" />
-            <p>{event.venue_specific !== null || event.venue_specific !== '' ? event.venue_specific + ', ' : ''}{event.venue_name}</p>
+            <p>{event.venue_specific !== null && event.venue_specific !== '' ? event.venue_specific + ', ' : ''}{event.venue_name}</p>
           </div>
         </div>
 
