@@ -120,7 +120,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         tickets_data = validated_data.pop("ticket_types", None)
-        templates_data = validated_data.pop("reg_form_templates", None)
+        templates_data = validated_data.pop("reg_form_templates", None)        
 
         with transaction.atomic():
             # --- Update normal fields ---
@@ -138,6 +138,18 @@ class EventSerializer(serializers.ModelSerializer):
                     if ticket_id and ticket_id in existing_ticket_ids:
                         # Update existing ticket
                         ticket = Ticket_Type.objects.get(id=ticket_id, event=instance)
+                        old_total = ticket.quantity_total
+                        old_available = ticket.quantity_available
+                        new_total = int(ticket_data.get("quantity_total", old_total))
+
+                        # tickets already sold = old_total - old_available
+                        tickets_sold = old_total - old_available
+
+                        # If quantity_total has changed, update quantity_available
+                        if "quantity_total" in ticket_data:
+                            ticket_data["quantity_available"] = max(new_total - tickets_sold, 0)
+                        # --- End quantity logic modification ---
+
                         for attr, value in ticket_data.items():
                             if attr != "id":
                                 setattr(ticket, attr, value)

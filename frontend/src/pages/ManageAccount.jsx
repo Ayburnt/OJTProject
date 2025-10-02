@@ -9,6 +9,8 @@ import { toast } from 'react-toastify';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { FaTrashAlt } from "react-icons/fa";
+import { HiOutlineDotsCircleHorizontal } from "react-icons/hi";
+import { BiTransferAlt } from "react-icons/bi";
 
 // Modal for success/error messages
 const MessageModal = ({ message, onClose }) => {
@@ -46,7 +48,7 @@ const ManageAccount = () => {
   const [isStaffLoading, setIsStaffLoading] = useState(false);
   const [isUploadLogo, setIsUploadLogo] = useState(false);
   const [logoFile, setLogoFile] = useState(null);
-  const { userCode, userRole, orgLogo, setOrgLogo } = useAuth();
+  const { userCode, userRole, orgLogo, setOrgLogo, logout } = useAuth();
 
   const [notifications, setNotifications] = useState({
     email: true,
@@ -135,17 +137,18 @@ const ManageAccount = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const [captchaToken, setCaptchaToken] = useState(null);
-  const {updateVerificationStatus} = useAuth();
+  const { updateVerificationStatus } = useAuth();
   const recaptchaRef = useRef();
 
   const fileInputRef = useRef(null); // for profile picture
   const logoInputRef = useRef(null); // for company logo
+  
 
   const fetchProfile = async () => {
     try {
       setLoading(true);
       const res = await api.get(`/me/`);
-      setUserData(res.data);      
+      setUserData(res.data);
       updateVerificationStatus(res.data.verification_status);
       setError(null);
     } catch (err) {
@@ -270,6 +273,8 @@ const ManageAccount = () => {
     fetchStaffs();
   }, [])
 
+  const [openMenuId, setOpenMenuId] = useState(null);
+
   // Active Staffs
   const activeStaffs = staffList.filter((staff) => staff.is_active);
   // Inactive Staffs
@@ -278,7 +283,7 @@ const ManageAccount = () => {
   const handleDeactivate = async (id) => {
     try {
       await api.delete(`staff/${id}/delete/`);
-      toast.success("Staff account deactivated!");
+      toast.success("Account deactivated!");
       fetchStaffs();
     } catch (err) {
       console.log(err)
@@ -289,7 +294,7 @@ const ManageAccount = () => {
   const handleReactivate = async (id) => {
     try {
       await api.post(`staff/${id}/reactivate/`, { is_active: true });
-      toast.success("Staff account reactivated!");
+      toast.success("Account reactivated!");
       fetchStaffs();
     } catch (err) {
       const message =
@@ -299,6 +304,61 @@ const ManageAccount = () => {
       toast.error(message, { autoClose: 5000 });
     }
   };
+
+  const [isTransferring, setIsTransferring] = useState(false);
+
+  // Handler to transfer ownership to selected staff
+  const handleTransferOwnership = async (staffId) => {
+  if (!window.confirm("Are you sure you want to transfer ownership to this staff? This will swap your accounts.")) {
+    return;
+  }
+  setIsTransferring(true);
+  try {
+    console.log("Transferring ownership:", { organizer_id: userData.id, staffId });
+    const res = await api.post('transfer-ownership/', {
+      organizer_id: userData.id,
+      staff_id: staffId
+    });
+
+    toast.success("Ownership transferred successfully. You will be logged out.");
+
+    // Log out the current organizer immediately
+    logout();
+
+    // For the swapped staff user, ensure backend invalidates their sessions/tokens, 
+    // so they must log in again.
+
+    // Optionally, redirect to the login page after logout
+    // navigate('/login'); // if you use react-router's useNavigate()
+  } catch (err) {
+  console.error("Transfer ownership failed:", err);
+  if (err.response?.data) {
+    console.error("Backend error response:", err.response.data);
+    toast.error(err.response.data.detail || "Failed to transfer ownership. Please try again.");
+  } else {
+    toast.error("Failed to transfer ownership. Please try again.");
+  }
+}
+ finally {
+    setIsTransferring(false);
+  }
+};
+
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
 
 
   if (loading) {
@@ -635,6 +695,7 @@ const ManageAccount = () => {
             {userRole === 'organizer' && (
               <div className="bg-white rounded-xl shadow-md p-4 lg:p-6">
                 <h3 className="text-lg font-semibold font-outfit text-gray-800 mb-4">Staff Accounts</h3>
+
                 <div className='font-outfit grid grid-cols-1 gap-4 lg:grid-cols-2'>
                   {Array.isArray(activeStaffs) && activeStaffs.length > 0 ? (
                     activeStaffs.map((staff) => (
@@ -646,7 +707,56 @@ const ManageAccount = () => {
                             <p className='text-sm text-gray-500 font-light'>{staff.email}</p>
                           </div>
                         </div>
-                        <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} />
+                        {/* <FaTrashAlt className='text-red-500 cursor-pointer' onClick={() => handleDeactivate(staff.id)} /> */}
+                        <div className="relative inline-block" ref={menuRef}>
+                          {/* Toggle button */}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpenMenuId(openMenuId === staff.id ? null : staff.id);                              
+                            }}
+                          >
+                            <HiOutlineDotsCircleHorizontal className='text-2xl cursor-pointer' />
+                          </button>
+
+                          {/* Popup container */}
+                          {openMenuId === staff.id && (
+                            <div className="absolute right-0 bottom-full w-50 bg-white border border-gray-200 rounded-lg shadow-lg/40 z-10">
+                              <ul className="py-1">
+                                <li>
+                                  <button
+                                    disabled={isTransferring}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      handleTransferOwnership(staff.id);
+                                      setOpenMenuId(null);
+                                      
+                                    }}
+                                    title="Transfer ownership to this staff"
+                                    className="w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center cursor-pointer"
+                                  >
+                                    <BiTransferAlt />Transfer Ownership
+                                  </button>
+                                </li>
+                                <div className="border-t border-gray-300"></div>
+                                <li>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      handleDeactivate(staff.id);
+                                      setOpenMenuId(null);
+                                    }}
+                                    className="text-red-500 w-full text-left px-3 py-2 hover:bg-gray-100 flex flex-row gap-1 items-center cursor-pointer"
+                                  >
+                                    <FaTrashAlt />Deactivate
+                                  </button>
+                                </li>
+                              </ul>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     ))
                   ) : (

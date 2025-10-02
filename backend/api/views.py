@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
 from django.contrib.auth import authenticate
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.cache import cache
 import random
@@ -22,6 +22,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView
 import requests
 from django.db.models import Q
+from rest_framework_simplejwt.token_blacklist.models import OutstandingToken, BlacklistedToken
 
 
 # Import all necessary serializers
@@ -66,6 +67,68 @@ try:
 except Exception as e:
     print(f"Error initializing AWS SES client: {e}")
     ses_client = None
+
+def invalidate_user_tokens(user):
+    tokens = OutstandingToken.objects.filter(user=user)
+    for token in tokens:
+        BlacklistedToken.objects.get_or_create(token=token)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def transfer_organizer_ownership(request):
+    organizer_id = request.data.get('organizer_id')
+    staff_id = request.data.get('staff_id')
+
+    if not organizer_id or not staff_id:
+        return Response({"detail": "organizer_id and staff_id are required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        default_logo_path = "defaults/default-logo.png"
+        organizer = CustomUser.objects.get(id=organizer_id)
+        staff = CustomUser.objects.get(id=staff_id)
+
+        fields = ['email', 'password', 'first_name', 'last_name', 'birthday', 'gender']
+        organizer_data = {f: getattr(organizer, f) for f in fields}
+        staff_data = {f: getattr(staff, f) for f in fields}
+        organizer_logo = organizer.org_logo
+
+        with transaction.atomic():
+            # Step 1: Temporarily assign organizer email to a unique placeholder
+            organizer_temp_email = organizer.email + ".temp"
+            organizer.email = organizer_temp_email
+            organizer.save(update_fields=['email'])
+
+            # Step 2: Assign staff email to organizer's original email
+            staff.email = organizer_data['email']
+            staff.save(update_fields=['email'])
+
+            # Step 3: Assign organizer email to staff's original email
+            organizer.email = staff_data['email']
+
+            # Swap other fields except email
+            other_fields = [f for f in fields if f != 'email']
+            for f in other_fields:
+                setattr(organizer, f, staff_data[f])
+            organizer.org_logo = organizer_logo
+            organizer.save()
+
+            for f in other_fields:
+                setattr(staff, f, organizer_data[f])
+            staff.org_logo = default_logo_path
+            staff.save()
+
+            # Invalidate tokens for both users
+            invalidate_user_tokens(organizer)
+            invalidate_user_tokens(staff)
+
+        return Response({"detail": "Ownership transferred successfully."}, status=status.HTTP_200_OK)
+
+    except CustomUser.DoesNotExist:
+        return Response({"detail": "Invalid organizer or staff ID."}, status=status.HTTP_404_NOT_FOUND)
+
+    except Exception as e:
+        return Response({"detail": f"An error occurred: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class UserRegistrationView(APIView):
@@ -945,6 +1008,7 @@ class CurrentUserView(APIView):
     def get(self, request):
         user = request.user
         return Response({
+            'id': user.id,
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
@@ -1072,7 +1136,7 @@ class StaffSoftDeleteView(APIView):
 
     def delete(self, request, pk=None):
         try:
-            staff = CustomUser.objects.get(pk=pk, role="staff", added_by=request.user)
+            staff = CustomUser.objects.get(pk=pk, role__in=["staff", "co-organizer"], added_by=request.user)
         except CustomUser.DoesNotExist:
             return Response(
                 {"detail": "Staff account not found or you don't have permission to delete it."},

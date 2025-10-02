@@ -59,6 +59,8 @@ const EditEventForm = () => {
     const [isSeatingMapErr, setIsSeatingMapErr] = useState(false);
     const [seatingMapErr, setSeatingMapErr] = useState('');
     const [alert, setAlert] = useState({ show: false, message: '' });
+    const [selectedTier, setSelectedTier] = useState('Free');
+    const [selectedPrice, setSelectedPrice] = useState(0.00);
 
     // --- Add all the helper functions here ---
     const handleEventChange = (e) => {
@@ -99,9 +101,7 @@ const EditEventForm = () => {
       // Poster: validate aspect ratio
       if (name === 'event_poster') {
         const img = new Image();
-        img.onload = () => {
-          const aspectRatio = img.width / img.height;
-          const ratio16by9 = 16 / 9;
+        img.onload = () => {          
 
           if (img.width <= img.height) {
             setIsPosterErr(true);
@@ -440,9 +440,9 @@ const handleUpdate = async (e) => {
                             </span>
                         </div>
                     )}
-                    {step === 1 && <CEStep1 formData={formData} handleEventChange={handleEventChange} isPosterErr={isPosterErr} posterErr={posterErr} />}
+                    {step === 1 && <CEStep1 formData={formData} handleEventChange={handleEventChange} isPosterErr={isPosterErr} posterErr={posterErr} selectedPrice={selectedPrice} setSelectedPrice={setSelectedPrice} selectedTier={selectedTier} setSelectedTier={setSelectedTier} />}
                     {step === 2 && <CEStep2 formData={formData} setFormData={setFormData} handleLocationChange={handleLocationChange} handleEventChange={handleEventChange} handleCheckboxChange={handleCheckboxChange} handleTimeChange={handleTimeChange} />}
-                    {step === 3 && <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} />}
+                    {step === 3 && <CEStep3 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} handleAddTicket={handleAddTicket} seatingMapErr={seatingMapErr} isSeatingMapErr={isSeatingMapErr} handleTicketChange={handleTicketChange} handleRemoveTicket={handleRemoveTicket} selectedTier={selectedTier} />}
                     {step === 4 && <CEStep4 formData={formData} setFormData={setFormData} handleEventChange={handleEventChange} />}
                     <div className="flex justify-between items-center mt-8">
                         <div className="flex justify-end ml-auto space-x-4">
