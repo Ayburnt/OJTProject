@@ -146,8 +146,7 @@ const ManageAccount = () => {
     try {
       setLoading(true);
       const res = await api.get(`/staff-info/`);
-      setUserData(res.data);      
-      console.log('coorg',res.data);
+      setUserData(res.data);            
       updateVerificationStatus(res.data.verification_status);
       setError(null);
     } catch (err) {

@@ -262,8 +262,7 @@ const ManageAccount = () => {
   const fetchStaffs = async () => {
     try {
       const res = await api.get(`staff-list/`);
-      setStaffList(res.data);
-      console.log(res.data);
+      setStaffList(res.data);      
     } catch (err) {
       console.error("Failed to fetch staff accounts:", err);
     }
@@ -313,8 +312,7 @@ const ManageAccount = () => {
     return;
   }
   setIsTransferring(true);
-  try {
-    console.log("Transferring ownership:", { organizer_id: userData.id, staffId });
+  try {    
     const res = await api.post('transfer-ownership/', {
       organizer_id: userData.id,
       staff_id: staffId
