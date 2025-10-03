@@ -176,8 +176,9 @@ function OrganizerEventCard({ onShare, fetchEventDetails, eventStatusColor, even
                   e.stopPropagation();
                   setOpen(!open)
                 }}
+                className='hover:bg-gray-200 cursor-pointer p-2 rounded-lg transition-all duration-300'
               >
-                <BsThreeDotsVertical className='text-2xl cursor-pointer' />
+                <BsThreeDotsVertical className='text-2xl' />
               </button>
 
               {/* Popup container */}
