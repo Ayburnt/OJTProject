@@ -51,52 +51,83 @@ function EventAttendees({ fetchAttendees, currentEvent, attendeeList, filteredAt
     }
   };
 
-  const downloadCsv = () => {
+const downloadCsv = () => {
   if (!filteredAttendees || filteredAttendees.length === 0) {
     alert("No attendees to export.");
     return;
   }
 
-  // Only the rows you're currently displaying
-  const visibleData = filteredAttendees;   // or paginatedAttendees if you only want the current page
+  // 1️⃣ Collect all unique questions from all attendees (use question_label now)
+ const allQuestions = Array.from(
+  new Set(
+    filteredAttendees.flatMap(att =>
+      (att.responses || [])
+        .map(resp => resp.question_details?.question_label) // 👈 fixed
+        .filter(Boolean)
+    )
+  )
+);
 
+  // 2️⃣ Build CSV headers
   const headers = [
     "Reference Code",
+    "Registration Date",
     "First Name",
     "Last Name",
     "Email",
     "Ticket Type",
-    "Check-in Time"
+    "Price at Purchase",
+    "Check-in Time",
+    ...allQuestions
   ];
 
-  const rows = visibleData.map(a => [
-    a.attendee_code || "—",
-    a.firstname || "",
-    a.lastname || "",
-    a.email || "",
-    a.ticket_read?.ticket_name || "",
-    a.attendance?.check_in_time
-      ? new Date(a.attendance.check_in_time).toLocaleString()
-      : ""
-  ]);
+  // 3️⃣ Map attendees into rows
+  const rows = filteredAttendees.map(att => {
+    const base = [
+      att.attendee_code || "",
+      att.registration_date || "",
+      att.firstname || "",
+      att.lastname || "",
+      att.email || "",
+      att.ticket_read?.ticket_name || "",
+      att.price_at_purchase || "",
+      att.attendance?.check_in_time
+        ? new Date(att.attendance.check_in_time).toLocaleString()
+        : ""
+    ];
 
-  // Build CSV
-  let csvContent =
+    // Map answers per question_label
+const answers = allQuestions.map(q => {
+  const resp = (att.responses || []).find(
+    r => r.question_details?.question_label === q // 👈 fixed
+  );
+  return resp ? resp.response_value || "" : "";
+});
+
+    return [...base, ...answers];
+  });
+
+  // 4️⃣ Build CSV content (with BOM for Excel)
+  const csvContent =
+    "\uFEFF" +
     headers.join(",") +
     "\n" +
-    rows.map(r => r.map(value =>
-      `"${String(value).replace(/"/g, '""')}"`
-    ).join(",")).join("\n");
+    rows
+      .map(r =>
+        r
+          .map(value =>
+            `"${String(value).replace(/"/g, '""').replace(/\r?\n/g, " ")}"`
+          )
+          .join(",")
+      )
+      .join("\n");
 
-  // Download
+  // 5️⃣ Trigger download
   const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.setAttribute(
-    "download",
-    `${currentEvent?.event_code || "attendees"}_visible.csv`
-  );
+  link.setAttribute("download", `${currentEvent?.event_code || "attendees"}_full.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

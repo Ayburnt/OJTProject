@@ -90,28 +90,35 @@ const Attendees = () => {
     }
   };
 
-  const downloadCsv = async () => {
-    if (!currentEvent) return;
-    try {
-      const res = await api.get(
-        `/attendees/${currentEvent.event_code}/export-csv/`,
-        { responseType: "blob" }
-      );
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute(
-        "download",
-        `${currentEvent.event_code}_attendees.csv`
-      );
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      console.error("Error downloading CSV:", err);
-      alert("Failed to download CSV.");
-    }
-  };
+const downloadCsv = async () => {
+  if (!currentEvent) {
+    alert("No event selected.");
+    return;
+  }
+
+  try {
+    // ✅ Request backend CSV
+    const res = await api.get(
+      `/attendees/${currentEvent.event_code}/export-csv/`,
+      { responseType: "blob" } // get raw CSV file
+    );
+
+    // ✅ Create file download
+    const url = window.URL.createObjectURL(new Blob([res.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `${currentEvent.event_code}_attendees.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (err) {
+    console.error("Error downloading CSV:", err);
+    alert("Failed to download CSV.");
+  }
+};
+
+
 
   // --- Filters ---
   const filteredEvents = events.filter((event) =>

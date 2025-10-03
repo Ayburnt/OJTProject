@@ -17,7 +17,7 @@ from django.utils.html import strip_tags
 from botocore.exceptions import ClientError
 import boto3
 from django.conf import settings
-
+from events.models import Reg_Form_Question
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -194,22 +194,53 @@ class ExportCSVView(APIView):
         if not attendees.exists():
             return Response({"error": "No attendees found for this event."}, status=400)
 
-        response = HttpResponse(content_type='text/csv')
+        # ✅ Get all registration questions for this event
+        questions = Reg_Form_Question.objects.filter(
+            regForm_template__event__event_code=event_code
+        )
+        question_labels = [q.question_label for q in questions]
+
+        # ✅ Build CSV response with UTF-8 BOM so Excel shows all columns
+        response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
         response['Content-Disposition'] = f'attachment; filename="{event_code}_attendees.csv"'
 
-        writer = csv.writer(response)
-        writer.writerow(['Reference Code', 'Registration Date', 'First Name', 'Last Name', 'Email', 'Ticket Type', 'Price at Purchase'])
+        # ✅ Excel-compatible CSV (comma-delimited, UTF-8 BOM, quotes around text)
+        writer = csv.writer(response, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
 
+        # ✅ Header row (always includes questions)
+        header = [
+            'Reference Code',
+            'Registration Date',
+            'First Name',
+            'Last Name',
+            'Email',
+            'Ticket Type',
+            'Price at Purchase'
+        ] + question_labels
+        writer.writerow(header)
+
+        # ✅ Write rows per attendee
         for a in attendees:
-            writer.writerow([
+            row = [
                 a.attendee_code,
                 a.created_at.strftime("%Y-%m-%d"),
                 a.firstname,
                 a.lastname,
                 a.email,
                 a.ticket_type.ticket_name if a.ticket_type else "",
-                a.price_at_purchase,
-            ])
+                str(a.price_at_purchase),  # convert to string for Excel safety
+            ]
+
+            # Map responses to their question_label
+            responses = {
+                r.question.question_label: r.response_value
+                for r in a.responses.all()
+            }
+
+            for q in question_labels:
+                row.append(responses.get(q, ""))  # leave blank if no response
+
+            writer.writerow(row)
 
         return response
 
