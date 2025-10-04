@@ -173,7 +173,7 @@ function EventDetailPage() {
     const fetchComments = async (eventId) => {
         try {
             const response = await api.get(`/comments/list-create/${eventId}/`);
-            setComments(response.data);
+            setComments(response.data);            
         } catch (error) {
             console.error("Error fetching comments:", error);
         }
@@ -291,6 +291,14 @@ function EventDetailPage() {
     const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
     const qrUrl = eventDetails.event_qr_image; // from backend    
 
+    const totalCommentsCount = comments.reduce((total, comment) => {
+    // Start with 1 for the main comment
+    let count = 1;
+    // Add the number of replies in the 'replies' array
+    count += comment.replies.length;
+    return total + count;
+}, 0);
+
 
     return (
         <>
@@ -340,11 +348,11 @@ function EventDetailPage() {
                         e.stopPropagation();
                         setIsComments(false);
                     }}>
-                        <div className="bg-white flex max-h-150 flex-col rounded-lg shadow-xl w-full max-w-sm md:max-w-lg lg:max-w-xl 2xl:max-w-3xl text-center" onClick={(e) => {
+                        <div className="bg-white flex max-h-150 flex-col rounded-lg shadow-xl w-full max-w-sm md:max-w-lg lg:max-w-xl 2xl:max-w-3xl text-center overflow-hidden" onClick={(e) => {
                             e.stopPropagation();
                         }}>
                             <div className='flex px-4 flex-row justify-between items-center w-full border-b-2 border-gray-200 py-5'>
-                                <h1 className='font-semibold text-xl'>Comments</h1>
+                                <h1 className='font-semibold text-xl'>{totalCommentsCount > 0 ? `${totalCommentsCount} Comments` : `Comments`}</h1>
                                 <button onClick={() => setIsComments(false)} className='text-lg cursor-pointer'><IoCloseOutline /></button>
                             </div>
 
@@ -354,7 +362,7 @@ function EventDetailPage() {
                                         <div key={row.id} className='gap-2 flex flex-row w-full items-start justify-start'>
                                             <img src={row.user.org_logo} className='aspect-square w-8 rounded-full' alt="" />
                                             <div className='flex flex-col items-start justify-start leading-none w-full'>
-                                                <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
+                                                <div className='flex flex-col items-start justify-start leading-none w-full bg-black/15 p-2 rounded-lg'>
                                                     <div className='flex flex-row gap-2'>
                                                         <p className='text-lg leading-none font-semibold'>{row.user.company_name || `${row.user.first_name} ${row.user.last_name}`}</p>
                                                         <p className='text-sm text-grey'>{timeAgo(row.created_at)}</p>
@@ -376,7 +384,7 @@ function EventDetailPage() {
                                                                     <div key={reply.id} className='gap-2 flex flex-row w-full items-start justify-start'>
                                                                         <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
                                                                         <div className='flex flex-col items-start justify-start leading-none w-full'>
-                                                                            <div className='flex flex-col items-start justify-start leading-none w-full bg-black/5 p-2 rounded-lg'>
+                                                                            <div className='flex flex-col items-start justify-start leading-none w-full bg-black/15 p-2 rounded-lg'>
                                                                                 <div className='flex flex-row gap-2'>
                                                                                     <p className='text-lg leading-none font-semibold'>{reply.user.company_name || `${reply.user.first_name} ${reply.user.last_name}`}</p>
                                                                                     <p className='text-sm text-grey'>{timeAgo(reply.created_at)}</p>
@@ -408,12 +416,12 @@ function EventDetailPage() {
                                 ) : (
                                     <div className='w-full flex flex-col py-4 items-center justify-center'>
                                         <BiCommentDetail className='text-7xl text-gray-500' />
-                                        <p className='text-lg font-semibold text-gray-500'>No comments yet</p>
+                                        <p className='text-lg font-semibold text-gray-500'>No comments yet</p>                                    
                                     </div>
                                 )}
                             </div>
 
-                            {isLoggedIn && (
+                            {isLoggedIn ? (
                                 <form onSubmit={handleAddComment} className='py-3 shadow-lg self-end w-full px-3 flex flex-row items-center gap-2 justify-between'>
                                     <img src={orgLogo} className='aspect-square w-8 rounded-full' alt="" />
                                     <input name='commentValue' value={commentValue} onChange={(e) => setCommentValue(e.target.value)} type="text" className='w-full outline-none border-2 rounded-lg border-gray-200 py-2 px-2' placeholder='Write a public comment...' />
@@ -421,6 +429,8 @@ function EventDetailPage() {
                                         <IoSend className={`text-xl ${commentValue && 'text-secondary cursor-pointer'}`} disabled={!commentValue} />
                                     </button>
                                 </form>
+                            ) : (
+                                <p className='text-sm text-gray-700 border-t-2 border-gray-200 py-2 w-full'>Please <button className='cursor-pointer text-blue-700 font-medium' onClick={() => navigate('/login')}>login</button> to comment</p>
                             )}
                         </div>
                     </div>
@@ -468,7 +478,7 @@ function EventDetailPage() {
                                     onClick={() => setIsComments(true)}
                                     className="text-base md:text-lg font-semibold text-gray-700 hover:text-teal-600 rounded-md transition-colors cursor-pointer"
                                 >
-                                    Comments
+                                    Comment
                                 </a>
                             </nav>
                         </div>

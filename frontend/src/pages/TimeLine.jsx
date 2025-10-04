@@ -169,16 +169,16 @@ const EventCard = ({ event }) => {
         className="w-full h-40 object-cover"
       />
 
-      <div className="p-4 sm:p-6 bg-teal-500 text-white">
+      <div className="p-4 sm:p-6 bg-teal-500 text-white w-full">
         <div className="flex items-start justify-between mb-2">
-          <a className="text-xl font-bold cursor-pointer hover:underline" href={`/events/${event.event_code}`}>{event.title}</a>
+          <a className="text-xl font-bold cursor-pointer hover:underline w-full truncate" href={`/events/${event.event_code}`}>{event.title}</a>
           <span className={`px-3 py-1 rounded-full text-xs font-semibold font-outfit text-white ${statusColorClass}`}>
             {category ? category.charAt(0).toUpperCase() + category.slice(1) : "Unknown"}
           </span>
         </div>
 
         <div className="flex flex-col items-start sm:space-x-4 mb-2">
-          <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0">
+          <div className="flex items-center font-outfit space-x-2 text-sm mb-1 sm:mb-0 w-full [&_p]:truncate">
             <FiCalendar className="w-4 h-4" />
             <p>
               {formatEventDateTime(event.start_date, event.start_time, event.end_date, event.end_time)}
@@ -190,10 +190,10 @@ const EventCard = ({ event }) => {
           </div>
         </div>
 
-        <div className="flex items-center font-outfit space-x-2 text-sm">
+        {/* <div className="flex items-center font-outfit space-x-2 text-sm">
           <FiUsers className="w-4 h-4" />
           <p>{event.attendees} attendees</p>
-        </div>
+        </div> */}
 
         <a href={googleCalendarLink(event)} target="_blank" rel="noopener noreferrer">
           <button className="border mt-2 font-outfit border-white p-2 text-sm z-200 rounded-lg cursor-pointer hover:bg-secondary/70">

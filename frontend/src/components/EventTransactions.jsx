@@ -71,19 +71,12 @@ function EventTransactions({ currentEvent, transactions, filteredTransactions, l
                 <div className="w-full flex flex-col md:flex-row md:items-center md:justify-between mb-6">
                     <h1 className="text-2xl font-semibold text-gray-800">
                         {currentEvent.title || "Event Transactions"}
-                    </h1>
-
-                    <button
-                        onClick={downloadCsv}
-                        className="mt-2 md:mt-0 flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-all"
-                    >
-                        Download CSV <BsDownload />
-                    </button>
+                    </h1>                    
                 </div>
 
                 {/* Search input */}
-                <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 mb-8 w-full">
-                    <div className="relative w-full lg:max-w-sm">
+                <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8 w-full">
+                    <div className="relative w-full lg:max-w-md">
                         <CiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary" size={18} />
                         <input
                             type="text"
@@ -93,6 +86,13 @@ function EventTransactions({ currentEvent, transactions, filteredTransactions, l
                             className="w-full pl-10 border-b border-gray-400 focus:border-teal-500 py-2 text-gray-700 placeholder-gray-400 focus:outline-none"
                         />
                     </div>
+
+                    <button
+                        onClick={downloadCsv}
+                        className="mt-2 md:mt-0 whitespace-nowrap flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 text-center justify-center rounded-md text-sm font-medium transition-all"
+                    >
+                        Download CSV <BsDownload />
+                    </button>
                 </div>
             </>
 
